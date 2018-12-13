@@ -54,7 +54,7 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'PluginLib'
 
-    publishedGroupId = 'com.example.sample'
+    publishedGroupId = 'com.prefect47'
     libraryName = 'PluginLib'
     artifact = 'pluginlib' //This artifact name should be the same with library module name
 
@@ -63,7 +63,7 @@ ext {
     siteUrl = 'https://github.com/prefect4742/PluginLib'
     gitUrl = 'https://github.com/prefect4742/PluginLib.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '0.1.1'
 
     developerId = 'prefect4742'
     developerName = 'Niklas Brunlid'

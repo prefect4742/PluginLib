@@ -7,7 +7,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
-        versionName "0.0.1"
+        versionName "0.1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -63,7 +63,7 @@ ext {
     siteUrl = 'https://github.com/prefect4742/PluginLib'
     gitUrl = 'https://github.com/prefect4742/PluginLib.git'
 
-    libraryVersion = '0.1.1'
+    libraryVersion = android.defaultConfig.versionName
 
     developerId = 'prefect4742'
     developerName = 'Niklas Brunlid'

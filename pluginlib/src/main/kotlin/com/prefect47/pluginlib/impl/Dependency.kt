@@ -18,7 +18,6 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.PluginTracker
-import com.prefect47.pluginlib.plugin.Preconditions
 import kotlin.reflect.KClass
 
 /**
@@ -69,7 +68,9 @@ object Dependency {
 
     @Synchronized
     fun start(context: Context) {
-        Preconditions.checkState(providers.isEmpty(), "Can only be called once")
+        if (providers.isNotEmpty()) {
+            throw IllegalStateException("Can only be called once")
+        }
 
         providers[PluginPrefs::class] =
                 DependencyProvider {
@@ -117,7 +118,10 @@ object Dependency {
     }
 
     private fun <T: Any> createDependency(cls: Any): T {
-        Preconditions.checkArgument(cls is DependencyKey<*> || cls is KClass<*>)
+
+        if (cls !is DependencyKey<*> && cls !is KClass<*>) {
+            throw IllegalArgumentException()
+        }
 
         val provider = providers[cls] ?: throw IllegalArgumentException(
             "Unsupported dependency " + cls

@@ -27,13 +27,13 @@ import android.content.Context
  * PluginLifecycle:
  * <pre class="prettyprint">
  *
- * plugin.onCreate(Context sysuiContext, Context pluginContext);
+ * plugin.onCreate(Context appContext, Context pluginContext);
  * --- This is always called before any other calls
  *
  * pluginListener.onPluginConnected(Plugin p);
  * --- This lets the plugin hook know that a plugin is now connected.
  *
- * ** Any other calls back and forth between sysui/plugin **
+ * ** Any other calls back and forth between app/plugin **
  *
  * pluginListener.onPluginDisconnected(Plugin p);
  * --- Lets the plugin hook know that it should stop interacting with
@@ -117,7 +117,7 @@ interface Plugin {
         }
     */
 
-    fun onCreate(sysuiContext: Context, pluginContext:Context) {}
+    fun onCreate(appContext: Context, pluginContext:Context) {}
 
     fun onDestroy() {}
 }

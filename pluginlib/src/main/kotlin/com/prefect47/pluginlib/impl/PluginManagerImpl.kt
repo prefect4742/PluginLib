@@ -278,7 +278,7 @@ class PluginManagerImpl(val context: Context,
             var disabledAny: Boolean = checkStack(throwable)
             if (!disabledAny) {
                 // We couldn't find any plugins involved in this crash, just to be safe
-                // disable all the plugins, so we can be sure that SysUI is running as
+                // disable all the plugins, so we can be sure that the app is running as
                 // best as possible.
                 pluginMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
             }

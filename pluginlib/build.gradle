@@ -7,7 +7,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
-        versionName "0.1.2"
+        versionName "0.1.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -58,7 +58,7 @@ ext {
     libraryName = 'PluginLib'
     artifact = 'pluginlib' //This artifact name should be the same with library module name
 
-    libraryDescription = 'Add plugin functionality to your Android app'
+    //libraryDescription = 'Add plugin functionality to your Android app'
 
     siteUrl = 'https://github.com/prefect4742/PluginLib'
     gitUrl = 'https://github.com/prefect4742/PluginLib.git'
@@ -75,5 +75,6 @@ ext {
 }
 
 //These two remote files contain Bintray configuration as described above.
-apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/install.gradle'
-apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/bintray.gradle'
+apply from: rootProject.file('release-bintray.gradle')
+//apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/install.gradle'
+//apply from: 'https://raw.githubusercontent.com/quangctkm9207/template-files/master/android/gradle/bintray.gradle'

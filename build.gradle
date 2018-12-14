@@ -19,6 +19,8 @@ buildscript {
 
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        classpath 'org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.16'
+        classpath 'org.jetbrains.dokka:dokka-gradle-plugin:0.9.16'
     }
 }
 

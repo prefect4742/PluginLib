@@ -15,7 +15,6 @@
 
 package com.prefect47.pluginlib.impl
 
-import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -193,7 +192,7 @@ class PluginManagerImpl(val context: Context,
                         .setSmallIcon(icon)
                         .setWhen(0)
                         .setShowWhen(false)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setColor(context.getColor(color))
                         .setContentTitle("Plugin \"$label\" has updated")
                         .setContentText("Restart ExtScanner for changes to take effect.")

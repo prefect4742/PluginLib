@@ -44,7 +44,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
     val version: VersionInfo, val manager: PluginManager
 ): PluginInstanceManager<T> {
 
-    companion object: PluginInstanceManager.Factory {
+    companion object factory: PluginInstanceManager.Factory {
         private const val DEBUG = false
         private const val TAG = "PluginInstanceManager"
 
@@ -198,13 +198,14 @@ class PluginInstanceManagerImpl<T: Plugin>(
         fun handlePluginConnected(info: PluginInfo<T>) {
             launch(Dispatchers.Main) {
                 Dependency[PluginPrefs::class].setHasPlugins()
+                val descr = Dependency[PluginMetadataFactory::class].create(info.pluginContext, info.cls)
                 manager.handleWtfs()
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
                     // will get the onCreate as part of the fragment lifecycle.
                     info.plugin.onCreate(context, info.pluginContext)
                 //}
-                listener!!.onPluginConnected(info.plugin, info.pluginContext)
+                listener!!.onPluginConnected(info.plugin, info.pluginContext, descr)
             }
         }
 
@@ -298,9 +299,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     context.packageName)
             val color = Resources.getSystem().getIdentifier(
                     "system_notification_accent_color", "color", "android")
-            val nb: Notification.Builder = Notification.Builder(context,
-                PluginManager.NOTIFICATION_CHANNEL_ID
-            )
+            val nb: Notification.Builder = Notification.Builder(context, PluginManager.NOTIFICATION_CHANNEL_ID)
                             .setStyle(Notification.BigTextStyle())
                             .setSmallIcon(icon)
                             .setWhen(0)

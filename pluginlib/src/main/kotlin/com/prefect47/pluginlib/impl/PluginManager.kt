@@ -27,7 +27,7 @@ interface PluginManager {
 
     interface Factory {
         fun create(
-            context: Context, instanceFactory: PluginInstanceManager.Factory,
+            context: Context,
             defaultHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
         ): PluginManager
     }

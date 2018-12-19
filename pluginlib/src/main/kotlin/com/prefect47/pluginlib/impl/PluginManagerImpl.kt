@@ -44,16 +44,15 @@ import kotlin.reflect.KClass
  * @see Plugin
  */
 class PluginManagerImpl(val context: Context,
-                        private val factory: PluginInstanceManager.Factory = PluginInstanceManagerImpl,
                         defaultHandler: UncaughtExceptionHandler
         ) : BroadcastReceiver(), PluginManager {
 
     companion object: PluginManager.Factory {
         override fun create(
-            context: Context, instanceFactory: PluginInstanceManager.Factory,
+            context: Context,
             defaultHandler: Thread.UncaughtExceptionHandler
         ): PluginManager {
-            return PluginManagerImpl(context, instanceFactory, defaultHandler)
+            return PluginManagerImpl(context, /*instanceFactory,*/ defaultHandler)
         }
     }
 
@@ -77,6 +76,8 @@ class PluginManagerImpl(val context: Context,
 
     private val notificationId = PluginManager.nextNotificationId
 
+    private val factory: PluginInstanceManager.Factory by lazy { Dependency[PluginInstanceManager.Factory::class] }
+
     init {
 
         val uncaughtExceptionHandler = PluginExceptionHandler(defaultHandler)
@@ -99,7 +100,7 @@ class PluginManagerImpl(val context: Context,
         val r = context.resources
         val channel = NotificationChannel(PluginManager.NOTIFICATION_CHANNEL_ID,
             r.getString(R.string.plugin_channel_name), NotificationManager.IMPORTANCE_HIGH )
-        channel.description = r.getString(R.string.plugin_channel_description)
+        channel.metadata = r.getString(R.string.plugin_channel_description)
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         */
     }

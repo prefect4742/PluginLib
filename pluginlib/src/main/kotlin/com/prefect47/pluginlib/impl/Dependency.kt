@@ -79,8 +79,7 @@ object Dependency {
         providers[PluginManager::class] =
                 DependencyProvider {
                     PluginManagerImpl.create(
-                        context,
-                        PluginInstanceManagerImpl
+                        context
                     )
                 }
 
@@ -97,6 +96,16 @@ object Dependency {
                         )
                     )
                     PluginDependencyProvider
+                }
+
+        providers[PluginInstanceManager.Factory::class] =
+                DependencyProvider {
+                    PluginInstanceManagerImpl.factory
+                }
+
+        providers[PluginMetadataFactory::class] =
+                DependencyProvider {
+                    PluginMetadataImpl.factory
                 }
 
         // TODO: Allow app that uses library to add its own dependencies

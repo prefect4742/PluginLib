@@ -16,7 +16,6 @@
 package com.prefect47.pluginlib.plugin
 
 import com.prefect47.pluginlib.impl.Dependency
-import com.prefect47.pluginlib.impl.PluginDependencyProvider
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
@@ -27,17 +26,20 @@ import kotlin.reflect.KClass
 
 @ProvidesInterface(version = PluginTracker.VERSION)
 abstract class PluginTracker {
+    data class Entry<T>(val plugin: T, val metadata: PluginMetadata)
     companion object {
         const val VERSION = 1
 
-        inline fun <reified T : Plugin> create(p: Plugin): List<T> {
+        inline fun <reified T : Plugin> create(p: Plugin): List<Entry<T>> {
             return PluginDependency[p, PluginTracker::class].create(T::class)
         }
 
-        inline fun <reified T : Plugin> create(cls: KClass<T>): List<T> {
+        inline fun <reified T : Plugin> create(cls: KClass<T>): List<Entry<T>> {
             return Dependency[PluginTracker::class].create(cls)
         }
     }
 
-    abstract fun <T: Plugin> create(cls: KClass<T>): List<T>
+    abstract fun <T: Plugin> create(cls: KClass<T>): List<Entry<T>>
 }
+
+typealias PluginTrackerList<T> = List<PluginTracker.Entry<T>>

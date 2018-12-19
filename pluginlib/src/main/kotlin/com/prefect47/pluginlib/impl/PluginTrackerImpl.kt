@@ -15,19 +15,27 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.plugin.PluginTracker
 import kotlin.reflect.KClass
 
 object PluginTrackerImpl : PluginTracker() {
 
-    class PluginTrackerImpl<T: Plugin>: PluginListener<T>, ArrayList<T>() {
-        override fun onPluginConnected(plugin: T, pluginContext: Context) {
-            add(plugin)
+    class PluginTrackerImpl<T: Plugin>: PluginListener<T>, ArrayList<Entry<T>>() {
+        override fun onPluginConnected(plugin: T, pluginContext: Context, metadata: PluginMetadata) {
+            add(Entry(plugin, metadata))
         }
 
         override fun onPluginDisconnected(plugin: T) {
-            remove(plugin)
+            val iter = listIterator()
+            while (iter.hasNext()) {
+                val entry = iter.next()
+                if (entry.plugin.equals(plugin)) {
+                    iter.remove();
+                    return;
+                }
+            }
         }
     }
 
@@ -35,7 +43,7 @@ object PluginTrackerImpl : PluginTracker() {
         Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTracker::class)
     }
 
-    override fun <T : Plugin> create(cls: KClass<T>): List<T> {
+    override fun <T : Plugin> create(cls: KClass<T>): List<Entry<T>> {
         val tracker = PluginTrackerImpl<T>()
 
         // Reload the class with our own classloader

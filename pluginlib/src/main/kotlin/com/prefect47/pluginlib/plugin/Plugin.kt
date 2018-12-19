@@ -17,6 +17,7 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
+import com.prefect47.pluginlib.impl.VersionInfo
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces

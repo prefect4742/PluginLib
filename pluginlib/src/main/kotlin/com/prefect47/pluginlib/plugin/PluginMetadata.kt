@@ -12,13 +12,12 @@
  * permissions and limitations under the License.
  */
 
-
 package com.prefect47.pluginlib.plugin
 
-import android.graphics.drawable.Icon
+import android.graphics.drawable.Drawable
 
 interface PluginMetadata {
-    fun getTitle(): String?
-    fun getDescription(): String?
-    fun getIcon(): Icon?
+    fun getTitle(): String
+    fun getDescription(): String
+    fun getIcon(): Drawable
 }

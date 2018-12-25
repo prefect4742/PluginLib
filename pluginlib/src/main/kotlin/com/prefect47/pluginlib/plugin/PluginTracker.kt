@@ -43,3 +43,7 @@ abstract class PluginTracker {
 }
 
 typealias PluginTrackerList<T> = List<PluginTracker.Entry<T>>
+
+fun <T: Plugin> PluginTrackerList<T>.getMetaData(): List<PluginMetadata> {
+    return map { it.metadata }
+}

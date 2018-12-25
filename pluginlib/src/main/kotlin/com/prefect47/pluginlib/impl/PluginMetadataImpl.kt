@@ -18,22 +18,20 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.Icon
 import android.os.Bundle
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
-class PluginMetadataImpl(val pluginContext: Context, val cls: String) : PluginMetadata {
-    private val default_icon: Drawable by lazy { ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)!! }
+class PluginMetadataImpl(val context: Context, val pluginContext: Context, val cls: String) : PluginMetadata {
+    private val default_icon: Drawable by lazy { ContextCompat.getDrawable(context, R.drawable.ic_no_icon)!! }
 
     companion object factory: PluginMetadataFactory {
 
         override fun create(
-            pluginContext: Context, cls: String
+            context: Context, pluginContext: Context, cls: String
         ): PluginMetadata {
-            return PluginMetadataImpl(pluginContext, cls)
+            return PluginMetadataImpl(context, pluginContext, cls)
         }
     }
 

@@ -198,7 +198,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         fun handlePluginConnected(info: PluginInfo<T>) {
             launch(Dispatchers.Main) {
                 Dependency[PluginPrefs::class].setHasPlugins()
-                val descr = Dependency[PluginMetadataFactory::class].create(info.pluginContext, info.cls)
+                val descr = Dependency[PluginMetadataFactory::class].create(context, info.pluginContext, info.cls)
                 manager.handleWtfs()
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments

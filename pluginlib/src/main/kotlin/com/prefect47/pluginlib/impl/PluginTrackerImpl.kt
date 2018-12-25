@@ -49,7 +49,7 @@ object PluginTrackerImpl : PluginTracker() {
         // Reload the class with our own classloader
         val ourCls = Class.forName(cls.qualifiedName).kotlin as KClass<T>
 
-        Dependency[PluginManager::class].addPluginListener(tracker, ourCls)
+        Dependency[PluginManager::class].addPluginListener(tracker, ourCls, allowMultiple = true)
         return tracker
     }
 }

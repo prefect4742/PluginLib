@@ -19,6 +19,6 @@ import com.prefect47.pluginlib.plugin.PluginMetadata
 
 interface PluginMetadataFactory {
     fun create(
-        pluginContext: Context, cls: String
+        context: Context, pluginContext: Context, cls: String
     ): PluginMetadata
 }

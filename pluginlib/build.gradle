@@ -49,4 +49,6 @@ repositories {
     mavenCentral()
 }
 
-apply from: rootProject.file('release-bintray.gradle')
+if (rootProject.file('release-bintray.gradle').exists()) {
+    apply from: rootProject.file('release-bintray.gradle')
+}

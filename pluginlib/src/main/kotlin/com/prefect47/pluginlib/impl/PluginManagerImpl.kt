@@ -267,13 +267,12 @@ class PluginManagerImpl(val context: Context,
 
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             var theThrowable: Throwable = throwable
-            // TODO: Add this as another setting somewhere...
-            /*
-            if (SystemProperties.getBoolean("plugin.debugging", false)) {
+
+            if (PluginManager.DEBUG_PLUGINS) {
                 handler.uncaughtException(thread, throwable)
                 return
             }
-            */
+
             // Search for and disable plugins that may have been involved in this crash.
             var disabledAny: Boolean = checkStack(throwable)
             if (!disabledAny) {

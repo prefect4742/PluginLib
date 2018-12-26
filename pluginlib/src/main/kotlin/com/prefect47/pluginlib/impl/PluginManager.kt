@@ -35,6 +35,7 @@ interface PluginManager {
     companion object {
         lateinit var PLUGIN_PERMISSION: String
         lateinit var CLIENT_PLUGIN_CLASS_PREFIX: String
+        var DEBUG_PLUGINS: Boolean = true
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
         //const val NOTIFICATION_CHANNEL_TAG = "EXS"
@@ -97,5 +98,9 @@ interface PluginManager {
 
     fun setClientPluginClassPrefix(clientPluginClassPrefix: String) {
         CLIENT_PLUGIN_CLASS_PREFIX = clientPluginClassPrefix
+    }
+
+    fun setDebugPlugins(debugPlugins: Boolean) {
+        DEBUG_PLUGINS = debugPlugins
     }
 }

@@ -19,9 +19,15 @@ import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginManager
 
 object PluginLibrary {
-    fun init(context: Context, permissionName: String, clientPluginClassPrefix: String) {
+    /**
+     * Initialize the plugin library for an app plugin permission [permissionName] and whose plugins packages start with
+     * [clientPluginClassPrefix]. While developing the app, [debugPlugins] should be true so that crashes do not cause
+     * plugin components to be disabled.
+     */
+    fun init(context: Context, permissionName: String, clientPluginClassPrefix: String, debugPlugins: Boolean) {
         Dependency.init(context)
         Dependency[PluginManager::class].setPermissionName(permissionName)
         Dependency[PluginManager::class].setClientPluginClassPrefix(clientPluginClassPrefix)
+        Dependency[PluginManager::class].setDebugPlugins(debugPlugins)
     }
 }

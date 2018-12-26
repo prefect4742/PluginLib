@@ -1,6 +1,5 @@
 <resources>
     <declare-styleable name="Plugin">
         <attr name="className" format="string" />
-        <attr name="action" format="string" />
     </declare-styleable>
 </resources>

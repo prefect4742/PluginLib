@@ -45,7 +45,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
 ): PluginInstanceManager<T> {
 
     companion object factory: PluginInstanceManager.Factory {
-        private const val DEBUG = false
+        private val DEBUG = PluginManager.DEBUG_PLUGINS
         private const val TAG = "PluginInstanceManager"
 
         override fun <T: Plugin> create(context: Context, action: String, listener: PluginListener<T>?,
@@ -155,7 +155,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
     inner class PluginHandler: CoroutineScope {
         val plugins = ArrayList<PluginInfo<T>>()
 
-        override val coroutineContext = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
+        override val coroutineContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
 
         fun queryAll() {
             launch {

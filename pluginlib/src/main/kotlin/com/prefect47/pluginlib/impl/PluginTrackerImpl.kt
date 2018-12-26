@@ -14,6 +14,7 @@
 package com.prefect47.pluginlib.impl
 
 import android.content.Context
+import android.util.Log
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginListener
@@ -24,10 +25,12 @@ object PluginTrackerImpl : PluginTracker() {
 
     class PluginTrackerImpl<T: Plugin>: PluginListener<T>, ArrayList<Entry<T>>() {
         override fun onPluginConnected(plugin: T, pluginContext: Context, metadata: PluginMetadata) {
+            Dependency[PluginManager::class].debug("Plugin $plugin connected")
             add(Entry(plugin, metadata))
         }
 
         override fun onPluginDisconnected(plugin: T) {
+            Dependency[PluginManager::class].debug("Plugin $plugin disconnected")
             val iter = listIterator()
             while (iter.hasNext()) {
                 val entry = iter.next()
@@ -47,9 +50,9 @@ object PluginTrackerImpl : PluginTracker() {
         val tracker = PluginTrackerImpl<T>()
 
         // Reload the class with our own classloader
-        val ourCls = Class.forName(cls.qualifiedName).kotlin as KClass<T>
+        //val ourCls = Class.forName(cls.qualifiedName).kotlin as KClass<T>
 
-        Dependency[PluginManager::class].addPluginListener(tracker, ourCls, allowMultiple = true)
+        Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
         return tracker
     }
 }

@@ -17,6 +17,7 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.text.TextUtils
+import android.util.Log
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
@@ -36,6 +37,7 @@ interface PluginManager {
         lateinit var PLUGIN_PERMISSION: String
         lateinit var CLIENT_PLUGIN_CLASS_PREFIX: String
         var DEBUG_PLUGINS: Boolean = true
+        var APP_TAG: String = "PluginLib"
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
         //const val NOTIFICATION_CHANNEL_TAG = "EXS"
@@ -100,7 +102,12 @@ interface PluginManager {
         CLIENT_PLUGIN_CLASS_PREFIX = clientPluginClassPrefix
     }
 
-    fun setDebugPlugins(debugPlugins: Boolean) {
+    fun setDebugPlugins(debugPlugins: Boolean, tag: String) {
         DEBUG_PLUGINS = debugPlugins
+        APP_TAG = tag
+    }
+
+    fun debug(msg: String) {
+        if (DEBUG_PLUGINS) Log.d(APP_TAG, msg)
     }
 }

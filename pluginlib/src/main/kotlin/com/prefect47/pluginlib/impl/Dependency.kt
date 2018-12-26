@@ -127,14 +127,12 @@ object Dependency {
     }
 
     private fun <T: Any> createDependency(cls: Any): T {
-
         if (cls !is DependencyKey<*> && cls !is KClass<*>) {
             throw IllegalArgumentException()
         }
 
         val provider = providers[cls] ?: throw IllegalArgumentException(
-            "Unsupported dependency " + cls
-                    + ". " + providers.size + " providers known."
+            "Unsupported dependency ${cls}. ${providers.size} providers known."
         )
         @Suppress("UNCHECKED_CAST")
         return provider.createDependency.invoke() as T

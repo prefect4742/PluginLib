@@ -17,17 +17,41 @@ package com.prefect47.pluginlib
 import android.content.Context
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginManager
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginMetadata
+import com.prefect47.pluginlib.plugin.PluginTracker
+import com.prefect47.pluginlib.plugin.PluginTrackerList
+import kotlin.reflect.KClass
 
 object PluginLibrary {
+    val trackers = HashMap<KClass<*>, PluginTrackerList<*>>()
+
     /**
      * Initialize the plugin library for an app plugin permission [permissionName] and whose plugins packages start with
      * [clientPluginClassPrefix]. While developing the app, [debugPlugins] should be true so that crashes do not cause
      * plugin components to be disabled.
      */
-    fun init(context: Context, permissionName: String, clientPluginClassPrefix: String, debugPlugins: Boolean) {
+    fun init(context: Context, permissionName: String, clientPluginClassPrefix: String,
+             debugPlugins: Boolean, debugTag: String) {
         Dependency.init(context)
         Dependency[PluginManager::class].setPermissionName(permissionName)
         Dependency[PluginManager::class].setClientPluginClassPrefix(clientPluginClassPrefix)
-        Dependency[PluginManager::class].setDebugPlugins(debugPlugins)
+        Dependency[PluginManager::class].setDebugPlugins(debugPlugins, debugTag)
+        Dependency[PluginManager::class].debug("PluginLib initialized")
+    }
+
+    inline fun <reified T : Plugin> track(cls: KClass<T>) {
+        trackers[cls] = Dependency[PluginTracker::class].create(cls)
+        Dependency[PluginManager::class].debug("Tracking $cls")
+    }
+
+    inline fun <reified T : Plugin> getPlugins(cls: KClass<T>): List<T>? {
+        val tracker: PluginTrackerList<T>? = trackers[cls] as PluginTrackerList<T>
+        return tracker?.map { it.plugin }
+    }
+
+    fun getMetaData(className: String): List<PluginMetadata>? {
+        val pluginClass = Class.forName(className).kotlin
+        return trackers[pluginClass]?.map { it.metadata }
     }
 }

@@ -23,21 +23,21 @@ import androidx.core.content.ContextCompat
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
-class PluginMetadataImpl(val context: Context, val pluginContext: Context, val cls: String) : PluginMetadata {
-    private val default_icon: Drawable by lazy { ContextCompat.getDrawable(context, R.drawable.ic_no_icon)!! }
+class PluginMetadataImpl(val context: Context, override val pluginContext: Context, override val pkg: String,
+                         override val className: String, val classLoader: ClassLoader) : PluginMetadata {
+    private val defaultIcon: Drawable by lazy { ContextCompat.getDrawable(context, R.drawable.ic_no_icon)!! }
 
-    companion object factory: PluginMetadataFactory {
-
+    companion object Factory: PluginMetadataFactory {
         override fun create(
-            context: Context, pluginContext: Context, cls: String
+            context: Context, pluginContext: Context, pkg: String, cls: String, classLoader: ClassLoader
         ): PluginMetadata {
-            return PluginMetadataImpl(context, pluginContext, cls)
+            return PluginMetadataImpl(context, pluginContext, pkg, cls, classLoader)
         }
     }
 
     private val data: Bundle by lazy {
-        val myService = ComponentName(pluginContext, cls);
-        pluginContext.getPackageManager().getServiceInfo(myService, PackageManager.GET_META_DATA).metaData
+        val myService = ComponentName(pluginContext, className)
+        pluginContext.packageManager.getServiceInfo(myService, PackageManager.GET_META_DATA).metaData
     }
 
     override fun getTitle(): String {
@@ -47,13 +47,19 @@ class PluginMetadataImpl(val context: Context, val pluginContext: Context, val c
     }
 
     override fun getDescription(): String {
-        data.getInt("pluginDescriptionRes").let { if (it !=0) return pluginContext.resources.getString(it) }
+        data.getInt("pluginDescriptionRes").let { if (it != 0) return pluginContext.resources.getString(it) }
         data.getString("pluginDescription").let {return it}
         return "NO_DESCRIPTION"
     }
 
     override fun getIcon(): Drawable {
-        data.getInt("pluginIconRes").let { if (it !=0) ContextCompat.getDrawable(pluginContext, it)?.let { return it } }
-        return default_icon
+        data.getInt("pluginIconRes").let {
+            if (it != 0 ) ContextCompat.getDrawable(pluginContext, it)?.let { drawable -> return drawable }
+        }
+        return defaultIcon
+    }
+
+    override fun getSettingsResId(): Int {
+        return data.getInt("pluginSettingsRes")
     }
 }

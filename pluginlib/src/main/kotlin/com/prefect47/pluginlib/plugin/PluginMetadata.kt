@@ -14,10 +14,18 @@
 
 package com.prefect47.pluginlib.plugin
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 
 interface PluginMetadata {
+    val pkg: String
+    val className: String
+    val pluginContext: Context
+
     fun getTitle(): String
     fun getDescription(): String
     fun getIcon(): Drawable
+    fun getSettingsResId(): Int
+    fun hasSettings(): Boolean = getSettingsResId() != 0
 }
+

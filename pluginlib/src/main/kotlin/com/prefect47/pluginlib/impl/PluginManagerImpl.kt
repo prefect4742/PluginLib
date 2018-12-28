@@ -263,7 +263,7 @@ class PluginManagerImpl(val context: Context,
         }
     }
 
-    inner class PluginExceptionHandler(val handler: UncaughtExceptionHandler): UncaughtExceptionHandler {
+    inner class PluginExceptionHandler(private val handler: UncaughtExceptionHandler): UncaughtExceptionHandler {
 
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             var theThrowable: Throwable = throwable

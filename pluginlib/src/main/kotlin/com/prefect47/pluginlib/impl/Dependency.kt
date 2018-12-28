@@ -100,12 +100,12 @@ object Dependency {
 
         providers[PluginInstanceManager.Factory::class] =
                 DependencyProvider {
-                    PluginInstanceManagerImpl.factory
+                    PluginInstanceManagerImpl.Factory
                 }
 
         providers[PluginMetadataFactory::class] =
                 DependencyProvider {
-                    PluginMetadataImpl.factory
+                    PluginMetadataImpl.Factory
                 }
 
         // TODO: Allow app that uses library to add its own dependencies
@@ -132,7 +132,7 @@ object Dependency {
         }
 
         val provider = providers[cls] ?: throw IllegalArgumentException(
-            "Unsupported dependency ${cls}. ${providers.size} providers known."
+            "Unsupported dependency $cls. ${providers.size} providers known."
         )
         @Suppress("UNCHECKED_CAST")
         return provider.createDependency.invoke() as T

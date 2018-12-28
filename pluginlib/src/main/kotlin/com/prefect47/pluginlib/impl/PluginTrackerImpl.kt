@@ -14,10 +14,9 @@
 package com.prefect47.pluginlib.impl
 
 import android.content.Context
-import android.util.Log
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginListener
+import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginTracker
 import kotlin.reflect.KClass
 
@@ -34,9 +33,9 @@ object PluginTrackerImpl : PluginTracker() {
             val iter = listIterator()
             while (iter.hasNext()) {
                 val entry = iter.next()
-                if (entry.plugin.equals(plugin)) {
-                    iter.remove();
-                    return;
+                if (entry.plugin == plugin) {
+                    iter.remove()
+                    return
                 }
             }
         }

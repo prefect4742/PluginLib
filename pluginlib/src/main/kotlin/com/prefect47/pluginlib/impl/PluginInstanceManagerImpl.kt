@@ -44,7 +44,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
     val version: VersionInfo, val manager: PluginManager
 ): PluginInstanceManager<T> {
 
-    companion object factory: PluginInstanceManager.Factory {
+    companion object Factory: PluginInstanceManager.Factory {
         private val DEBUG = PluginManager.DEBUG_PLUGINS
         private const val TAG = "PluginInstanceManager"
 
@@ -131,7 +131,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin " + info.pkg + "/" + info.cls)
+        Log.w(TAG, "Disabling plugin ${info.pkg}/${info.cls}")
         pm.setComponentEnabledSetting(
                 ComponentName(info.pkg, info.cls),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -195,10 +195,10 @@ class PluginInstanceManagerImpl<T: Plugin>(
             }
         }
 
-        fun handlePluginConnected(info: PluginInfo<T>) {
+        private fun handlePluginConnected(info: PluginInfo<T>) {
+            Dependency[PluginPrefs::class].setHasPlugins()
+            val descr = Dependency[PluginMetadataFactory::class].create(context, info.pluginContext, info.pkg, info.cls, info.classLoader)
             launch(Dispatchers.Main) {
-                Dependency[PluginPrefs::class].setHasPlugins()
-                val descr = Dependency[PluginMetadataFactory::class].create(context, info.pluginContext, info.cls)
                 manager.handleWtfs()
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
@@ -229,7 +229,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 intent.setPackage(pkgName)
             }
             val result: MutableList<ResolveInfo> = pm.queryIntentServices(intent, 0)
-            if (DEBUG) Log.d(TAG, "Found " + result.size + "com/prefect47/pluginlib/plugin")
+            if (DEBUG) Log.d(TAG, "Found ${result.size} plugins for $action")
             if (result.size > 1 && !allowMultiple) {
                 // TODO: Show warning.
                 Log.w(TAG, "Multiple plugins found for $action")
@@ -278,7 +278,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    return PluginInfo(pkg, cls, plugin, pluginContext, pluginVersion)
+                    return PluginInfo(pkg, cls, plugin, pluginContext, pluginVersion, classLoader)
                 } catch (e: InvalidVersionException) {
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.

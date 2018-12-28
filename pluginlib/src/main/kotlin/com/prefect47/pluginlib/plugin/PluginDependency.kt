@@ -15,8 +15,6 @@
 
 package com.prefect47.pluginlib.plugin
 
-import com.prefect47.pluginlib.impl.Dependency
-import com.prefect47.pluginlib.impl.PluginDependencyProvider
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 

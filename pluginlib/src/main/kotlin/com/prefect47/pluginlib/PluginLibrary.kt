@@ -33,13 +33,19 @@ object PluginLibrary {
      * [clientPluginClassPrefix]. While developing the app, [debugPlugins] should be true so that crashes do not cause
      * plugin components to be disabled.
      */
-    fun init(context: Context, permissionName: String, clientPluginClassPrefix: String,
-             debugPlugins: Boolean, debugTag: String) {
+    fun init(context: Context, permissionName: String, debugPlugins: Boolean, debugTag: String) {
         Dependency.init(context)
         Dependency[PluginManager::class].setPermissionName(permissionName)
-        Dependency[PluginManager::class].setClientPluginClassPrefix(clientPluginClassPrefix)
         Dependency[PluginManager::class].setDebugPlugins(debugPlugins, debugTag)
         Dependency[PluginManager::class].debug("PluginLib initialized")
+    }
+
+    /**
+     * Add a [filter] to the plugin classloader that lets plugins use libraries or code where class names might
+     * conflict with those of the app.
+     */
+    fun addClassFilter(filter: (String) -> Boolean) {
+        Dependency[PluginManager::class].addClassFilter(filter)
     }
 
     inline fun <reified T : Plugin> track(cls: KClass<T>) {

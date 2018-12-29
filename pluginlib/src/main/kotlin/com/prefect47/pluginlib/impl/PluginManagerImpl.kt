@@ -60,15 +60,15 @@ class PluginManagerImpl(val context: Context,
             ArrayMap<PluginListener<*>, PluginInstanceManager<*>>()
     private val classLoaders: MutableMap<String, ClassLoader> = ArrayMap<String, ClassLoader>()
     private val oneShotPackages: MutableSet<String> = ArraySet<String>()
-    //private final Context mContext
-    //private final PluginInstanceManagerFactory mFactory
 
     // Lazily load this so it doesn't have any effect on devices without plugins.
-    private val parentClassLoader: ClassLoaderFilter by lazy {
-        ClassLoaderFilter(
-            this::class.java.classLoader!!,
-            "com.prefect47.pluginlib.plugin"
-        )
+    private val parentClassLoaderInternal: ClassLoaderFilterInternal by lazy {
+        val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
+        filter.filters.add( { name ->
+            name.startsWith("com.prefect47.pluginlib") &&
+                    !name.startsWith("com.prefect47.pluginlib.plugin")
+        } )
+        filter
     }
     private var isListening: Boolean = false
     private var hasOneShot: Boolean = false
@@ -218,7 +218,7 @@ class PluginManagerImpl(val context: Context,
         if (classLoaders.containsKey(pkg)) {
             return classLoaders[pkg]!!
         }
-        val classLoader: ClassLoader = PathClassLoader(sourceDir, parentClassLoader)
+        val classLoader: ClassLoader = PathClassLoader(sourceDir, parentClassLoaderInternal)
         classLoaders[pkg] = classLoader
         return classLoader
     }
@@ -251,13 +251,22 @@ class PluginManagerImpl(val context: Context,
         }
     }
 
+    override fun addClassFilter(filter: (String) -> Boolean) {
+        parentClassLoaderInternal.filters.add(filter)
+    }
+
     // This allows plugins to include any libraries or copied code they want by only including
     // classes from the plugin library.
-    private class ClassLoaderFilter(val base: ClassLoader, val pkg: String) : ClassLoader(getSystemClassLoader()) {
+    private class ClassLoaderFilterInternal(val base: ClassLoader) : ClassLoader(getSystemClassLoader()) {
+        val filters = ArrayList<(String) -> Boolean>()
+
         @Throws(ClassNotFoundException::class)
         override fun loadClass(name: String, resolve: Boolean): Class<*>? {
-            if (!name.startsWith(pkg) && !name.startsWith(PluginManager.CLIENT_PLUGIN_CLASS_PREFIX)) {
-                super.loadClass(name, resolve)
+            for (filter in filters) {
+                if (filter.invoke(name)) {
+                    super.loadClass(name, resolve)
+                    break
+                }
             }
             return base.loadClass(name)
         }

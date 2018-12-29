@@ -35,7 +35,6 @@ interface PluginManager {
 
     companion object {
         lateinit var PLUGIN_PERMISSION: String
-        lateinit var CLIENT_PLUGIN_CLASS_PREFIX: String
         var DEBUG_PLUGINS: Boolean = true
         var APP_TAG: String = "PluginLib"
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
@@ -94,12 +93,10 @@ interface PluginManager {
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()
 
+    fun addClassFilter(filter: (String) -> Boolean)
+
     fun setPermissionName(permissionName: String) {
         PLUGIN_PERMISSION = permissionName
-    }
-
-    fun setClientPluginClassPrefix(clientPluginClassPrefix: String) {
-        CLIENT_PLUGIN_CLASS_PREFIX = clientPluginClassPrefix
     }
 
     fun setDebugPlugins(debugPlugins: Boolean, tag: String) {

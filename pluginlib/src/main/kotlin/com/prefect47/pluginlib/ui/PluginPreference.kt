@@ -23,6 +23,7 @@ class PluginPreference(context: Context, layoutResId: Int,
         title = metadata.getTitle()
         summary = metadata.getDescription()
         icon = metadata.getIcon()
+        key = metadata.className
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {

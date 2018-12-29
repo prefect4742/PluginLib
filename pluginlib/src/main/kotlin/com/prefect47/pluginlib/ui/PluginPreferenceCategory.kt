@@ -14,23 +14,29 @@ class PluginPreferenceCategory : PreferenceCategory {
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
 
-    constructor(context: Context): super(context) {
+    constructor(context: Context):
+            super(context) {
         init(null, R.attr.preferenceStyle, android.R.attr.preferenceStyle)
     }
-    constructor(context: Context, attrs: AttributeSet): super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet):
+            super(context, attrs) {
         init(attrs, R.attr.preferenceStyle, android.R.attr.preferenceStyle)
     }
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int): super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int):
+            super(context, attrs, defStyleAttr) {
         init(attrs, defStyleAttr, 0)
     }
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int): super(context, attrs, defStyleAttr, defStyleRes)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int):
+            super(context, attrs, defStyleAttr, defStyleRes)
 
     private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         if (attrs != null) {
-            context.obtainStyledAttributes(attrs, R.styleable.Plugin, defStyleAttr, defStyleRes).apply {
+            context.obtainStyledAttributes(attrs, R.styleable.PluginPreferenceCategory,
+                    defStyleAttr, defStyleRes).apply {
                 try {
-                    getString(R.styleable.Plugin_className)?.let { className = it }
-                    layoutResId = getResourceId(R.styleable.Plugin_layout, R.layout.plugin_pref)
+                    getString(R.styleable.PluginPreferenceCategory_pluginClassName)?.let { className = it }
+                    layoutResId = getResourceId(R.styleable.PluginPreferenceCategory_pluginEntryLayout,
+                            R.layout.plugin_pref)
                 } finally {
                     recycle()
                 }

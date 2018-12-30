@@ -62,7 +62,7 @@ class PluginManagerImpl(val context: Context,
     private val oneShotPackages: MutableSet<String> = ArraySet<String>()
 
     // Lazily load this so it doesn't have any effect on devices without plugins.
-    private val parentClassLoaderInternal: ClassLoaderFilterInternal by lazy {
+    private val parentClassLoader: ClassLoaderFilterInternal by lazy {
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
         filter.filters.add( { name ->
             name.startsWith("com.prefect47.pluginlib") &&
@@ -218,7 +218,7 @@ class PluginManagerImpl(val context: Context,
         if (classLoaders.containsKey(pkg)) {
             return classLoaders[pkg]!!
         }
-        val classLoader: ClassLoader = PathClassLoader(sourceDir, parentClassLoaderInternal)
+        val classLoader: ClassLoader = PathClassLoader(sourceDir, parentClassLoader)
         classLoaders[pkg] = classLoader
         return classLoader
     }
@@ -252,7 +252,7 @@ class PluginManagerImpl(val context: Context,
     }
 
     override fun addClassFilter(filter: (String) -> Boolean) {
-        parentClassLoaderInternal.filters.add(filter)
+        parentClassLoader.filters.add(filter)
     }
 
     // This allows plugins to include any libraries or copied code they want by only including

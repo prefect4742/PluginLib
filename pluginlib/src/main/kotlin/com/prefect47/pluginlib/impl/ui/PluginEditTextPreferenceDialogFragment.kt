@@ -1,5 +1,6 @@
-package com.prefect47.pluginlib.ui
+package com.prefect47.pluginlib.impl.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary

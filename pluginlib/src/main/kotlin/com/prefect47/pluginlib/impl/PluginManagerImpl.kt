@@ -66,8 +66,8 @@ class PluginManagerImpl(val context: Context,
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
         filter.filters.add( { name ->
             name.startsWith("com.prefect47.pluginlib") &&
-                    !name.startsWith("com.prefect47.pluginlib.plugin") &&
-                    !name.startsWith("com.prefect47.pluginlib.ui")
+                !name.startsWith("com.prefect47.pluginlib.plugin") &&
+                !name.startsWith("com.prefect47.pluginlib.ui")
         } )
         filter
     }

@@ -21,13 +21,13 @@ import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginTracker
 import com.prefect47.pluginlib.plugin.PluginTrackerList
-import com.prefect47.pluginlib.ui.PluginPreference
+import com.prefect47.pluginlib.ui.preference.PluginListEntry
 import kotlin.reflect.KClass
 
 object PluginLibrary {
     const val ARG_CLASSNAME = "pluginClassName"
 
-    lateinit var settingsHandler: PluginPreference.SettingsHandler
+    lateinit var settingsHandler: PluginListEntry.SettingsHandler
     val trackers = HashMap<KClass<*>, PluginTrackerList<*>>()
 
     /**
@@ -72,7 +72,7 @@ object PluginLibrary {
         return null
     }
 
-    fun setPluginSettingsHandler(handler: PluginPreference.SettingsHandler) {
+    fun setPluginSettingsHandler(handler: PluginListEntry.SettingsHandler) {
         settingsHandler = handler
     }
 }

@@ -1,8 +1,7 @@
-package com.prefect47.pluginlib.ui
+package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.view.View
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreference
 import com.prefect47.pluginlib.PluginLibrary
@@ -12,8 +11,8 @@ import com.prefect47.pluginlib.plugin.PluginMetadata
 /**
  * Preference with plugin metadata. Turns on the settings button if plugin has a settings layout.
  */
-class PluginPreference(context: Context, layoutResId: Int,
-        private val metadata: PluginMetadata) : SwitchPreference(context) {
+class PluginListEntry(context: Context, layoutResId: Int,
+                      private val metadata: PluginMetadata) : SwitchPreference(context) {
     interface SettingsHandler {
         fun openSettings(metadata: PluginMetadata)
     }
@@ -31,7 +30,7 @@ class PluginPreference(context: Context, layoutResId: Int,
         holder.findViewById(R.id.settings_frame)?.let {
             if (metadata.hasSettings()) {
                 it.visibility = View.VISIBLE
-                it.findViewById<AppCompatImageButton>(R.id.settings_button)?.setOnClickListener {
+                it.findViewById<View>(R.id.settings_button)?.setOnClickListener {
                     PluginLibrary.settingsHandler.openSettings(metadata)
                 }
             } else {

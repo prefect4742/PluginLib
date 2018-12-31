@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.ui
+package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.util.AttributeSet

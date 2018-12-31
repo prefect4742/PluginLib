@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.ui
+package com.prefect47.pluginlib.impl.ui
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

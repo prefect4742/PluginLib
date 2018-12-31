@@ -25,6 +25,8 @@ import com.prefect47.pluginlib.ui.PluginPreference
 import kotlin.reflect.KClass
 
 object PluginLibrary {
+    const val ARG_CLASSNAME = "pluginClassName"
+
     lateinit var settingsHandler: PluginPreference.SettingsHandler
     val trackers = HashMap<KClass<*>, PluginTrackerList<*>>()
 

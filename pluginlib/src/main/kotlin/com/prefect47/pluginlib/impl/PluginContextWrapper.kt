@@ -17,6 +17,7 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 
 class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader) : ContextWrapper(base) {
@@ -33,5 +34,10 @@ class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader
             return inflater
         }
         return baseContext.getSystemService(name) as Any
+    }
+
+    override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences {
+        // TODO Prevent plugins from reading anything outside or their own settings
+        return super.getSharedPreferences(name, mode)
     }
 }

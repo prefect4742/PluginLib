@@ -1,22 +1,19 @@
-package com.prefect47.pluginlib.impl.ui
+package com.prefect47.pluginlib.ui.preference
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.prefect47.pluginlib.PluginLibrary
+import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.plugin.PluginMetadata
-import com.prefect47.pluginlib.ui.preference.PluginEditTextPreference
 
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
  */
-class PluginWrapperFragment : PreferenceFragmentCompat() {
+class PluginPreferencesWrapperFragment : PreferenceFragmentCompat() {
     companion object {
         val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }

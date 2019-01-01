@@ -21,6 +21,7 @@ interface PluginMetadata {
     val pkg: String
     val className: String
     val pluginContext: Context
+    val plugin: Plugin
 
     fun getTitle(): String
     fun getDescription(): String

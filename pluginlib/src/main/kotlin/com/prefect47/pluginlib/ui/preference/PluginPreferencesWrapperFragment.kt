@@ -9,6 +9,7 @@ import androidx.preference.PreferenceScreen
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.plugin.PluginMetadata
+import com.prefect47.pluginlib.plugin.PluginSettings
 
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
@@ -27,8 +28,9 @@ class PluginPreferencesWrapperFragment : PreferenceFragmentCompat() {
 
         preferenceManager.sharedPreferencesName = "${className}_preferences"
 
+        val preferencesResId = (metadata.plugin as PluginSettings).preferencesResId
         val xmlRoot = preferenceManager.inflateFromResource(
-            metadata.pluginContext, metadata.getSettingsResId(), null) as PreferenceScreen
+            metadata.pluginContext, preferencesResId, null) as PreferenceScreen
 
         val root: Preference
         if (rootKey != null) {

@@ -26,7 +26,5 @@ interface PluginMetadata {
     fun getTitle(): String
     fun getDescription(): String
     fun getIcon(): Drawable
-    fun getSettingsResId(): Int
-    fun hasSettings(): Boolean = getSettingsResId() != 0
 }
 

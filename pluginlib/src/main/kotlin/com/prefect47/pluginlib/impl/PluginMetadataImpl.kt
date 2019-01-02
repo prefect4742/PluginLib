@@ -60,8 +60,4 @@ class PluginMetadataImpl(override val plugin: Plugin, val context: Context, over
         }
         return defaultIcon
     }
-
-    override fun getSettingsResId(): Int {
-        return data.getInt("pluginSettingsRes")
-    }
 }

@@ -14,7 +14,7 @@ import com.prefect47.pluginlib.plugin.PluginSettings
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
  */
-class PluginPreferencesWrapperFragment : PreferenceFragmentCompat() {
+class PluginPreferencesFragment : PreferenceFragmentCompat() {
     companion object {
         val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }

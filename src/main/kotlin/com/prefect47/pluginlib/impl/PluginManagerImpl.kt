@@ -231,7 +231,7 @@ class PluginManagerImpl(val context: Context,
     @Throws(NameNotFoundException::class)
     fun getContext(info: ApplicationInfo, pkg: String): Context {
         val classLoader: ClassLoader = getClassLoader(info.sourceDir, pkg)
-        return PluginContextWrapper(context.createPackageContext(pkg, 0), classLoader)
+        return PluginContextWrapper(context.createPackageContext(pkg, 0), classLoader, pkg)
     }
 
     override fun <T: Any> dependsOn(p: Plugin, cls: KClass<T>): Boolean {

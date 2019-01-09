@@ -26,7 +26,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         metadata = PluginLibrary.getMetaData(className!!)!!
 
-        preferenceManager.sharedPreferencesName = "${className}_preferences"
+        preferenceManager.sharedPreferencesName = "${metadata.pkg}_preferences"
 
         val preferencesResId = (metadata.plugin as PluginSettings).preferencesResId
         val xmlRoot = preferenceManager.inflateFromResource(

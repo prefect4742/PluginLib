@@ -257,7 +257,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 // Create our own ClassLoader so we can use our own code as the parent.
                 val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
                 val pluginContext =
-                    PluginContextWrapper(context.createPackageContext(pkg, 0), classLoader)
+                    PluginContextWrapper(context.createPackageContext(pkg, 0), classLoader, pkg)
 
                 // TODO: Can we work around this without suppressing the warning?
                 @Suppress("UNCHECKED_CAST")

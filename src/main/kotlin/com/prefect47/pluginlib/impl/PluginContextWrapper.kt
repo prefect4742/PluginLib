@@ -19,8 +19,10 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.view.LayoutInflater
+import androidx.preference.PreferenceManager
 
-class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader) : ContextWrapper(base) {
+class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader,
+                           private val pkg: String) : ContextWrapper(base) {
     private val inflater: LayoutInflater by lazy {
         LayoutInflater.from(baseContext).cloneInContext(this)
     }
@@ -36,8 +38,11 @@ class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader
         return baseContext.getSystemService(name) as Any
     }
 
-    override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences {
-        // TODO Prevent plugins from reading anything outside or their own settings
-        return super.getSharedPreferences(name, mode)
+    override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
+        name?.equals("${pkg}_preferences")?.let {
+            // TODO Prevent plugins from reading anything outside or their own settings
+            return super.getSharedPreferences(name, mode)
+        }
+        return null
     }
 }

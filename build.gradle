@@ -5,7 +5,7 @@ buildscript {
     ext {
         versionMajor = 0
         versionMinor = 1
-        versionPatch = 11
+        versionPatch = 12
 
         androidx_version = '1.1.0-alpha02'
         androidx_appcompat_version = '1.1.0-alpha01'

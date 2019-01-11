@@ -50,7 +50,10 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
                 metadata.className,
-                preference.key
+                preference.key,
+                preference.inputType,
+                preference.digits
+
             );
             f.setTargetFragment(this, 0);
             f.show(fragmentManager!!,

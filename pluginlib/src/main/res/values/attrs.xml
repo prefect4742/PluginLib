@@ -5,4 +5,8 @@
         <attr name="pluginClassName" format="string" />
         <attr name="pluginEntryLayout" format="reference" />
     </declare-styleable>
+    <declare-styleable name="PluginEditTextPreference">
+        <attr name="android:inputType" />
+        <attr name="android:digits" />
+    </declare-styleable>
 </resources>

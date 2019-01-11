@@ -27,7 +27,9 @@ class PluginListCategory : PreferenceCategory {
         init(attrs, defStyleAttr, 0)
     }
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int):
-            super(context, attrs, defStyleAttr, defStyleRes)
+            super(context, attrs, defStyleAttr, defStyleRes) {
+        init(attrs, defStyleAttr, defStyleRes)
+    }
 
     private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
         if (attrs != null) {

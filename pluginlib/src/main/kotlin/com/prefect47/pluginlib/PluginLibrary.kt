@@ -35,8 +35,10 @@ object PluginLibrary {
      * [clientPluginClassPrefix]. While developing the app, [debugPlugins] should be true so that crashes do not cause
      * plugin components to be disabled.
      */
-    fun init(context: Context, permissionName: String, debugPlugins: Boolean, debugTag: String) {
+    fun init(context: Context, notificationChannel: String, notificationIconResId: Int, permissionName: String,
+             debugPlugins: Boolean, debugTag: String) {
         Dependency.init(context)
+        Dependency[PluginManager::class].setNotification(notificationChannel, notificationIconResId)
         Dependency[PluginManager::class].setPermissionName(permissionName)
         Dependency[PluginManager::class].setDebugPlugins(debugPlugins, debugTag)
         Dependency[PluginManager::class].debug("PluginLib initialized")

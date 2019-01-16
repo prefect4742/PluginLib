@@ -1,6 +1,7 @@
 package com.prefect47.pluginlib.ui.preference
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
@@ -19,6 +20,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }
 
+    private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
     private lateinit var metadata: PluginMetadata
 
     @SuppressLint("RestrictedApi")
@@ -43,6 +45,18 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         }
 
         preferenceScreen = root
+
+        prefsListener = metadata.plugin as SharedPreferences.OnSharedPreferenceChangeListener
+    }
+
+    override fun onResume() {
+        super.onResume()
+        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(prefsListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefsListener)
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {
@@ -50,7 +64,10 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
                 metadata.className,
-                preference.key
+                preference.key,
+                preference.inputType,
+                preference.digits
+
             );
             f.setTargetFragment(this, 0);
             f.show(fragmentManager!!,

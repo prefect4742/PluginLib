@@ -33,6 +33,7 @@ import androidx.core.app.NotificationCompat.Action
 import android.util.ArrayMap
 import android.util.ArraySet
 import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
@@ -179,7 +180,6 @@ class PluginManagerImpl(val context: Context,
             val data: Uri = intent.data!!
             val pkg: String = data.encodedSchemeSpecificPart
             if (oneShotPackages.contains(pkg)) {
-                val icon = context.resources.getIdentifier("tuner", "drawable", context.packageName)
                 val color = Resources.getSystem().getIdentifier(
                     "system_notification_accent_color", "color", "android")
                 var label: String = pkg
@@ -188,10 +188,8 @@ class PluginManagerImpl(val context: Context,
                     label = pm.getApplicationInfo(pkg, 0).loadLabel(pm).toString()
                 } catch (e: NameNotFoundException) {}
 
-                val nb: NotificationCompat.Builder = NotificationCompat.Builder(context,
-                    PluginManager.NOTIFICATION_CHANNEL_ID
-                )
-                        .setSmallIcon(icon)
+                val nb = NotificationCompat.Builder(context, PluginManager.NOTIFICATION_CHANNEL)
+                        .setSmallIcon(PluginManager.NOTIFICATION_ICON)
                         .setWhen(0)
                         .setShowWhen(false)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -202,7 +200,7 @@ class PluginManagerImpl(val context: Context,
                     Uri.parse("package://$pkg"))
                 val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
                 nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
-                context.getSystemService(NotificationManager::class.java).notify(notificationId, nb.build())
+                NotificationManagerCompat.from(context).notify(notificationId, nb.build())
             }
             if (clearClassLoader(pkg)) {
                 Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()

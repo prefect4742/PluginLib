@@ -6,17 +6,19 @@ import android.util.AttributeSet
 import androidx.preference.EditTextPreference
 import com.prefect47.pluginlib.R
 
-/** 
+/**
  * EditText Preference wrapper since we need a dialog that has en editText.
  */
 class PluginEditTextPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0, defStyleRes: Int = 0) : EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {
+        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
+        defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
+            : EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {
     var inputType: Int = InputType.TYPE_CLASS_TEXT
     var digits: String? = null
 
     init {
         if (attrs != null) {
-            context.obtainStyledAttributes(attrs, R.styleable.PluginEditTextPreference,
+            context.theme.obtainStyledAttributes(attrs, R.styleable.PluginEditTextPreference,
                 defStyleAttr, defStyleRes).apply {
                 try {
                     inputType = getInt(R.styleable.PluginEditTextPreference_android_inputType,

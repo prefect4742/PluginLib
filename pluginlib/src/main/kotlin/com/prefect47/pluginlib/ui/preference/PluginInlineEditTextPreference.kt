@@ -9,7 +9,9 @@ import com.prefect47.pluginlib.R
  * Inline EditText Preference.
  */
 class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0, defStyleRes: Int = 0) : Preference(context, attrs, defStyleAttr, defStyleRes) {
+        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
+        defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
+            : Preference(context, attrs, defStyleAttr, defStyleRes) {
 
     init {
         if (attrs != null) {

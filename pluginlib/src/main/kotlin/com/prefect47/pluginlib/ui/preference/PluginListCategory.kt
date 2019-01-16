@@ -12,7 +12,9 @@ import com.prefect47.pluginlib.R
  */
 
 class PluginListCategory @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0, defStyleRes: Int = 0) : PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
+        defStyleAttr: Int = android.R.attr.preferenceCategoryStyle,
+        defStyleRes: Int = android.R.attr.preferenceCategoryStyle)
+            : PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
 

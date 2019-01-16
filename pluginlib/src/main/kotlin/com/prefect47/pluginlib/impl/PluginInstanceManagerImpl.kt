@@ -15,9 +15,6 @@
 
 package com.prefect47.pluginlib.impl
 
-import android.app.Notification
-import android.app.Notification.Action
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
@@ -29,6 +26,8 @@ import android.content.res.Resources
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
@@ -268,8 +267,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
                 // TODO: Only create the plugin before version check if we need it for legacy version check.
 
+                var pluginVersion: VersionInfo? = null
                 try {
-                    val pluginVersion: VersionInfo? = checkVersion(pluginClass, version)
+                    pluginVersion = checkVersion(pluginClass, version)
                     //val pluginVersion: VersionInfo? = checkVersion(pluginClass, plugin, version)
                     if (DEBUG) Log.d(TAG, "createPlugin")
 
@@ -284,9 +284,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.
                     //@Suppress("DEPRECATION")
-                    //Log.w(TAG, "Plugin has invalid interface version " + plugin.version
-                    //        + ", expected " + version)
-                    Log.w(TAG, "Plugin has invalid interface version, expected $version")
+                    Log.w(TAG, "Plugin has invalid interface ${pluginVersion}, expected $version")
                     return null
                 }
             } catch (e: Throwable) {
@@ -296,16 +294,14 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
 
         private fun notifyInvalidVersion(component: ComponentName, cls: String, tooNew: Boolean, msg: String?) {
-            val icon = context.resources.getIdentifier("tuner", "drawable",
-                    context.packageName)
             val color = Resources.getSystem().getIdentifier(
                     "system_notification_accent_color", "color", "android")
-            val nb: Notification.Builder = Notification.Builder(context, PluginManager.NOTIFICATION_CHANNEL_ID)
-                            .setStyle(Notification.BigTextStyle())
-                            .setSmallIcon(icon)
+            val nb = NotificationCompat.Builder(context, PluginManager.NOTIFICATION_CHANNEL)
+                            .setStyle(NotificationCompat.BigTextStyle())
+                            .setSmallIcon(PluginManager.NOTIFICATION_ICON)
                             .setWhen(0)
                             .setShowWhen(false)
-                            .setVisibility(Notification.VISIBILITY_PUBLIC)
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setColor(context.getColor(color))
             var label: String = cls
             try {
@@ -313,24 +309,21 @@ class PluginInstanceManagerImpl<T: Plugin>(
             } catch (e2: NameNotFoundException) {
             }
             if (!tooNew) {
-                // Localization not required as this will never ever appear in a user build.
                 nb.setContentTitle("Plugin \"$label\" is too old")
                         .setContentText("Contact plugin developer to get an updated version.\n$msg")
             } else {
-                // Localization not required as this will never ever appear in a user build.
                 nb.setContentTitle("Plugin \"$label\" is too new")
                         .setContentText("Check to see if an OTA is available.\n$msg")
             }
             val i: Intent = Intent(PluginManager.DISABLE_PLUGIN).setData(
                     Uri.parse("package://" + component.flattenToString()))
             val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
-            nb.addAction(Action.Builder(null, "Disable plugin", pi).build())
-            context.getSystemService(NotificationManager::class.java).notify(notificationId, nb.build())
+            nb.addAction(NotificationCompat.Action(0, "Disable plugin", pi))
+            NotificationManagerCompat.from(context).notify(notificationId, nb.build())
         }
 
         @Throws(InvalidVersionException::class)
         private fun checkVersion(pluginClass: KClass<*>, version: VersionInfo): VersionInfo? {
-        //private fun checkVersion(pluginClass: KClass<*>, plugin: T, version: VersionInfo): VersionInfo? {
             val pv: VersionInfo = VersionInfo().addClass(pluginClass)
             if (pv.hasVersionInfo()) {
                 version.checkVersion(pv)

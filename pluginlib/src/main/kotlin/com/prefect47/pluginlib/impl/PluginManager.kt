@@ -34,13 +34,13 @@ interface PluginManager {
     }
 
     companion object {
+        lateinit var NOTIFICATION_CHANNEL: String
+        var NOTIFICATION_ICON: Int = 0
         lateinit var PLUGIN_PERMISSION: String
         var DEBUG_PLUGINS: Boolean = true
         var APP_TAG: String = "PluginLib"
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
-        //const val NOTIFICATION_CHANNEL_TAG = "EXS"
-        const val NOTIFICATION_CHANNEL_ID = "PluginManager"
 
         fun <P: Plugin> getAction(cls: KClass<P>) : String {
             // TODO: Due to KT-7186 we cannot access the members of a subclass inside a loop over the superclass (yet).
@@ -94,6 +94,11 @@ interface PluginManager {
     fun handleWtfs()
 
     fun addClassFilter(filter: (String) -> Boolean)
+
+    fun setNotification(channel: String, iconResId: Int) {
+        NOTIFICATION_CHANNEL = channel
+        NOTIFICATION_ICON = iconResId
+    }
 
     fun setPermissionName(permissionName: String) {
         PLUGIN_PERMISSION = permissionName

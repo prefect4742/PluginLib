@@ -10,28 +10,15 @@ import com.prefect47.pluginlib.R
 /**
  * Preference category that automatically adds all plugins of its type and sets their common layout.
  */
-class PluginListCategory : PreferenceCategory {
+
+class PluginListCategory @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0, defStyleRes: Int = 0) : PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
 
-    constructor(context: Context):
-            super(context) {
-        init(null, R.attr.preferenceStyle, android.R.attr.preferenceStyle)
-    }
-    constructor(context: Context, attrs: AttributeSet):
-            super(context, attrs) {
-        init(attrs, R.attr.preferenceStyle, android.R.attr.preferenceStyle)
-    }
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int):
-            super(context, attrs, defStyleAttr) {
-        init(attrs, defStyleAttr, 0)
-    }
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int):
-            super(context, attrs, defStyleAttr, defStyleRes)
-
-    private fun init(attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) {
+    init {
         if (attrs != null) {
-            context.obtainStyledAttributes(attrs, R.styleable.PluginListCategory,
+            context.theme.obtainStyledAttributes(attrs, R.styleable.PluginListCategory,
                     defStyleAttr, defStyleRes).apply {
                 try {
                     getString(R.styleable.PluginListCategory_pluginClassName)?.let { className = it }

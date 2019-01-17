@@ -14,5 +14,6 @@
         <attr name="android:inputType" />
         <attr name="android:digits" />
         <attr name="android:defaultValue" />
+        <attr name="android:hint" />
     </declare-styleable>
 </resources>

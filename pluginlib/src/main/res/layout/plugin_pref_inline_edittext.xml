@@ -13,15 +13,27 @@
         android:focusable="true"
         android:baselineAligned="false">
 
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/plugin_pref_inline_edittext_frame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-        <com.google.android.material.textfield.TextInputEditText
+    <include layout="@layout/image_frame"/>
+    <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+        <TextView
+                android:id="@android:id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textAppearance="@style/Preference_TextAppearanceMaterialSubhead"
+                android:ellipsize="marquee"/>
+        <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/plugin_pref_inline_edittext_value"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-    </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="wrap_content"
+                android:layout_below="@android:id/title"
+                android:layout_alignLeft="@android:id/title"
+                android:singleLine="true" />
+    </RelativeLayout>
 
 </LinearLayout>

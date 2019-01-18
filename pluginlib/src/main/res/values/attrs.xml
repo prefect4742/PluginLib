@@ -10,10 +10,8 @@
         <attr name="android:digits" />
     </declare-styleable>
     <declare-styleable name="PluginInlineEditTextPreference">
-        <attr name="android:title" />
         <attr name="android:inputType" />
         <attr name="android:digits" />
-        <attr name="android:defaultValue" />
         <attr name="android:hint" />
     </declare-styleable>
 </resources>

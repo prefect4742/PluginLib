@@ -2,8 +2,6 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.os.Parcel
-import android.os.Parcelable
 import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
@@ -12,7 +10,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.extensions.afterTextChanged
-import com.prefect47.pluginlib.impl.extensions.createParcel
 
 /**
  * Inline EditText Preference.
@@ -89,47 +86,4 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
     }
 
     fun getText(): String? = value
-
-    override fun onSaveInstanceState(): Parcelable {
-        val superState = super.onSaveInstanceState()
-        if (isPersistent) {
-            // No need to save instance state since it's persistent
-            return superState
-        }
-        val ss = SavedState(superState)
-        ss.text = value
-        return ss
-    }
-
-    override fun onRestoreInstanceState(state: Parcelable) {
-        if (state !is SavedState) {
-            super.onRestoreInstanceState(state)
-            return
-        }
-
-        super.onRestoreInstanceState(state.superState)
-        value = state.text
-        notifyChanged()
-    }
-
-    class SavedState: BaseSavedState {
-        companion object {
-            @JvmField @Suppress("unused")
-            val CREATOR = createParcel { SavedState(it) }
-        }
-
-        var text: String? = null
-
-        @Suppress("unused")
-        constructor(superState: Parcelable) : super(superState)
-
-        override fun writeToParcel(dest: Parcel, flags: Int) {
-            super.writeToParcel(dest, flags)
-            dest.writeString(text)
-        }
-
-        private constructor(source: Parcel) : super(source) {
-            text = source.readString()
-        }
-    }
 }

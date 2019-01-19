@@ -5,6 +5,8 @@ import android.content.res.TypedArray
 import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
+import androidx.annotation.AttrRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
@@ -15,8 +17,8 @@ import com.prefect47.pluginlib.impl.extensions.afterTextChanged
  * Inline EditText Preference.
  */
 class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
-        defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
+        @AttrRes defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
+        @StyleRes defStyleRes: Int = android.R.style.Widget_Material_EditText)
             : Preference(context, attrs, defStyleAttr, defStyleRes) {
     var editText: AppCompatEditText? = null
     var value: String? = null
@@ -58,19 +60,19 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
                 if (callChangeListener(it)) {
                     setTextInternal(it, false)
                 } else {
-                    editText?.setText(it)
+                    setText(it)
                 }
             }
+            isEnabled = this@PluginInlineEditTextPreference.isEnabled
         }
-        editText?.isEnabled = isEnabled
     }
 
     override fun onSetInitialValue(defaultValue: Any?) {
         setText(getPersistedString(defaultValue as? String))
     }
 
-    override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
-        return a.getString(index) as Any
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
+        return a.getString(index)
     }
 
     fun setText(text: String?) {

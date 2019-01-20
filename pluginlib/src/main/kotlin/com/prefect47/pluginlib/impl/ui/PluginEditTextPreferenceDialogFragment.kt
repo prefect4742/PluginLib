@@ -17,16 +17,15 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
         private const val ARG_DIGITS = "digits"
 
         fun create(className: String, key: String, inputType: Int,
-                   digits: String?): PluginEditTextPreferenceDialogFragment {
-            val fragment = PluginEditTextPreferenceDialogFragment()
-            val b = Bundle(1)
-            b.putString(ARG_KEY, key)
-            b.putString(PluginLibrary.ARG_CLASSNAME, className)
-            b.putInt(ARG_INPUTTYPE, inputType)
-            digits?.let { b.putString(ARG_DIGITS, digits) }
-            fragment.arguments = b
-            return fragment
-        }
+                   digits: String?): PluginEditTextPreferenceDialogFragment =
+            PluginEditTextPreferenceDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_KEY, key)
+                    putString(PluginLibrary.ARG_CLASSNAME, className)
+                    putInt(ARG_INPUTTYPE, inputType)
+                    digits?.let { putString(ARG_DIGITS, digits) }
+                }
+            }
     }
 
     private lateinit var metadata: PluginMetadata

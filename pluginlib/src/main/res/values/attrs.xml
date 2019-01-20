@@ -5,13 +5,20 @@
         <attr name="pluginClassName" format="string" />
         <attr name="pluginEntryLayout" format="reference" />
     </declare-styleable>
+
     <declare-styleable name="PluginEditTextPreference">
         <attr name="android:inputType" />
         <attr name="android:digits" />
     </declare-styleable>
+
     <declare-styleable name="PluginInlineEditTextPreference">
         <attr name="android:inputType" />
         <attr name="android:digits" />
         <attr name="android:hint" />
+    </declare-styleable>
+
+    <declare-styleable name="FilePickerPreference">
+        <attr name="mimeType" format="string" />
+        <attr name="layout" format="reference" />
     </declare-styleable>
 </resources>

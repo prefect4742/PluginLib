@@ -5,8 +5,6 @@ import android.content.res.TypedArray
 import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
-import androidx.annotation.AttrRes
-import androidx.annotation.StyleRes
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
@@ -17,8 +15,8 @@ import com.prefect47.pluginlib.impl.extensions.afterTextChanged
  * Inline EditText Preference.
  */
 class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        @AttrRes defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
-        @StyleRes defStyleRes: Int = android.R.style.Widget_Material_EditText)
+        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
+        defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
             : Preference(context, attrs, defStyleAttr, defStyleRes) {
     var editText: AppCompatEditText? = null
     var value: String? = null

@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.ImageButton
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
@@ -21,6 +22,12 @@ class PluginImagePickerPreference @JvmOverloads constructor(context: Context, at
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
+        val widgetFrame = holder.findViewById(android.R.id.widget_frame) as? ImageButton
+        if (widgetFrame != null) {
+            Log.d("NIBR", "frame width is " + widgetFrame.measuredWidth)
+            Log.d("NIBR", "frame width is " + widgetFrame.maxWidth)
+            Log.d("NIBR", "frame width is " + widgetFrame.width)
+        }
         super.onBindViewHolder(holder)
 
         // TODO: Now we can call startActivityForResult()
@@ -28,7 +35,6 @@ class PluginImagePickerPreference @JvmOverloads constructor(context: Context, at
         // TODO: The preference already has the right PluginWrapperContext :)
         // TODO: When result returns, save the URI to the pref and then load it into the ImageButton.
 
-        val widgetFrame = holder.findViewById(R.id.button) as? ImageButton
         if (widgetFrame != null) {
             //with (fragment as PluginPreferencesFragment) {
             //    hello()

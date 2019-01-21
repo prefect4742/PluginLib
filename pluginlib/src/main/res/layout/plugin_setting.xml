@@ -8,4 +8,5 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:clickable="true"
+        android:padding="5dp"
         android:background="@null"/>

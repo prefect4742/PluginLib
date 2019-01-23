@@ -17,8 +17,8 @@
         <attr name="android:hint" />
     </declare-styleable>
 
-    <declare-styleable name="FilePickerPreference">
+    <declare-styleable name="PluginFilePickerPreference">
+        <attr name="requestCode" format="integer" />
         <attr name="mimeType" format="string" />
-        <attr name="layout" format="reference" />
     </declare-styleable>
 </resources>

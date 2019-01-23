@@ -58,7 +58,7 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
                 if (callChangeListener(it)) {
                     setTextInternal(it, false)
                 } else {
-                    setText(it)
+                    this.setText(it)
                 }
             }
             isEnabled = this@PluginInlineEditTextPreference.isEnabled

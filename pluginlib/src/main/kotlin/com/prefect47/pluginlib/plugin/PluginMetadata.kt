@@ -16,10 +16,12 @@ package com.prefect47.pluginlib.plugin
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import java.util.*
 
 interface PluginMetadata {
     val pkg: String
     val className: String
+
     val pluginContext: Context
     val plugin: Plugin
 

@@ -2,10 +2,13 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.R
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginMetadata
 
 /**
  * Preference category that automatically adds all plugins of its type and sets their common layout.
@@ -36,8 +39,35 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     override fun onAttachedToHierarchy(preferenceManager: PreferenceManager?) {
         super.onAttachedToHierarchy(preferenceManager)
 
+        val allowMulti = PluginLibrary.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
+        val creator: (Context, Int, PluginMetadata)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
+
         PluginLibrary.getMetaDataList(className)?.forEach {
-            addPreference(PluginListEntry(context, layoutResId, it))
+            addPreference(creator(context, layoutResId, it))
+        }
+    }
+
+    private fun createPref(context: Context, layoutResId: Int, metadata: PluginMetadata) : Preference {
+        return PluginListEntry(context, layoutResId, metadata).apply {
+            setOnPreferenceChangeListener { preference, newValue ->
+                preferenceChanged(preference as PluginListEntry, newValue as Boolean) }
+        }
+    }
+
+    private fun createMultiPref(context: Context, layoutResId: Int, metadata: PluginMetadata) : Preference {
+        return PluginMultiListEntry(context, layoutResId, metadata)
+    }
+
+    private fun preferenceChanged(preference: PluginListEntry, newValue: Boolean): Boolean {
+        if (newValue) {
+            for (index in 0..preferenceCount-1) {
+                (getPreference(index) as PluginListEntry).apply {
+                    if (this != preference) isChecked = false
+                }
+            }
+            return true
+        } else {
+            return false
         }
     }
 }

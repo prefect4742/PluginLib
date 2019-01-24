@@ -3,6 +3,7 @@ package com.prefect47.pluginlib.impl.ui
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.PreferenceViewHolder

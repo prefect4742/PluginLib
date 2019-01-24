@@ -22,7 +22,12 @@ import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginTracker
 import com.prefect47.pluginlib.plugin.PluginTrackerList
 import com.prefect47.pluginlib.ui.preference.PluginListEntry
+import java.util.EnumSet
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.declaredMemberProperties
 
 object PluginLibrary {
     const val ARG_CLASSNAME = "pluginClassName"
@@ -65,6 +70,17 @@ object PluginLibrary {
     fun getMetaDataList(pluginClassName: String): List<PluginMetadata>? {
         val pluginClass = Class.forName(pluginClassName).kotlin
         return trackers[pluginClass]?.map { it.metadata }
+    }
+
+    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
+        val pluginClass = Class.forName(pluginClassName).kotlin
+        val result = pluginClass?.companionObject?.declaredMemberProperties?.find { it.name == "FLAGS" }
+        if (result is KProperty1) {
+            result as KProperty1<Any?, EnumSet<Plugin.Flag>>
+            return result.get(pluginClass.companionObjectInstance) as EnumSet<Plugin.Flag>?
+        }
+
+        return null
     }
 
     fun getMetaData(className: String): PluginMetadata? {

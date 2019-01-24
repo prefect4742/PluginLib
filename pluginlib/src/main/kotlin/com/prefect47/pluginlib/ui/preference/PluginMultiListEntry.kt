@@ -2,8 +2,8 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.view.View
+import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
-import androidx.preference.SwitchPreference
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.PluginMetadata
@@ -11,11 +11,11 @@ import com.prefect47.pluginlib.plugin.PluginSettings
 
 /**
  * Preference with plugin metadata. Turns on the settings button if plugin has a settings layout.
- * This preference is meant to be part of a list where only one can be selected, since it inherits
- * SwitchPreference.
+ * This preference is meant to be part of a list where more than one can be selected, since it inherits
+ * CheckBoxPreference.
  */
-class PluginListEntry(context: Context, layoutResId: Int,
-                      private val metadata: PluginMetadata) : SwitchPreference(context) {
+class PluginMultiListEntry(context: Context, layoutResId: Int,
+                           private val metadata: PluginMetadata) : CheckBoxPreference(context) {
     interface SettingsHandler {
         fun openSettings(metadata: PluginMetadata)
     }

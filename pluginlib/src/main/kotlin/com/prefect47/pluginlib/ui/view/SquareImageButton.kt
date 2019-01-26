@@ -2,8 +2,8 @@ package com.prefect47.pluginlib.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewTreeObserver
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.view.doOnPreDraw
 import kotlin.math.max
 
 /**
@@ -12,7 +12,7 @@ import kotlin.math.max
 class SquareImageButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
         defStyleAttr: Int = android.R.attr.imageButtonStyle) : AppCompatImageButton(context, attrs, defStyleAttr) {
     init {
-        viewTreeObserver.addOnPreDrawListener(ViewTreeObserver.OnPreDrawListener {
+        doOnPreDraw {
             if (width != height) {
                 val maxSize = max(width, height)
                 layoutParams.apply {
@@ -20,9 +20,7 @@ class SquareImageButton @JvmOverloads constructor(context: Context, attrs: Attri
                     height = maxSize
                 }
                 requestLayout()
-                return@OnPreDrawListener false
             }
-            true
-        })
+        }
     }
 }

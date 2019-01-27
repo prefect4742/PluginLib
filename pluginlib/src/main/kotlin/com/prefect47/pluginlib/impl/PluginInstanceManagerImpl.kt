@@ -284,7 +284,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.
                     //@Suppress("DEPRECATION")
-                    Log.w(TAG, "Plugin has invalid interface ${pluginVersion}, expected $version")
+                    Log.w(TAG, "Plugin $cls has invalid interface $pluginVersion, expected $version")
                     return null
                 }
             } catch (e: Throwable) {

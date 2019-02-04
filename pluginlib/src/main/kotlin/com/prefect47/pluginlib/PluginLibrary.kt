@@ -21,7 +21,7 @@ import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginTracker
 import com.prefect47.pluginlib.plugin.PluginTrackerList
-import com.prefect47.pluginlib.ui.preference.PluginListEntry
+import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import java.util.EnumSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -32,7 +32,7 @@ import kotlin.reflect.full.declaredMemberProperties
 object PluginLibrary {
     const val ARG_CLASSNAME = "pluginClassName"
 
-    lateinit var settingsHandler: PluginListEntry.SettingsHandler
+    lateinit var settingsHandler: PluginListCategory.SettingsHandler
     val trackers = HashMap<KClass<*>, PluginTrackerList<*>>()
 
     /**
@@ -67,9 +67,12 @@ object PluginLibrary {
         return tracker?.map { it.plugin }
     }
 
+    fun getMetaDataList(cls: KClass<*>): List<PluginMetadata>? {
+        return trackers[cls]?.map { it.metadata }
+    }
+
     fun getMetaDataList(pluginClassName: String): List<PluginMetadata>? {
-        val pluginClass = Class.forName(pluginClassName).kotlin
-        return trackers[pluginClass]?.map { it.metadata }
+        return PluginLibrary.getMetaDataList(Class.forName(pluginClassName).kotlin)
     }
 
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
@@ -90,7 +93,7 @@ object PluginLibrary {
         return null
     }
 
-    fun setPluginSettingsHandler(handler: PluginListEntry.SettingsHandler) {
+    fun setPluginSettingsHandler(handler: PluginListCategory.SettingsHandler) {
         settingsHandler = handler
     }
 }

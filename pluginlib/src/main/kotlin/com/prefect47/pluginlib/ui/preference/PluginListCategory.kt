@@ -21,6 +21,10 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
 
+    interface SettingsHandler {
+        fun openSettings(metadata: PluginMetadata)
+    }
+
     init {
         if (attrs != null) {
             context.theme.obtainStyledAttributes(attrs, R.styleable.PluginListCategory,
@@ -48,9 +52,9 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     }
 
     private fun createPref(context: Context, layoutResId: Int, metadata: PluginMetadata) : Preference {
-        return PluginListEntry(context, layoutResId, metadata).apply {
+        return PluginSingleListEntry(context, layoutResId, metadata).apply {
             setOnPreferenceChangeListener { preference, newValue ->
-                preferenceChanged(preference as PluginListEntry, newValue as Boolean) }
+                preferenceChanged(preference as PluginSingleListEntry, newValue as Boolean) }
         }
     }
 
@@ -58,10 +62,10 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
         return PluginMultiListEntry(context, layoutResId, metadata)
     }
 
-    private fun preferenceChanged(preference: PluginListEntry, newValue: Boolean): Boolean {
+    private fun preferenceChanged(preference: PluginSingleListEntry, newValue: Boolean): Boolean {
         if (newValue) {
-            for (index in 0..preferenceCount-1) {
-                (getPreference(index) as PluginListEntry).apply {
+            for (index in 0 until preferenceCount) {
+                (getPreference(index) as PluginSingleListEntry).apply {
                     if (this != preference) isChecked = false
                 }
             }

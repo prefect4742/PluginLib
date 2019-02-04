@@ -16,15 +16,11 @@ import com.prefect47.pluginlib.plugin.PluginSettings
  */
 class PluginMultiListEntry(context: Context, layoutResId: Int,
                            private val metadata: PluginMetadata) : CheckBoxPreference(context) {
-    interface SettingsHandler {
-        fun openSettings(metadata: PluginMetadata)
-    }
-
     init {
         layoutResource = layoutResId
-        title = metadata.getTitle()
-        summary = metadata.getDescription()
-        icon = metadata.getIcon()
+        title = metadata.title
+        summary = metadata.description
+        icon = metadata.icon
         key = metadata.className
     }
 

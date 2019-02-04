@@ -35,3 +35,14 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
         }
     }
 }
+
+public val ViewGroup.views: List<View>
+    get() = asSequence().toList()
+
+public val ViewGroup.viewsRecursive: List<View>
+    get() = views.flatMap {
+        when (it) {
+            is ViewGroup -> it.viewsRecursive
+            else -> listOf(it)
+        }
+    }

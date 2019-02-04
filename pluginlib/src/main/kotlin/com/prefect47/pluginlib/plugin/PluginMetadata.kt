@@ -25,8 +25,10 @@ interface PluginMetadata {
     val pluginContext: Context
     val plugin: Plugin
 
-    fun getTitle(): String
-    fun getDescription(): String
-    fun getIcon(): Drawable
+    var enabled: Boolean
+
+    var title: String
+    var description: String
+    var icon: Drawable
 }
 

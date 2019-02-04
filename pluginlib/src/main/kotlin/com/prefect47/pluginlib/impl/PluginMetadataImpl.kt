@@ -20,6 +20,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
@@ -42,22 +43,32 @@ class PluginMetadataImpl(override val plugin: Plugin, val context: Context, over
         pluginContext.packageManager.getServiceInfo(myService, PackageManager.GET_META_DATA).metaData
     }
 
-    override fun getTitle(): String {
-        data.getInt("pluginTitleRes").let { if (it !=0) return pluginContext.resources.getString(it) }
-        data.getString("pluginTitle").let {return it}
-        return "NO_TITLE"
+    private fun getString(key: String): String {
+        data.getInt("${key}Res").let { if (it !=0) return pluginContext.resources.getString(it) }
+        data.getString(key)?.let {return it}
+        return "NO_STRING"
     }
 
-    override fun getDescription(): String {
-        data.getInt("pluginDescriptionRes").let { if (it != 0) return pluginContext.resources.getString(it) }
-        data.getString("pluginDescription").let {return it}
-        return "NO_DESCRIPTION"
-    }
-
-    override fun getIcon(): Drawable {
+    private fun getDrawable(): Drawable {
         data.getInt("pluginIconRes").let {
             if (it != 0 ) ContextCompat.getDrawable(pluginContext, it)?.let { drawable -> return drawable }
         }
         return defaultIcon
     }
+
+    override var enabled: Boolean
+        get() = PreferenceManager.getDefaultSharedPreferences(pluginContext).getBoolean(className, false)
+        set(value) {}
+
+    override var title: String
+        get() = getString("pluginTitle")
+        set(value) {}
+
+    override var description: String
+        get() = getString("pluginDescription")
+        set(value) {}
+
+    override var icon: Drawable
+        get() = getDrawable()
+        set(value) {}
 }

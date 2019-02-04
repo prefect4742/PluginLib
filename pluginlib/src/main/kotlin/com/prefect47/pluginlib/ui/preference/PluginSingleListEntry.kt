@@ -14,17 +14,13 @@ import com.prefect47.pluginlib.plugin.PluginSettings
  * This preference is meant to be part of a list where only one can be selected, since it inherits
  * SwitchPreference.
  */
-class PluginListEntry(context: Context, layoutResId: Int,
-                      private val metadata: PluginMetadata) : SwitchPreference(context) {
-    interface SettingsHandler {
-        fun openSettings(metadata: PluginMetadata)
-    }
-
+class PluginSingleListEntry(context: Context, layoutResId: Int,
+                            private val metadata: PluginMetadata) : SwitchPreference(context) {
     init {
         layoutResource = layoutResId
-        title = metadata.getTitle()
-        summary = metadata.getDescription()
-        icon = metadata.getIcon()
+        title = metadata.title
+        summary = metadata.description
+        icon = metadata.icon
         key = metadata.className
     }
 

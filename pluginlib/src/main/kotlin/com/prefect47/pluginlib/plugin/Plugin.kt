@@ -17,6 +17,11 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
+import com.prefect47.pluginlib.PluginLibrary
+import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.PluginInstanceManager
+import com.prefect47.pluginlib.impl.PluginManager
+import com.prefect47.pluginlib.impl.PluginMetadataMap
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -84,6 +89,9 @@ import android.content.Context
  * hold the permission you send to PlugLib.init() in their manifest. You must
  * also declare that permission in your own manifest.
  *
+ * If you declare the members [pluginContext] and/or [applicationContext] in a
+ * Plugin implementation, they will be set before onCreate() is called.
+ *
  * <pre class="prettyprint">
  * &lt;uses-permission android:name=&quot;com.yourapp.permission.PLUGIN&quot; /&gt;
  *
@@ -129,7 +137,10 @@ interface Plugin {
         }
     */
 
-    fun onCreate(appContext: Context, pluginContext:Context) {}
+    fun getPluginContext(): Context = PluginMetadataMap.get(this)!!.pluginContext
+    fun getApplicationContext(): Context = Dependency[PluginManager::class].getApplicationContext()
+
+    fun onCreate() {}
 
     fun onDestroy() {}
 }

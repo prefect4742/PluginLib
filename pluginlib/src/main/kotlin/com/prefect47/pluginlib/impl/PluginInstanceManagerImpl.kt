@@ -75,7 +75,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
             Dependency[PluginPrefs::class].setHasPlugins()
-            info.plugin.onCreate(context, info.pluginContext)
+            info.plugin.onCreate()
             return info
         }
         return null
@@ -166,6 +166,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                         // will get the onDestroy as part of the fragment lifecycle.
                         it.plugin.onDestroy()
                     //}
+                    PluginMetadataMap.remove(it.plugin)
                 }
                 plugins.clear()
                 handleQueryPlugins()
@@ -196,16 +197,18 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
         private fun handlePluginConnected(info: PluginInfo<T>) {
             Dependency[PluginPrefs::class].setHasPlugins()
-            val descr = Dependency[PluginMetadataFactory::class].create(
+            val metadata = Dependency[PluginMetadataFactory::class].create(
                     info.plugin, context, info.pluginContext, info.pkg, info.cls, info.classLoader)
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
+                PluginMetadataMap.add(metadata)
+
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
                     // will get the onCreate as part of the fragment lifecycle.
-                    info.plugin.onCreate(context, info.pluginContext)
+                    info.plugin.onCreate()
                 //}
-                listener!!.onPluginConnected(info.plugin, info.pluginContext, descr)
+                listener!!.onPluginConnected(info.plugin, metadata)
             }
         }
 
@@ -218,6 +221,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     info.plugin.onDestroy()
                 //}
+                PluginMetadataMap.remove(info.plugin)
             }
         }
 

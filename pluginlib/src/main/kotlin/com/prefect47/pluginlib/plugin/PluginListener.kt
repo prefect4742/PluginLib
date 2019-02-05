@@ -27,7 +27,7 @@ interface PluginListener<T : Plugin> {
      * It may also be called in the future if the plugin package changes
      * and needs to be reloaded.
      */
-    fun onPluginConnected(plugin: T, pluginContext: Context, metadata: PluginMetadata)
+    fun onPluginConnected(plugin: T, metadata: PluginMetadata)
 
     /**
      * Called when a plugin has been uninstalled/updated and should be removed

@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
 object PluginTrackerImpl : PluginTracker() {
 
     class PluginTrackerImpl<T: Plugin>: PluginListener<T>, ArrayList<Entry<T>>() {
-        override fun onPluginConnected(plugin: T, pluginContext: Context, metadata: PluginMetadata) {
+        override fun onPluginConnected(plugin: T, metadata: PluginMetadata) {
             Dependency[PluginManager::class].debug("Plugin $plugin connected")
             add(Entry(plugin, metadata))
         }

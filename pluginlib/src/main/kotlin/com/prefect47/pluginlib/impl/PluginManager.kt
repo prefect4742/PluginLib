@@ -93,6 +93,8 @@ interface PluginManager {
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()
 
+    fun getApplicationContext(): Context
+
     fun addClassFilter(filter: (String) -> Boolean)
 
     fun setNotification(channel: String, iconResId: Int) {

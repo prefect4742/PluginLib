@@ -250,6 +250,8 @@ class PluginManagerImpl(val context: Context,
         }
     }
 
+    override fun getApplicationContext(): Context = context
+
     override fun addClassFilter(filter: (String) -> Boolean) {
         parentClassLoader.filters.add(filter)
     }

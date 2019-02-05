@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 ext {
     versionMajor = 0
     versionMinor = 1
-    versionPatch = 15
+    versionPatch = 16
 }
 
 android {

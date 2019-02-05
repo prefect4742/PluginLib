@@ -19,6 +19,9 @@ abstract class PluginFilePickerPreference @JvmOverloads constructor(context: Con
     private var pickerRequestCode: Int = 0
     val pickerIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
         addCategory(Intent.CATEGORY_OPENABLE)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                 or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                 or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
     }
 
     init {
@@ -44,7 +47,12 @@ abstract class PluginFilePickerPreference @JvmOverloads constructor(context: Con
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == pickerRequestCode && resultCode == Activity.RESULT_OK) {
-            resultData?.data?.also { uri ->
+            resultData?.data?.let { uri ->
+                // Check for the freshest data.
+                val takeFlags: Int = resultData.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+
+                // ...and persist the Uri
                 if (callChangeListener(uri)) {
                     setUri(uri)
                 }

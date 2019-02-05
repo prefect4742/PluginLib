@@ -89,9 +89,6 @@ import com.prefect47.pluginlib.impl.PluginMetadataMap
  * hold the permission you send to PlugLib.init() in their manifest. You must
  * also declare that permission in your own manifest.
  *
- * If you declare the members [pluginContext] and/or [applicationContext] in a
- * Plugin implementation, they will be set before onCreate() is called.
- *
  * <pre class="prettyprint">
  * &lt;uses-permission android:name=&quot;com.yourapp.permission.PLUGIN&quot; /&gt;
  *

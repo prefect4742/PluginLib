@@ -36,9 +36,10 @@ object PluginLibrary {
     val trackers = HashMap<KClass<*>, PluginTrackerList<*>>()
 
     /**
-     * Initialize the plugin library for an app plugin permission [permissionName] and whose plugins packages start with
-     * [clientPluginClassPrefix]. While developing the app, [debugPlugins] should be true so that crashes do not cause
-     * plugin components to be disabled.
+     * Initialize the plugin library for an app plugin permission [permissionName], sending notifications to
+     * [notificationChannel] with icon [notificationIconResId].
+     * While developing the app, [debugPlugins] should be true (and [debugTag] set) so that crashes do not cause plugin
+     * components to be disabled.
      */
     fun init(context: Context, notificationChannel: String, notificationIconResId: Int, permissionName: String,
              debugPlugins: Boolean, debugTag: String) {

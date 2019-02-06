@@ -1,6 +1,5 @@
 package com.prefect47.pluginlib.ui.preference
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -31,7 +30,6 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     private lateinit var metadata: PluginMetadata
     private var activityResultHandler: ActivityResultHandler? = null
 
-    @SuppressLint("RestrictedApi")
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         metadata = PluginLibrary.getMetaData(className!!)!!
@@ -39,20 +37,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         preferenceManager.sharedPreferencesName = "${metadata.pkg}_preferences"
 
         val preferencesResId = (metadata.plugin as PluginSettings).preferencesResId
-        val xmlRoot = preferenceManager.inflateFromResource(
-            metadata.pluginContext, preferencesResId, null) as PreferenceScreen
-
-        val root: Preference
-        if (rootKey != null) {
-            root = xmlRoot.findPreference(rootKey)
-            if (root !is PreferenceScreen) {
-                throw IllegalStateException("Preference object with key $rootKey is not a PreferenceScreen")
-            }
-        } else {
-            root = xmlRoot
-        }
-
-        preferenceScreen = root
+        addPreferencesFromResource(preferencesResId)
 
         prefsListener = metadata.plugin as SharedPreferences.OnSharedPreferenceChangeListener
     }
@@ -100,6 +85,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         activityResultHandler = handler
         super.startActivityForResult(intent, requestCode, options)
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         activityResultHandler?.onActivityResult(requestCode, resultCode, data)
         activityResultHandler = null

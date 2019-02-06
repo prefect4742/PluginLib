@@ -18,17 +18,22 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
+import android.content.res.Resources
 import android.view.LayoutInflater
 import androidx.preference.PreferenceManager
 
-class PluginContextWrapper(base: Context, private val myClassLoader: ClassLoader,
+class PluginContextWrapper(private val appContext: Context, base: Context, private val myClassLoader: ClassLoader,
                            private val pkg: String) : ContextWrapper(base) {
     private val inflater: LayoutInflater by lazy {
-        LayoutInflater.from(baseContext).cloneInContext(this)
+        LayoutInflater.from(appContext).cloneInContext(this)
     }
 
     override fun getClassLoader(): ClassLoader {
         return myClassLoader
+    }
+
+    override fun getTheme(): Resources.Theme {
+        return appContext.getTheme()
     }
 
     override fun getSystemService(name: String): Any {

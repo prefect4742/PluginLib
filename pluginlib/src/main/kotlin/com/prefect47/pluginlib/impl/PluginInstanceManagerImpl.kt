@@ -166,7 +166,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                         // will get the onDestroy as part of the fragment lifecycle.
                         it.plugin.onDestroy()
                     //}
-                    Dependency[PluginManager::class].pluginMetadataMap.remove(it.plugin)
+                    manager.pluginMetadataMap.remove(it.plugin)
                 }
                 plugins.clear()
                 handleQueryPlugins()
@@ -199,7 +199,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
             Dependency[PluginPrefs::class].setHasPlugins()
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
-                Dependency[PluginManager::class].pluginMetadataMap.put(info.plugin, info.metadata)
+                manager.pluginMetadataMap.put(info.plugin, info.metadata)
 
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
@@ -219,7 +219,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     info.plugin.onDestroy()
                 //}
-                Dependency[PluginManager::class].pluginMetadataMap.remove(info.plugin)
+                manager.pluginMetadataMap.remove(info.plugin)
             }
         }
 
@@ -258,7 +258,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 // Create our own ClassLoader so we can use our own code as the parent.
                 val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
                 val pluginContext =
-                    PluginContextWrapper(context.createPackageContext(pkg, 0), classLoader, pkg)
+                    PluginContextWrapper(context, context.createPackageContext(pkg, 0), classLoader, pkg)
 
                 // TODO: Can we work around this without suppressing the warning?
                 @Suppress("UNCHECKED_CAST")

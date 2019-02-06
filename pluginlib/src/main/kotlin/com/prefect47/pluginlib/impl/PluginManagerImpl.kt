@@ -37,9 +37,15 @@ import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
+import com.prefect47.pluginlib.plugin.PluginMetadata
 import dalvik.system.PathClassLoader
 import java.lang.Thread.UncaughtExceptionHandler
+import java.util.*
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * @see Plugin
@@ -56,6 +62,9 @@ class PluginManagerImpl(val context: Context,
             return PluginManagerImpl(context, /*instanceFactory,*/ defaultHandler)
         }
     }
+
+    override val pluginMetadataMap: MutableMap<Plugin, PluginMetadata> = HashMap()
+    override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
 
     private val pluginMap: MutableMap<PluginListener<*>, PluginInstanceManager<out Plugin>> =
             ArrayMap<PluginListener<*>, PluginInstanceManager<*>>()
@@ -115,7 +124,7 @@ class PluginManagerImpl(val context: Context,
         Dependency[PluginPrefs::class].addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
         if (info != null) {
-            oneShotPackages.add(info.pkg)
+            oneShotPackages.add(info.metadata.pkg)
             hasOneShot = true
             startListening()
             return info.plugin
@@ -130,6 +139,14 @@ class PluginManagerImpl(val context: Context,
         p.loadAll()
         pluginMap[listener] = p
         startListening()
+
+        var flags = EnumSet.noneOf(Plugin.Flag::class.java)
+        val result = cls.companionObject?.declaredMemberProperties?.find { it.name == "FLAGS" }
+        if (result is KProperty1) {
+            result as KProperty1<Any?, EnumSet<Plugin.Flag>>
+            flags = result.get(cls.companionObjectInstance)
+        }
+        pluginClassFlagsMap.put(cls.qualifiedName!!, flags)
     }
 
     override fun removePluginListener(listener: PluginListener<*>) {

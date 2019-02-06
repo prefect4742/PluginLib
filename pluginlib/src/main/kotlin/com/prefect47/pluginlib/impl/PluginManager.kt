@@ -20,7 +20,9 @@ import android.text.TextUtils
 import android.util.Log
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
+import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
@@ -74,7 +76,8 @@ interface PluginManager {
             get() = nextNotificationIdInt++
     }
 
-    // must be one of the channels created in NotificationChannels.java
+    val pluginMetadataMap: MutableMap<Plugin, PluginMetadata>
+    val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
         cls

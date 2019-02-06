@@ -32,10 +32,10 @@ import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
-import java.util.ArrayList
 import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import kotlinx.coroutines.*
+import java.util.*
 import kotlin.reflect.full.createInstance
 
 class PluginInstanceManagerImpl<T: Plugin>(
@@ -75,7 +75,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
             Dependency[PluginPrefs::class].setHasPlugins()
-            info.plugin.onCreate()
+            info.metadata.plugin.onCreate()
             return info
         }
         return null
@@ -107,7 +107,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         var disableAny = false
         val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
         plugins.forEach {
-            if (className.startsWith(it.pkg)) {
+            if (className.startsWith(it.metadata.pkg)) {
                 disable(it)
                 disableAny = true
             }
@@ -130,9 +130,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin ${info.pkg}/${info.cls}")
+        Log.w(TAG, "Disabling plugin ${info.metadata.pkg}/${info.metadata.className}")
         pm.setComponentEnabledSetting(
-                ComponentName(info.pkg, info.cls),
+                ComponentName(info.metadata.pkg, info.metadata.className),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP)
     }
@@ -140,7 +140,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
     override fun <P: Any> dependsOn(p: Plugin, cls: KClass<P>): Boolean {
         val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
         plugins.forEach {
-            if (it.plugin::class.simpleName.equals(p::class.simpleName)) {
+            if (it.metadata.plugin::class.simpleName.equals(p::class.simpleName)) {
                 return (it.version != null && it.version.hasClass(cls))
             }
         }
@@ -166,7 +166,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                         // will get the onDestroy as part of the fragment lifecycle.
                         it.plugin.onDestroy()
                     //}
-                    PluginMetadataMap.remove(it.plugin)
+                    Dependency[PluginManager::class].pluginMetadataMap.remove(it.plugin)
                 }
                 plugins.clear()
                 handleQueryPlugins()
@@ -176,7 +176,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         fun removePackage(pkg: String) {
             launch {
                 plugins.forEach {
-                    if (it.pkg == pkg) {
+                    if (it.metadata.pkg == pkg) {
                         handlePluginDisconnected(it)
                         plugins.remove(it)
                     }
@@ -197,18 +197,16 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
         private fun handlePluginConnected(info: PluginInfo<T>) {
             Dependency[PluginPrefs::class].setHasPlugins()
-            val metadata = Dependency[PluginMetadataFactory::class].create(
-                    info.plugin, context, info.pluginContext, info.pkg, info.cls, info.classLoader)
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
-                PluginMetadataMap.add(metadata)
+                Dependency[PluginManager::class].pluginMetadataMap.put(info.plugin, info.metadata)
 
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
                     // will get the onCreate as part of the fragment lifecycle.
                     info.plugin.onCreate()
                 //}
-                listener!!.onPluginConnected(info.plugin, metadata)
+                listener!!.onPluginConnected(info.plugin, info.metadata)
             }
         }
 
@@ -221,7 +219,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     info.plugin.onDestroy()
                 //}
-                PluginMetadataMap.remove(info.plugin)
+                Dependency[PluginManager::class].pluginMetadataMap.remove(info.plugin)
             }
         }
 
@@ -264,10 +262,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
                 // TODO: Can we work around this without suppressing the warning?
                 @Suppress("UNCHECKED_CAST")
-                //val pluginClass = classLoader.loadClass(cls).kotlin as KClass<T>
-                //pluginClass.java.
                 val pluginClass = Class.forName(cls, true, classLoader).kotlin as KClass<T>
-                //val pluginClassInited = Class.forName(cls, true, classLoader).kotlin as KClass<T>
 
                 // TODO: Only create the plugin before version check if we need it for legacy version check.
 
@@ -283,7 +278,10 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    return PluginInfo(pkg, cls, plugin, pluginContext, pluginVersion, classLoader)
+                    val metadata = Dependency[PluginMetadataFactory::class].create(
+                        plugin, context, pluginContext, pkg, cls, classLoader)
+
+                    return PluginInfo(plugin, pluginVersion, metadata)
                 } catch (e: InvalidVersionException) {
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.

@@ -17,11 +17,8 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
-import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.Dependency
-import com.prefect47.pluginlib.impl.PluginInstanceManager
 import com.prefect47.pluginlib.impl.PluginManager
-import com.prefect47.pluginlib.impl.PluginMetadataMap
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -123,18 +120,7 @@ interface Plugin {
         ALLOW_SIMULTANEOUS_USE // Allow multiple plugins of this type to be enabled at the same time
     }
 
-    /**
-     * Default of -1 indicates the plugin supports the new Requires model.
-     */
-    /*
-    val version:Int
-        @Deprecated("Use Requires instead")
-        get() {
-            return -1
-        }
-    */
-
-    fun getPluginContext(): Context = PluginMetadataMap.get(this)!!.pluginContext
+    fun getPluginContext(): Context = Dependency[PluginManager::class].pluginMetadataMap.get(this)!!.pluginContext
     fun getApplicationContext(): Context = Dependency[PluginManager::class].getApplicationContext()
 
     fun onCreate() {}

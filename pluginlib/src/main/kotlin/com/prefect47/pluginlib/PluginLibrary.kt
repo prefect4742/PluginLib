@@ -73,18 +73,13 @@ object PluginLibrary {
     }
 
     fun getMetaDataList(pluginClassName: String): List<PluginMetadata>? {
-        return PluginLibrary.getMetaDataList(Class.forName(pluginClassName).kotlin)
+        return getMetaDataList(Class.forName(pluginClassName).kotlin)
     }
 
-    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
-        val pluginClass = Class.forName(pluginClassName).kotlin
-        val result = pluginClass?.companionObject?.declaredMemberProperties?.find { it.name == "FLAGS" }
-        if (result is KProperty1) {
-            result as KProperty1<Any?, EnumSet<Plugin.Flag>>
-            return result.get(pluginClass.companionObjectInstance) as EnumSet<Plugin.Flag>?
-        }
+    // TODO: Read these in loadAll() or something and put them in a map somewhere instead so we don't have to use reflection every time.
 
-        return null
+    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
+        return Dependency[PluginManager::class].pluginClassFlagsMap.get(pluginClassName)
     }
 
     fun getMetaData(className: String): PluginMetadata? {

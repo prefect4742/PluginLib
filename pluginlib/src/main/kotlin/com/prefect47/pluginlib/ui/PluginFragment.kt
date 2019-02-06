@@ -16,9 +16,7 @@ open class PluginFragment : Fragment() {
     }
 
     override fun onAttachFragment(childFragment: Fragment) {
-        childFragment.arguments = childFragment.arguments?.let {
-            it.putAll(arguments); it
-        } ?: Bundle(arguments)
+        childFragment.arguments = childFragment.arguments?.also { it.putAll(arguments) } ?: Bundle(arguments)
         super.onAttachFragment(childFragment)
     }
 }

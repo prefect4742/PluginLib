@@ -5,6 +5,7 @@ import android.content.res.TypedArray
 import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
+import android.widget.EditText
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
@@ -18,7 +19,7 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
         defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
         defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
             : Preference(context, attrs, defStyleAttr, defStyleRes) {
-    var editText: AppCompatEditText? = null
+    var editText: EditText? = null
     var value: String? = null
 
     var inputTypeAttr: Int = InputType.TYPE_CLASS_TEXT
@@ -45,10 +46,14 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
 
     override fun onBindViewHolder(holder: PreferenceViewHolder?) {
         super.onBindViewHolder(holder)
-        editText = (holder?.findViewById(android.R.id.edit) as? AppCompatEditText) ?:
-            throw IllegalStateException("PluginInlineEditTextPreference layout must contain an AppCompatEditText with "
-                    + "id @android:id/edit")
 
+        val view = holder?.findViewById(android.R.id.edit)
+        if (view == null) {
+            throw IllegalStateException("PluginInlineEditTextPreference layout must contain an AppCompatEditText with "
+                        + "id @android:id/edit")
+        }
+
+        editText = view as AppCompatEditText
         editText?.apply {
             inputType = inputTypeAttr
             digitsAttr?.let { keyListener = DigitsKeyListener.getInstance(it) }

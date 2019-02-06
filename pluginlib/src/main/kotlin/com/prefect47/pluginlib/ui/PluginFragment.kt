@@ -7,6 +7,7 @@ import com.prefect47.pluginlib.plugin.PluginMetadata
 
 open class PluginFragment : Fragment() {
     lateinit var metadata: PluginMetadata
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -15,7 +16,9 @@ open class PluginFragment : Fragment() {
     }
 
     override fun onAttachFragment(childFragment: Fragment) {
-        childFragment.arguments = childFragment.arguments?.let { it.putAll(arguments); it } ?: arguments
+        childFragment.arguments = childFragment.arguments?.let {
+            it.putAll(arguments); it
+        } ?: Bundle(arguments)
         super.onAttachFragment(childFragment)
     }
 }

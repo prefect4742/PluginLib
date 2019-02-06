@@ -76,8 +76,6 @@ object PluginLibrary {
         return getMetaDataList(Class.forName(pluginClassName).kotlin)
     }
 
-    // TODO: Read these in loadAll() or something and put them in a map somewhere instead so we don't have to use reflection every time.
-
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
         return Dependency[PluginManager::class].pluginClassFlagsMap.get(pluginClassName)
     }

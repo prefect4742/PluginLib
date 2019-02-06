@@ -31,8 +31,8 @@ class PluginMetadataImpl(override val plugin: Plugin, val context: Context, over
     private val defaultIcon: Drawable by lazy { ContextCompat.getDrawable(context, R.drawable.ic_no_icon)!! }
 
     companion object Factory: PluginMetadataFactory {
-        override fun create(
-            plugin: Plugin, context: Context, pluginContext: Context, pkg: String, cls: String, classLoader: ClassLoader
+        override fun create(plugin: Plugin, context: Context, pluginContext: Context, pkg: String,
+                cls: String, classLoader: ClassLoader
         ): PluginMetadata {
             return PluginMetadataImpl(plugin, context, pluginContext, pkg, cls, classLoader)
         }
@@ -56,19 +56,15 @@ class PluginMetadataImpl(override val plugin: Plugin, val context: Context, over
         return defaultIcon
     }
 
-    override var enabled: Boolean
+    override val enabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(pluginContext).getBoolean(className, false)
-        set(value) {}
 
-    override var title: String
+    override val title: String
         get() = getString("pluginTitle")
-        set(value) {}
 
-    override var description: String
+    override val description: String
         get() = getString("pluginDescription")
-        set(value) {}
 
-    override var icon: Drawable
+    override val icon: Drawable
         get() = getDrawable()
-        set(value) {}
 }

@@ -79,15 +79,10 @@ interface PluginManager {
     val pluginMetadataMap: MutableMap<Plugin, PluginMetadata>
     val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
-    fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
-        cls
-    )
-    ) : T?
+    fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(cls)) : T?
 
     fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-                                      action: String = getAction(
-                                          cls
-                                      ), allowMultiple : Boolean = false)
+            action: String = getAction(cls), allowMultiple : Boolean = false)
 
     fun removePluginListener(listener: PluginListener<*>)
 

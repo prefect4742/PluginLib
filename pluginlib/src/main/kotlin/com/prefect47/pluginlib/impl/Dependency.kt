@@ -90,9 +90,9 @@ object Dependency {
                 }
 
         providers[PluginLibraryControl::class] =
-            DependencyProvider {
-                PluginLibraryControlImpl
-            }
+                DependencyProvider {
+                    PluginLibraryControlImpl
+                }
 
         providers[PluginTrackerFactory::class] =
                 DependencyProvider {

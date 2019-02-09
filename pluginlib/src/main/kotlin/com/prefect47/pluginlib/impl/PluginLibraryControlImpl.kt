@@ -1,12 +1,14 @@
 package com.prefect47.pluginlib.impl
 
+import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import java.util.*
 import kotlin.reflect.KClass
 
 object PluginLibraryControlImpl: PluginLibraryControl {
-    internal val trackers = HashMap<KClass<*>, PluginTracker>()
+    private val trackers = HashMap<KClass<*>, PluginTracker>()
+    private val sharedPreferencesHandlers: ArrayMap<String, PluginSharedPreferencesHandler> = ArrayMap()
 
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
@@ -14,6 +16,8 @@ object PluginLibraryControlImpl: PluginLibraryControl {
     override var debugTag: String = PluginLibraryControl.DEFAULT_DEBUGTAG
     override var notificationChannel: String? = null
     override var notificationIconResId: Int = 0
+
+    override var currentSharedPreferencesHandler: PluginSharedPreferencesHandler? = null
 
     override fun addTracker(tracker: PluginTracker) {
         trackers[tracker.pluginClass] = tracker
@@ -44,14 +48,18 @@ object PluginLibraryControlImpl: PluginLibraryControl {
     }
 
     override fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler) {
-
+        sharedPreferencesHandlers[key] = handler
     }
 
     override fun removeSharedPreferencesHandler(key: String) {
-
+        sharedPreferencesHandlers.remove(key)
     }
 
     override fun switchSharedPreferencesHandler(key: String) {
-
+        currentSharedPreferencesHandler = sharedPreferencesHandlers[key] ?:
+                throw IllegalArgumentException("PluginSharedPreferencesHandler with key $key not found")
+        for ((_, tracker) in trackers) {
+            tracker.pluginList.filterIsInstance<PluginSettings>().forEach { it.onSharedPreferenceHandlerChanged() }
+        }
     }
 }

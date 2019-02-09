@@ -20,5 +20,6 @@ interface PluginSettings: SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Called when app changes the PluginSharedPreferencesFactory. This can happen if the app uses sessions and
     // wishes all its plugins to switch to another set of preferences.
+    // Plugin should reload whatever preferences it has cached.
     fun onSharedPreferenceHandlerChanged() {}
 }

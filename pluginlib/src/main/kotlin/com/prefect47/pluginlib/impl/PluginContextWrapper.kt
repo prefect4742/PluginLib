@@ -20,7 +20,7 @@ import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.view.LayoutInflater
-import androidx.preference.PreferenceManager
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 class PluginContextWrapper(private val appContext: Context, base: Context, private val myClassLoader: ClassLoader,
                            private val pkg: String) : ContextWrapper(base) {
@@ -44,6 +44,10 @@ class PluginContextWrapper(private val appContext: Context, base: Context, priva
     }
 
     override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
+        val handler = Dependency[PluginLibraryControl::class].currentSharedPreferencesHandler
+        handler?.let { return it.getSharedPreferences(name, mode) }
+
+        // If there is no handler set, use common sense.
         name?.equals("${pkg}_preferences")?.let {
             // TODO Prevent plugins from reading anything outside or their own settings
             return super.getSharedPreferences(name, mode)

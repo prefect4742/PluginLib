@@ -15,8 +15,6 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import java.util.EnumSet
 import kotlin.reflect.KClass
@@ -27,6 +25,7 @@ interface PluginLibraryControl {
         val DEFAULT_DEBUGTAG = "PluginLib"
     }
 
+    var currentSharedPreferencesHandler: PluginSharedPreferencesHandler?
     var settingsHandler: PluginListCategory.SettingsHandler?
     var permissionName: String
     var debugEnabled: Boolean

@@ -12,18 +12,12 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib
+package com.prefect47.pluginlib.impl
 
-import android.content.Context
-import com.prefect47.pluginlib.impl.Dependency
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginTracker
+import kotlin.reflect.KClass
 
-object PluginLibrary {
-    const val ARG_CLASSNAME = "pluginClassName"
-
-    fun init(context: Context) {
-        Dependency.init(context)
-    }
-
-    fun getControl() = Dependency[PluginLibraryControl::class]
+interface PluginTrackerFactory {
+    fun <T: Plugin> create(cls: KClass<T>): PluginTracker
 }

@@ -13,45 +13,40 @@
  */
 package com.prefect47.pluginlib.impl
 
-import android.content.Context
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginListener
-import com.prefect47.pluginlib.plugin.PluginMetadata
-import com.prefect47.pluginlib.plugin.PluginTracker
+import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.plugin.PluginTracker.Entry
 import kotlin.reflect.KClass
 
-object PluginTrackerImpl : PluginTracker() {
-
-    class PluginTrackerImpl<T: Plugin>: PluginListener<T>, ArrayList<Entry<T>>() {
-        override fun onPluginConnected(plugin: T, metadata: PluginMetadata) {
-            Dependency[PluginManager::class].debug("Plugin $plugin connected")
-            add(Entry(plugin, metadata))
+class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
+            PluginTracker, PluginListener<T>, ArrayList<Entry<T>>() {
+    companion object Factory: PluginTrackerFactory {
+        init {
+            Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTrackerFactory::class)
         }
 
-        override fun onPluginDisconnected(plugin: T) {
-            Dependency[PluginManager::class].debug("Plugin $plugin disconnected")
-            val iter = listIterator()
-            while (iter.hasNext()) {
-                val entry = iter.next()
-                if (entry.plugin == plugin) {
-                    iter.remove()
-                    return
-                }
+        override fun <T : Plugin> create(cls: KClass<T>): PluginTracker {
+            val tracker = PluginTrackerImpl<T>(cls)
+            Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
+            return tracker
+        }
+    }
+
+    override val pluginList = this
+
+    override fun onPluginConnected(plugin: T, metadata: PluginMetadata) {
+        Dependency[PluginLibraryControl::class].debug("Plugin $plugin connected")
+        add(Entry(plugin, metadata))
+    }
+
+    override fun onPluginDisconnected(plugin: T) {
+        Dependency[PluginLibraryControl::class].debug("Plugin $plugin disconnected")
+        val iter = listIterator()
+        while (iter.hasNext()) {
+            val entry = iter.next()
+            if (entry.plugin == plugin) {
+                iter.remove()
+                return
             }
         }
-    }
-
-    init {
-        Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTracker::class)
-    }
-
-    override fun <T : Plugin> create(cls: KClass<T>): List<Entry<T>> {
-        val tracker = PluginTrackerImpl<T>()
-
-        // Reload the class with our own classloader
-        //val ourCls = Class.forName(cls.qualifiedName).kotlin as KClass<T>
-
-        Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
-        return tracker
     }
 }

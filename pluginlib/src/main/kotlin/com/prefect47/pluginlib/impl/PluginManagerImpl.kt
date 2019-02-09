@@ -35,9 +35,7 @@ import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginListener
-import com.prefect47.pluginlib.plugin.PluginMetadata
+import com.prefect47.pluginlib.plugin.*
 import dalvik.system.PathClassLoader
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.*
@@ -205,19 +203,26 @@ class PluginManagerImpl(val context: Context,
                     label = pm.getApplicationInfo(pkg, 0).loadLabel(pm).toString()
                 } catch (e: NameNotFoundException) {}
 
-                val nb = NotificationCompat.Builder(context, PluginManager.NOTIFICATION_CHANNEL)
-                        .setSmallIcon(PluginManager.NOTIFICATION_ICON)
+                Dependency[PluginLibraryControl::class]?.let { control -> control.notificationChannel?.let {channel ->
+                    val nb = NotificationCompat.Builder(context, channel)
                         .setWhen(0)
                         .setShowWhen(false)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setColor(context.getColor(color))
                         .setContentTitle("Plugin \"$label\" has updated")
                         .setContentText("Restart ExtScanner for changes to take effect.")
-                val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
-                    Uri.parse("package://$pkg"))
-                val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
-                nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
-                NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+
+                    control.notificationIconResId.let {
+                        if (it != 0) nb.setSmallIcon(it)
+                    }
+
+                    val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
+                        Uri.parse("package://$pkg")
+                    )
+                    val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
+                    nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
+                    NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+                } }
             }
             if (clearClassLoader(pkg)) {
                 Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()
@@ -273,7 +278,7 @@ class PluginManagerImpl(val context: Context,
         parentClassLoader.filters.add(filter)
     }
 
-    // This allows plugins to include any libraries or copied code they want by only including
+        // This allows plugins to include any libraries or copied code they want by only including
     // classes from the plugin library.
     private class ClassLoaderFilterInternal(val base: ClassLoader) : ClassLoader(getSystemClassLoader()) {
         val filters = ArrayList<(String) -> Boolean>()
@@ -296,7 +301,7 @@ class PluginManagerImpl(val context: Context,
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             var theThrowable: Throwable = throwable
 
-            if (PluginManager.DEBUG_PLUGINS) {
+            if (Dependency[PluginLibraryControl::class].debugEnabled) {
                 handler.uncaughtException(thread, throwable)
                 return
             }

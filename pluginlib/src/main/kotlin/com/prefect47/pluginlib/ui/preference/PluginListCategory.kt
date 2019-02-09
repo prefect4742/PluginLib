@@ -7,7 +7,9 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.R
+import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
 /**
@@ -43,10 +45,11 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     override fun onAttachedToHierarchy(preferenceManager: PreferenceManager?) {
         super.onAttachedToHierarchy(preferenceManager)
 
-        val allowMulti = PluginLibrary.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
+        val control = Dependency[PluginLibraryControl::class]
+        val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
         val creator: (Context, Int, PluginMetadata)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
-        PluginLibrary.getMetaDataList(className)?.forEach {
+        control.getMetaDataList(className)?.forEach {
             addPreference(creator(context, layoutResId, it))
         }
     }

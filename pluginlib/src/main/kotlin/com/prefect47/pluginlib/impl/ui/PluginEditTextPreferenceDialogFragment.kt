@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.EditText
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary
+import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
 /**
@@ -32,7 +34,7 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        metadata = PluginLibrary.getMetaData(className!!)!!
+        metadata = Dependency[PluginLibraryControl::class].getMetaData(className!!)!!
         super.onCreate(savedInstanceState)
     }
 

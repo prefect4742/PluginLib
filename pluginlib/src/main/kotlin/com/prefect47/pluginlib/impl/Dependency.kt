@@ -17,8 +17,10 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.util.ArrayMap
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginTracker
 import kotlin.reflect.KClass
+import kotlin.reflect.full.companionObjectInstance
 
 /**
  * Class to handle ugly dependencies throughout pluginlib until we determine the
@@ -66,6 +68,10 @@ object Dependency {
     operator fun <T: Any> get(cls: DependencyKey<T>): T =
         getDependencyInner(cls)
 
+    operator fun <T: Any> set(cls: Any, value: T) {
+        setDependencyInner(cls, value)
+    }
+
     @Synchronized
     fun start(context: Context) {
         if (providers.isNotEmpty()) {
@@ -83,9 +89,14 @@ object Dependency {
                     )
                 }
 
-        providers[PluginTracker::class] =
+        providers[PluginLibraryControl::class] =
+            DependencyProvider {
+                PluginLibraryControlImpl
+            }
+
+        providers[PluginTrackerFactory::class] =
                 DependencyProvider {
-                    PluginTrackerImpl
+                    PluginTrackerImpl.Factory
                 }
 
         providers[PluginDependencyProvider::class] =
@@ -124,6 +135,13 @@ object Dependency {
         }
         @Suppress("UNCHECKED_CAST")
         return obj as T
+    }
+
+    @Synchronized
+    private fun <T: Any> setDependencyInner(key: Any, value: T) {
+        if (!dependencies.containsKey(key)) {
+            dependencies[key] = value
+        }
     }
 
     private fun <T: Any> createDependency(cls: Any): T {

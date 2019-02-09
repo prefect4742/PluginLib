@@ -36,11 +36,6 @@ interface PluginManager {
     }
 
     companion object {
-        lateinit var NOTIFICATION_CHANNEL: String
-        var NOTIFICATION_ICON: Int = 0
-        lateinit var PLUGIN_PERMISSION: String
-        var DEBUG_PLUGINS: Boolean = true
-        var APP_TAG: String = "PluginLib"
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
 
@@ -94,22 +89,4 @@ interface PluginManager {
     fun getApplicationContext(): Context
 
     fun addClassFilter(filter: (String) -> Boolean)
-
-    fun setNotification(channel: String, iconResId: Int) {
-        NOTIFICATION_CHANNEL = channel
-        NOTIFICATION_ICON = iconResId
-    }
-
-    fun setPermissionName(permissionName: String) {
-        PLUGIN_PERMISSION = permissionName
-    }
-
-    fun setDebugPlugins(debugPlugins: Boolean, tag: String) {
-        DEBUG_PLUGINS = debugPlugins
-        APP_TAG = tag
-    }
-
-    fun debug(msg: String) {
-        if (DEBUG_PLUGINS) Log.d(APP_TAG, msg)
-    }
 }

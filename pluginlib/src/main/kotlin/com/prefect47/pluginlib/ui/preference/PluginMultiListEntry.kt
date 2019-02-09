@@ -4,8 +4,9 @@ import android.content.Context
 import android.view.View
 import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
-import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.R
+import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginSettings
 
@@ -30,7 +31,7 @@ class PluginMultiListEntry(context: Context, layoutResId: Int,
             if (metadata.plugin is PluginSettings) {
                 it.visibility = View.VISIBLE
                 it.findViewById<View>(R.id.settings_button)?.setOnClickListener {
-                    PluginLibrary.settingsHandler.openSettings(metadata)
+                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(metadata)
                 }
             } else {
                 it.visibility = View.GONE

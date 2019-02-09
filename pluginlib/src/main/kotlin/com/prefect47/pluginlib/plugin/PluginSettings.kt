@@ -17,4 +17,8 @@ interface PluginSettings: SharedPreferences.OnSharedPreferenceChangeListener {
     val preferencesResId: Int
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {}
+
+    // Called when app changes the PluginSharedPreferencesFactory. This can happen if the app uses sessions and
+    // wishes all its plugins to switch to another set of preferences.
+    fun onSharedPreferenceHandlerChanged() {}
 }

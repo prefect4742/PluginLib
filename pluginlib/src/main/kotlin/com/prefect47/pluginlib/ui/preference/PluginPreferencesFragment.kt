@@ -9,8 +9,10 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
+import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginSettings
 
@@ -32,7 +34,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        metadata = PluginLibrary.getMetaData(className!!)!!
+        metadata = Dependency[PluginLibraryControl::class].getMetaData(className!!)!!
 
         preferenceManager.sharedPreferencesName = "${metadata.pkg}_preferences"
 

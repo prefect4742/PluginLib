@@ -16,6 +16,7 @@
 package com.prefect47.pluginlib.plugin
 
 import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.PluginTrackerFactory
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
@@ -25,24 +26,25 @@ import kotlin.reflect.KClass
  */
 
 @ProvidesInterface(version = PluginTracker.VERSION)
-abstract class PluginTracker {
+interface PluginTracker {
     data class Entry<T>(val plugin: T, val metadata: PluginMetadata)
     companion object {
         const val VERSION = 1
 
-        inline fun <reified T : Plugin> create(p: Plugin): List<Entry<T>> {
-            return PluginDependency[p, PluginTracker::class].create(T::class)
+        inline fun <reified T : Plugin> create(p: Plugin): PluginTracker {
+            return PluginDependency[p, PluginTrackerFactory::class].create(T::class)
         }
 
-        inline fun <reified T : Plugin> create(cls: KClass<T>): List<Entry<T>> {
-            return Dependency[PluginTracker::class].create(cls)
+        inline fun <reified T : Plugin> create(cls: KClass<T>): PluginTracker {
+            return Dependency[PluginTrackerFactory::class].create(cls)
         }
     }
 
-    abstract fun <T: Plugin> create(cls: KClass<T>): List<Entry<T>>
+    val pluginClass: KClass<*>
+    val pluginList: List<Entry<*>>
 }
 
-typealias PluginTrackerList<T> = List<PluginTracker.Entry<T>>
+typealias PluginTrackerList<T> = ArrayList<PluginTracker.Entry<T>>
 
 fun <T: Plugin> PluginTrackerList<T>.getMetaData(): List<PluginMetadata> {
     return map { it.metadata }

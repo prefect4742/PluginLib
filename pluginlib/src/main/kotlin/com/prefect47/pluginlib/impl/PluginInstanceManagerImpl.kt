@@ -32,6 +32,7 @@ import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import kotlinx.coroutines.*
@@ -44,7 +45,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
 ): PluginInstanceManager<T> {
 
     companion object Factory: PluginInstanceManager.Factory {
-        private val DEBUG = PluginManager.DEBUG_PLUGINS
+        private val DEBUG = Dependency[PluginLibraryControl::class].debugEnabled
         private const val TAG = "PluginInstanceManager"
 
         override fun <T: Plugin> create(context: Context, action: String, listener: PluginListener<T>?,
@@ -251,7 +252,8 @@ class PluginInstanceManagerImpl<T: Plugin>(
             try {
                 val info = pm.getApplicationInfo(pkg, 0)
                 // TODO: This probably isn't needed given that we don't have IGNORE_SECURITY on
-                if (pm.checkPermission(PluginManager.PLUGIN_PERMISSION, pkg) != PackageManager.PERMISSION_GRANTED) {
+                val permissionName = Dependency[PluginLibraryControl::class].permissionName
+                if (pm.checkPermission(permissionName, pkg) != PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Plugin doesn't have permission: $pkg")
                     return null
                 }
@@ -295,32 +297,41 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
 
         private fun notifyInvalidVersion(component: ComponentName, cls: String, tooNew: Boolean, msg: String?) {
-            val color = Resources.getSystem().getIdentifier(
-                    "system_notification_accent_color", "color", "android")
-            val nb = NotificationCompat.Builder(context, PluginManager.NOTIFICATION_CHANNEL)
-                            .setStyle(NotificationCompat.BigTextStyle())
-                            .setSmallIcon(PluginManager.NOTIFICATION_ICON)
-                            .setWhen(0)
-                            .setShowWhen(false)
-                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                            .setColor(context.getColor(color))
-            var label: String = cls
-            try {
-                label = pm.getServiceInfo(component, 0).loadLabel(pm).toString()
-            } catch (e2: NameNotFoundException) {
-            }
-            if (!tooNew) {
-                nb.setContentTitle("Plugin \"$label\" is too old")
+            Dependency[PluginLibraryControl::class]?.let { control -> control.notificationChannel?.let { channel ->
+
+                val color = Resources.getSystem().getIdentifier(
+                    "system_notification_accent_color", "color", "android"
+                )
+                val nb = NotificationCompat.Builder(context, channel)
+                    .setStyle(NotificationCompat.BigTextStyle())
+                    .setWhen(0)
+                    .setShowWhen(false)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setColor(context.getColor(color))
+
+                control.notificationIconResId.let {
+                    if (it != 0) nb.setSmallIcon(it)
+                }
+
+                var label: String = cls
+                try {
+                    label = pm.getServiceInfo(component, 0).loadLabel(pm).toString()
+                } catch (e2: NameNotFoundException) {
+                }
+                if (!tooNew) {
+                    nb.setContentTitle("Plugin \"$label\" is too old")
                         .setContentText("Contact plugin developer to get an updated version.\n$msg")
-            } else {
-                nb.setContentTitle("Plugin \"$label\" is too new")
+                } else {
+                    nb.setContentTitle("Plugin \"$label\" is too new")
                         .setContentText("Check to see if an OTA is available.\n$msg")
-            }
-            val i: Intent = Intent(PluginManager.DISABLE_PLUGIN).setData(
-                    Uri.parse("package://" + component.flattenToString()))
-            val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
-            nb.addAction(NotificationCompat.Action(0, "Disable plugin", pi))
-            NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+                }
+                val i: Intent = Intent(PluginManager.DISABLE_PLUGIN).setData(
+                    Uri.parse("package://" + component.flattenToString())
+                )
+                val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
+                nb.addAction(NotificationCompat.Action(0, "Disable plugin", pi))
+                NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+            } }
         }
 
         @Throws(InvalidVersionException::class)

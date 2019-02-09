@@ -59,7 +59,7 @@ class PluginManagerImpl(val context: Context,
             context: Context,
             defaultHandler: Thread.UncaughtExceptionHandler
         ): PluginManager {
-            return PluginManagerImpl(context, /*instanceFactory,*/ defaultHandler)
+            return PluginManagerImpl(PluginAppContextWrapper(context), defaultHandler)
         }
     }
 
@@ -74,11 +74,11 @@ class PluginManagerImpl(val context: Context,
     // Lazily load this so it doesn't have any effect on devices without plugins.
     private val parentClassLoader: ClassLoaderFilterInternal by lazy {
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
-        filter.filters.add( { name ->
+        filter.filters.add { name ->
             name.startsWith("com.prefect47.pluginlib") &&
-                !name.startsWith("com.prefect47.pluginlib.plugin") &&
-                !name.startsWith("com.prefect47.pluginlib.ui")
-        } )
+                    !name.startsWith("com.prefect47.pluginlib.plugin") &&
+                    !name.startsWith("com.prefect47.pluginlib.ui")
+        }
         filter
     }
     private var isListening: Boolean = false

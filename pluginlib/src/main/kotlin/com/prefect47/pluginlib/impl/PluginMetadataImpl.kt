@@ -25,16 +25,16 @@ import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
-class PluginMetadataImpl(override val plugin: Plugin, val context: Context, override val pluginContext: Context,
+class PluginMetadataImpl(override val plugin: Plugin,
+                         override val pluginContext: Context,
                          override val pkg: String,
-                         override val className: String, val classLoader: ClassLoader) : PluginMetadata {
-    private val defaultIcon: Drawable by lazy { ContextCompat.getDrawable(context, R.drawable.ic_no_icon)!! }
+                         override val className: String) : PluginMetadata {
+    private val defaultIcon: Drawable by lazy { ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)!! }
 
     companion object Factory: PluginMetadataFactory {
-        override fun create(plugin: Plugin, context: Context, pluginContext: Context, pkg: String,
-                cls: String, classLoader: ClassLoader
+        override fun create(plugin: Plugin, pluginContext: Context, pkg: String, cls: String
         ): PluginMetadata {
-            return PluginMetadataImpl(plugin, context, pluginContext, pkg, cls, classLoader)
+            return PluginMetadataImpl(plugin, pluginContext, pkg, cls)
         }
     }
 

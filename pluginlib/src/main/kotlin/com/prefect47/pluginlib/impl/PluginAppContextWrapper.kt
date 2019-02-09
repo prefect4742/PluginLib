@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 The Android Open Source Project
  * Copyright (C) 2018 Niklas Brunlid
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -15,10 +16,11 @@
 package com.prefect47.pluginlib.impl
 
 import android.content.Context
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginMetadata
+import android.content.ContextWrapper
+import android.content.SharedPreferences
 
-interface PluginMetadataFactory {
-    fun create(plugin: Plugin, pluginContext: Context, pkg: String, cls: String
-    ): PluginMetadata
+class PluginAppContextWrapper(base: Context) : ContextWrapper(base) {
+    override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
+        throw IllegalAccessException("Plugins can't access the applications SHaredPreferences")
+    }
 }

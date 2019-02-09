@@ -278,8 +278,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    val metadata = Dependency[PluginMetadataFactory::class].create(
-                        plugin, context, pluginContext, pkg, cls, classLoader)
+                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin, pluginContext, pkg, cls)
 
                     return PluginInfo(plugin, pluginVersion, metadata)
                 } catch (e: InvalidVersionException) {

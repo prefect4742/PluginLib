@@ -32,7 +32,7 @@ interface PluginInstanceManager<T: Plugin> {
 
     data class PluginInfo<T: Plugin>(val plugin: T, val version: VersionInfo?, val metadata: PluginMetadata)
 
-    fun loadAll()
+    suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean
     fun destroy()

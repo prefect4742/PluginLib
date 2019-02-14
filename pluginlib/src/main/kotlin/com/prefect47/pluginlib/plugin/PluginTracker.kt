@@ -40,6 +40,9 @@ interface PluginTracker {
         }
     }
 
+    suspend fun start()
+    fun stop()
+
     val pluginClass: KClass<*>
     val pluginList: List<Entry<*>>
 }

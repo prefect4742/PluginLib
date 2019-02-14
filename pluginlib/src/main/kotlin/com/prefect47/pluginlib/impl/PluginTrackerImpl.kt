@@ -26,12 +26,25 @@ class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
 
         override fun <T : Plugin> create(cls: KClass<T>): PluginTracker {
             val tracker = PluginTrackerImpl<T>(cls)
-            Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
+            tracker.startFunc = {
+                Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
+            }
             return tracker
         }
     }
 
+    private lateinit var startFunc : suspend () -> Unit
     override val pluginList = this
+
+    override suspend fun start() {
+        Dependency[PluginLibraryControl::class].debug("PluginLib starting tracker ${pluginClass.qualifiedName}")
+        startFunc.invoke()
+        Dependency[PluginLibraryControl::class].debug("PluginLib started tracker ${pluginClass.qualifiedName}")
+    }
+
+    override fun stop() {
+        Dependency[PluginManager::class].removePluginListener(this)
+    }
 
     override fun onPluginConnected(plugin: T, metadata: PluginMetadata) {
         Dependency[PluginLibraryControl::class].debug("Plugin $plugin connected")

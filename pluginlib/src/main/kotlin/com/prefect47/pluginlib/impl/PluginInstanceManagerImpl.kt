@@ -72,7 +72,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw RuntimeException("Must be called from UI thread")
         }
-        pluginHandler.handleQueryPlugins( notify = false ) // Don't call listeners
+        runBlocking {
+            pluginHandler.handleQueryPlugins( notify = false ) // Don't call listeners
+        }
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
             Dependency[PluginPrefs::class].setHasPlugins()
@@ -82,7 +84,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         return null
     }
 
-    override fun loadAll() {
+    override suspend fun loadAll() {
         if (DEBUG) Log.d(TAG, "loadAll")
         pluginHandler.queryAll()
     }
@@ -157,21 +159,19 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
         override val coroutineContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
 
-        fun queryAll() {
-            launch {
-                if (DEBUG) Log.d(TAG, "queryAll $action")
-                plugins.forEach {
-                    listener!!.onPluginDisconnected(it.plugin)
-                    //if (!(it.plugin is PluginFragment)) {
-                        // Only call onDestroy for plugins that aren't fragments, as fragments
-                        // will get the onDestroy as part of the fragment lifecycle.
-                        it.plugin.onDestroy()
-                    //}
-                    manager.pluginMetadataMap.remove(it.plugin)
-                }
-                plugins.clear()
-                handleQueryPlugins()
+        suspend fun queryAll() {
+            if (DEBUG) Log.d(TAG, "queryAll $action")
+            plugins.forEach {
+                listener!!.onPluginDisconnected(it.plugin)
+                //if (!(it.plugin is PluginFragment)) {
+                    // Only call onDestroy for plugins that aren't fragments, as fragments
+                    // will get the onDestroy as part of the fragment lifecycle.
+                    it.plugin.onDestroy()
+                //}
+                manager.pluginMetadataMap.remove(it.plugin)
             }
+            plugins.clear()
+            handleQueryPlugins()
         }
 
         fun removePackage(pkg: String) {
@@ -224,7 +224,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
             }
         }
 
-        fun handleQueryPlugins(pkgName: String? = null, notify: Boolean = true) {
+        suspend fun handleQueryPlugins(pkgName: String? = null, notify: Boolean = true) {
             // This isn't actually a service and shouldn't ever be started, but is
             // a convenient PM based way to manage our plugins.
             val intent = Intent(action)
@@ -238,11 +238,17 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 Log.w(TAG, "Multiple plugins found for $action")
                 return
             }
-            result.forEach {
-                val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
-                val info = handleLoadPlugin(name) ?: return@forEach
-                notify.let { handlePluginConnected(info) }
-                plugins.add(info)
+
+            coroutineScope {
+                result.forEach {
+                    async(coroutineContext) {
+                        val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
+                        handleLoadPlugin(name)?.let { info ->
+                            notify.let { handlePluginConnected(info) }
+                            plugins.add(info)
+                        }
+                    }
+                }
             }
         }
 
@@ -297,7 +303,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
 
         private fun notifyInvalidVersion(component: ComponentName, cls: String, tooNew: Boolean, msg: String?) {
-            Dependency[PluginLibraryControl::class]?.let { control -> control.notificationChannel?.let { channel ->
+            Dependency[PluginLibraryControl::class].let { control -> control.notificationChannel?.let { channel ->
 
                 val color = Resources.getSystem().getIdentifier(
                     "system_notification_accent_color", "color", "android"

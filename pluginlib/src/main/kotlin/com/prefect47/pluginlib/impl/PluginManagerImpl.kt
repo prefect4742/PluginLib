@@ -37,6 +37,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.*
 import dalvik.system.PathClassLoader
+import kotlinx.coroutines.*
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.*
 import kotlin.reflect.KClass
@@ -130,7 +131,7 @@ class PluginManagerImpl(val context: Context,
         return null
     }
 
-    override fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
+    override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
                                                allowMultiple: Boolean) {
         Dependency[PluginPrefs::class].addAction(action)
         val p: PluginInstanceManager<T> = factory.create(context, action, listener, allowMultiple, cls, this)
@@ -177,60 +178,69 @@ class PluginManagerImpl(val context: Context,
     }
 
     @Override
-    override fun onReceive(context: Context, intent: Intent)  = when(intent.action) {
-        Intent.ACTION_USER_UNLOCKED -> {
-            pluginMap.values.forEach { it.loadAll() }
-        }
-        PluginManager.DISABLE_PLUGIN -> {
-            val uri: Uri = intent.data!!
-            val component = ComponentName.unflattenFromString(uri.toString().substring(10))!!
-            context.packageManager.setComponentEnabledSetting(
-                component,
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP
-            )
-            context.getSystemService(NotificationManager::class.java).cancel(notificationId)
-        }
-        else -> {
-            val data: Uri = intent.data!!
-            val pkg: String = data.encodedSchemeSpecificPart
-            if (oneShotPackages.contains(pkg)) {
-                val color = Resources.getSystem().getIdentifier(
-                    "system_notification_accent_color", "color", "android")
-                var label: String = pkg
-                try {
-                    val pm: PackageManager = context.packageManager
-                    label = pm.getApplicationInfo(pkg, 0).loadLabel(pm).toString()
-                } catch (e: NameNotFoundException) {}
+    override fun onReceive(context: Context, intent: Intent) {
 
-                Dependency[PluginLibraryControl::class]?.let { control -> control.notificationChannel?.let {channel ->
-                    val nb = NotificationCompat.Builder(context, channel)
-                        .setWhen(0)
-                        .setShowWhen(false)
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setColor(context.getColor(color))
-                        .setContentTitle("Plugin \"$label\" has updated")
-                        .setContentText("Restart ExtScanner for changes to take effect.")
-
-                    control.notificationIconResId.let {
-                        if (it != 0) nb.setSmallIcon(it)
+        when (intent.action) {
+            Intent.ACTION_USER_UNLOCKED -> {
+                GlobalScope.launch(Dispatchers.Default) {
+                    pluginMap.values.forEach { it.loadAll() }
+                }
+            }
+            PluginManager.DISABLE_PLUGIN -> {
+                val uri: Uri = intent.data!!
+                val component = ComponentName.unflattenFromString(uri.toString().substring(10))!!
+                context.packageManager.setComponentEnabledSetting(
+                    component,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+                )
+                context.getSystemService(NotificationManager::class.java).cancel(notificationId)
+            }
+            else -> {
+                val data: Uri = intent.data!!
+                val pkg: String = data.encodedSchemeSpecificPart
+                if (oneShotPackages.contains(pkg)) {
+                    val color = Resources.getSystem().getIdentifier(
+                        "system_notification_accent_color", "color", "android"
+                    )
+                    var label: String = pkg
+                    try {
+                        val pm: PackageManager = context.packageManager
+                        label = pm.getApplicationInfo(pkg, 0).loadLabel(pm).toString()
+                    } catch (e: NameNotFoundException) {
                     }
 
-                    val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
-                        Uri.parse("package://$pkg")
-                    )
-                    val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
-                    nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
-                    NotificationManagerCompat.from(context).notify(notificationId, nb.build())
-                } }
-            }
-            if (clearClassLoader(pkg)) {
-                Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()
-            }
-            if (Intent.ACTION_PACKAGE_REMOVED != intent.action) {
-                pluginMap.values.forEach { it.onPackageChange(pkg) }
-            } else {
-                pluginMap.values.forEach { it.onPackageRemoved(pkg) }
+                    Dependency[PluginLibraryControl::class]?.let { control ->
+                        control.notificationChannel?.let { channel ->
+                            val nb = NotificationCompat.Builder(context, channel)
+                                .setWhen(0)
+                                .setShowWhen(false)
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                                .setColor(context.getColor(color))
+                                .setContentTitle("Plugin \"$label\" has updated")
+                                .setContentText("Restart ExtScanner for changes to take effect.")
+
+                            control.notificationIconResId.let {
+                                if (it != 0) nb.setSmallIcon(it)
+                            }
+
+                            val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
+                                Uri.parse("package://$pkg")
+                            )
+                            val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
+                            nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
+                            NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+                        }
+                    }
+                }
+                if (clearClassLoader(pkg)) {
+                    Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()
+                }
+                if (Intent.ACTION_PACKAGE_REMOVED != intent.action) {
+                    pluginMap.values.forEach { it.onPackageChange(pkg) }
+                } else {
+                    pluginMap.values.forEach { it.onPackageRemoved(pkg) }
+                }
             }
         }
     }

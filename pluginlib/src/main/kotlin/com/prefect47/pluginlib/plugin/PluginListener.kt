@@ -15,8 +15,6 @@
 
 package com.prefect47.pluginlib.plugin
 
-import android.content.Context
-
 /**
  * Interface for listening to plugins being connected.
  */

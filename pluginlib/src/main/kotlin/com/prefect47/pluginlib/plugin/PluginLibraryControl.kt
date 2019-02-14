@@ -25,6 +25,13 @@ interface PluginLibraryControl {
         val DEFAULT_DEBUGTAG = "PluginLib"
     }
 
+    interface StateListener {
+        fun onStarted() // All added trackers have loaded their plugins
+        fun onPaused()
+        fun onResumed()
+        fun onStopped()
+    }
+
     var currentSharedPreferencesHandler: PluginSharedPreferencesHandler?
     var settingsHandler: PluginListCategory.SettingsHandler?
     var permissionName: String
@@ -34,6 +41,14 @@ interface PluginLibraryControl {
     var notificationIconResId: Int
 
     fun addTracker(tracker: PluginTracker)
+
+    fun addStateListener(listener: StateListener)
+    fun removeStateListener(listener: StateListener)
+
+    suspend fun start()
+    fun pause()
+    fun resume()
+    fun stop()
 
     /**
      * Add a [filter] to the plugin classloader that lets plugins use libraries or code where class names might

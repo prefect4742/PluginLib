@@ -17,6 +17,9 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
+import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginManager
 
@@ -120,8 +123,15 @@ interface Plugin {
         ALLOW_SIMULTANEOUS_USE // Allow multiple plugins of this type to be enabled at the same time
     }
 
-    fun getPluginContext(): Context = Dependency[PluginManager::class].pluginMetadataMap.get(this)!!.pluginContext
-    fun getApplicationContext(): Context = Dependency[PluginManager::class].getApplicationContext()
+    val pluginContext: Context
+        get() = Dependency[PluginManager::class].pluginMetadataMap.get(this)!!.pluginContext
+    val applicationContext: Context
+        get() = Dependency[PluginManager::class].getApplicationContext()
+
+    val title: String
+    val description: String
+    val icon: Drawable?
+        get() = ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)
 
     fun onCreate() {}
 

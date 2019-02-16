@@ -19,9 +19,9 @@ class PluginMultiListEntry(context: Context, layoutResId: Int,
                            private val metadata: PluginMetadata) : CheckBoxPreference(context) {
     init {
         layoutResource = layoutResId
-        title = metadata.title
-        summary = metadata.description
-        icon = metadata.icon
+        title = metadata.plugin.title
+        summary = metadata.plugin.description
+        icon = metadata.plugin.icon
         key = metadata.className
     }
 

@@ -4,11 +4,12 @@ import android.content.Context
 import android.view.View
 import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
-import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginSettings
+import kotlinx.android.synthetic.main.plugin_pref.view.*
+import kotlinx.android.synthetic.main.plugin_setting.view.*
 
 /**
  * Preference with plugin metadata. Turns on the settings button if plugin has a settings layout.
@@ -27,10 +28,10 @@ class PluginMultiListEntry(context: Context, layoutResId: Int,
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
-        holder.findViewById(R.id.settings_frame)?.let {
+        holder.itemView.settings_frame?.let {
             if (metadata.plugin is PluginSettings) {
                 it.visibility = View.VISIBLE
-                it.findViewById<View>(R.id.settings_button)?.setOnClickListener {
+                it.settings_button?.setOnClickListener {
                     Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(metadata)
                 }
             } else {

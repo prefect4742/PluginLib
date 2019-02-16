@@ -11,6 +11,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.extensions.afterTextChanged
+import kotlinx.android.synthetic.main.plugin_pref_inline_edittext.view.*
 
 /**
  * Inline EditText Preference.
@@ -44,17 +45,10 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
         layoutResource = R.layout.plugin_pref_inline_edittext
     }
 
-    override fun onBindViewHolder(holder: PreferenceViewHolder?) {
+    override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
 
-        val view = holder?.findViewById(android.R.id.edit)
-        if (view == null) {
-            throw IllegalStateException("PluginInlineEditTextPreference layout must contain an AppCompatEditText with "
-                        + "id @android:id/edit")
-        }
-
-        editText = view as AppCompatEditText
-        editText?.apply {
+        holder.itemView.edit?.apply {
             inputType = inputTypeAttr
             digitsAttr?.let { keyListener = DigitsKeyListener.getInstance(it) }
             hintAttr?.let { hint = hintAttr }
@@ -67,7 +61,8 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
                 }
             }
             isEnabled = this@PluginInlineEditTextPreference.isEnabled
-        }
+        } ?: throw IllegalStateException("PluginInlineEditTextPreference layout must contain an AppCompatEditText with "
+                        + "id @android:id/edit")
     }
 
     override fun onSetInitialValue(defaultValue: Any?) {

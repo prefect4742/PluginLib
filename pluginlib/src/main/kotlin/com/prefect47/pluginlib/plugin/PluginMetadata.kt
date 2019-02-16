@@ -15,7 +15,6 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 
 interface PluginMetadata {
     val pkg: String
@@ -25,8 +24,4 @@ interface PluginMetadata {
     val plugin: Plugin
 
     val enabled: Boolean
-
-    val title: String
-    val description: String
-    val icon: Drawable
 }

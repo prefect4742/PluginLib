@@ -17,11 +17,8 @@ package com.prefect47.pluginlib.impl
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
@@ -29,8 +26,6 @@ class PluginMetadataImpl(override val plugin: Plugin,
                          override val pluginContext: Context,
                          override val pkg: String,
                          override val className: String) : PluginMetadata {
-    private val defaultIcon: Drawable by lazy { ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)!! }
-
     companion object Factory: PluginMetadataFactory {
         override fun create(plugin: Plugin, pluginContext: Context, pkg: String, cls: String
         ): PluginMetadata {
@@ -43,28 +38,6 @@ class PluginMetadataImpl(override val plugin: Plugin,
         pluginContext.packageManager.getServiceInfo(myService, PackageManager.GET_META_DATA).metaData
     }
 
-    private fun getString(key: String): String {
-        data.getInt("${key}Res").let { if (it !=0) return pluginContext.resources.getString(it) }
-        data.getString(key)?.let {return it}
-        return "NO_STRING"
-    }
-
-    private fun getDrawable(): Drawable {
-        data.getInt("pluginIconRes").let {
-            if (it != 0 ) ContextCompat.getDrawable(pluginContext, it)?.let { drawable -> return drawable }
-        }
-        return defaultIcon
-    }
-
     override val enabled: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(pluginContext).getBoolean(className, false)
-
-    override val title: String
-        get() = getString("pluginTitle")
-
-    override val description: String
-        get() = getString("pluginDescription")
-
-    override val icon: Drawable
-        get() = getDrawable()
 }

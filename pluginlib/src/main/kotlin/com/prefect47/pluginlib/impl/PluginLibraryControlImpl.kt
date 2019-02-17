@@ -6,6 +6,7 @@ import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -44,7 +45,7 @@ object PluginLibraryControlImpl: PluginLibraryControl {
         debug("PluginLib starting")
         GlobalScope.async(Dispatchers.Default) {
             for ((_, tracker) in trackers) {
-                tracker.start()
+                launch { tracker.start() }
             }
         }.join()
         debug("PluginLib started")

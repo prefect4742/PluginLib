@@ -6,12 +6,10 @@ import android.text.InputType
 import android.text.method.DigitsKeyListener
 import android.util.AttributeSet
 import android.widget.EditText
-import androidx.appcompat.widget.AppCompatEditText
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.extensions.afterTextChanged
-import kotlinx.android.synthetic.main.plugin_pref_inline_edittext.view.*
 
 /**
  * Inline EditText Preference.
@@ -20,7 +18,6 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
         defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
         defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
             : Preference(context, attrs, defStyleAttr, defStyleRes) {
-    var editText: EditText? = null
     var value: String? = null
 
     var inputTypeAttr: Int = InputType.TYPE_CLASS_TEXT
@@ -48,7 +45,7 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(context: Context,
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
 
-        holder.itemView.edit?.apply {
+        holder.itemView.findViewById<EditText>(android.R.id.edit)?.apply {
             inputType = inputTypeAttr
             digitsAttr?.let { keyListener = DigitsKeyListener.getInstance(it) }
             hintAttr?.let { hint = hintAttr }

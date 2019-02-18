@@ -62,7 +62,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val f: DialogFragment
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
-                metadata.className,
+                metadata.plugin::class.qualifiedName!!,
                 preference.key,
                 preference.inputType,
                 preference.digits

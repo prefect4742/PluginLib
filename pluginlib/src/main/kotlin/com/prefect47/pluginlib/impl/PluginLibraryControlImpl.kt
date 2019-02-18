@@ -78,7 +78,7 @@ object PluginLibraryControlImpl: PluginLibraryControl {
 
     override fun getMetaData(className: String): PluginMetadata? {
         for ((_, tracker) in trackers) {
-            tracker.pluginList.find { it.metadata.className == className }?.let { return it.metadata }
+            tracker.pluginList.find { it.plugin::class.qualifiedName == className }?.let { return it.metadata }
         }
         return null
     }

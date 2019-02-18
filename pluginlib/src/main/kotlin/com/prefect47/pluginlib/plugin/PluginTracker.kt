@@ -44,7 +44,7 @@ interface PluginTracker {
     fun stop()
 
     val pluginClass: KClass<*>
-    val pluginList: List<Entry<*>>
+    val pluginList: List<Entry<Plugin>>
 }
 
 typealias PluginTrackerList<T> = ArrayList<PluginTracker.Entry<T>>

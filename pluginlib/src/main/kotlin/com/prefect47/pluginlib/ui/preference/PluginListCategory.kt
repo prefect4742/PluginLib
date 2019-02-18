@@ -24,7 +24,7 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     private var layoutResId = R.layout.plugin_pref
 
     interface SettingsHandler {
-        fun openSettings(metadata: PluginMetadata)
+        fun openSettings(plugin: Plugin)
     }
 
     init {

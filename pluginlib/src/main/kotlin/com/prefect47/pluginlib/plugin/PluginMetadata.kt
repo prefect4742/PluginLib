@@ -18,7 +18,6 @@ import android.content.Context
 
 interface PluginMetadata {
     val pkg: String
-    val className: String
 
     val pluginContext: Context
     val plugin: Plugin

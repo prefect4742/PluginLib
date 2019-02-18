@@ -78,7 +78,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
             Dependency[PluginPrefs::class].setHasPlugins()
-            info.metadata.plugin.onCreate()
+            info.plugin.onCreate()
             return info
         }
         return null
@@ -143,7 +143,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
     override fun <P: Any> dependsOn(p: Plugin, cls: KClass<P>): Boolean {
         val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
         plugins.forEach {
-            if (it.metadata.plugin::class.simpleName.equals(p::class.simpleName)) {
+            if (it.plugin::class.simpleName.equals(p::class.simpleName)) {
                 return (it.version != null && it.version.hasClass(cls))
             }
         }
@@ -207,7 +207,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onCreate as part of the fragment lifecycle.
                     info.plugin.onCreate()
                 //}
-                listener!!.onPluginConnected(info.plugin, info.metadata)
+                listener!!.onPluginConnected(info.plugin)
             }
         }
 
@@ -288,9 +288,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin)
-
-                    return PluginInfo(plugin, pkg, pluginVersion, pluginContext, metadata)
+                    return PluginInfo(plugin, pkg, pluginVersion, pluginContext)
                 } catch (e: InvalidVersionException) {
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.

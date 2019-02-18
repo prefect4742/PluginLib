@@ -4,17 +4,17 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginMetadata
 
 open class PluginFragment : Fragment() {
-    lateinit var metadata: PluginMetadata
+    lateinit var plugin: Plugin
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        metadata = Dependency[PluginLibraryControl::class].getMetaData(className!!)!!
+        plugin = Dependency[PluginLibraryControl::class].getPlugin(className!!)!!
     }
 
     override fun onAttachFragment(childFragment: Fragment) {

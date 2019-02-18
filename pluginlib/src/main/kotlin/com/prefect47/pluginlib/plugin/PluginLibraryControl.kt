@@ -56,12 +56,12 @@ interface PluginLibraryControl {
      */
     fun addClassFilter(filter: (String) -> Boolean)
 
-    fun getMetaDataList(cls: KClass<*>): List<PluginMetadata>?
-    fun getMetaDataList(pluginClassName: String): List<PluginMetadata>?
+    fun getPluginList(cls: KClass<*>): List<Plugin>?
+    fun getPluginList(pluginClassName: String): List<Plugin>?
 
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
 
-    fun getMetaData(className: String): PluginMetadata?
+    fun getPlugin(className: String): Plugin?
 
     fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler)
     fun removeSharedPreferencesHandler(key: String)

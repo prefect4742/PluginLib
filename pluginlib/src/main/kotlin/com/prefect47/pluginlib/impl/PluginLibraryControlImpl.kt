@@ -64,21 +64,19 @@ object PluginLibraryControlImpl: PluginLibraryControl {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getMetaDataList(cls: KClass<*>): List<PluginMetadata>? {
-        return trackers[cls]?.pluginList?.map { it.metadata }
-    }
+    override fun getPluginList(cls: KClass<*>): List<Plugin>? = trackers[cls]?.pluginList
 
-    override fun getMetaDataList(pluginClassName: String): List<PluginMetadata>? {
-        return getMetaDataList(Class.forName(pluginClassName).kotlin)
+    override fun getPluginList(pluginClassName: String): List<Plugin>? {
+        return getPluginList(Class.forName(pluginClassName).kotlin)
     }
 
     override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
         return Dependency[PluginManager::class].pluginClassFlagsMap[pluginClassName]
     }
 
-    override fun getMetaData(className: String): PluginMetadata? {
+    override fun getPlugin(className: String): Plugin? {
         for ((_, tracker) in trackers) {
-            tracker.pluginList.find { it.plugin::class.qualifiedName == className }?.let { return it.metadata }
+            tracker.pluginList.find { it::class.qualifiedName == className }?.let { return it }
         }
         return null
     }

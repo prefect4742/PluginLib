@@ -13,8 +13,8 @@ import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginContextWrapper
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
+import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginSettings
 
 /**
@@ -30,20 +30,20 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     }
 
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
-    private lateinit var metadata: PluginMetadata
+    private lateinit var plugin: Plugin
     private var activityResultHandler: ActivityResultHandler? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        metadata = Dependency[PluginLibraryControl::class].getMetaData(className!!)!!
+        plugin = Dependency[PluginLibraryControl::class].getPlugin(className!!)!!
 
-        val contextWrapper = metadata.plugin.pluginContext as PluginContextWrapper
+        val contextWrapper = plugin.pluginContext as PluginContextWrapper
         preferenceManager.sharedPreferencesName = "${contextWrapper.pkg}_preferences"
 
-        val preferencesResId = (metadata.plugin as PluginSettings).preferencesResId
+        val preferencesResId = (plugin as PluginSettings).preferencesResId
         addPreferencesFromResource(preferencesResId)
 
-        prefsListener = metadata.plugin as SharedPreferences.OnSharedPreferenceChangeListener
+        prefsListener = plugin as SharedPreferences.OnSharedPreferenceChangeListener
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
@@ -64,7 +64,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val f: DialogFragment
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
-                metadata.plugin::class.qualifiedName!!,
+                plugin::class.qualifiedName!!,
                 preference.key,
                 preference.inputType,
                 preference.digits

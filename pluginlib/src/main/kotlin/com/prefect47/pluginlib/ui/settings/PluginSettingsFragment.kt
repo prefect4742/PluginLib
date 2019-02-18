@@ -11,7 +11,7 @@ class PluginSettingsFragment : PluginFragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val layoutResId = (metadata.plugin as PluginSettings).layoutResId
+        val layoutResId = (plugin as PluginSettings).layoutResId
         return inflater.inflate(layoutResId, container, false)
     }
 }

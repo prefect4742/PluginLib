@@ -14,11 +14,10 @@
 package com.prefect47.pluginlib.impl
 
 import com.prefect47.pluginlib.plugin.*
-import com.prefect47.pluginlib.plugin.PluginTracker.Entry
 import kotlin.reflect.KClass
 
 class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
-            PluginTracker, PluginListener<T>, ArrayList<Entry<Plugin>>() {
+            PluginTracker, PluginListener<T>, ArrayList<Plugin>() {
     companion object Factory: PluginTrackerFactory {
         init {
             Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTrackerFactory::class)
@@ -46,9 +45,9 @@ class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
         Dependency[PluginManager::class].removePluginListener(this)
     }
 
-    override fun onPluginConnected(plugin: T, metadata: PluginMetadata) {
+    override fun onPluginConnected(plugin: T) {
         Dependency[PluginLibraryControl::class].debug("Plugin $plugin connected")
-        add(Entry(plugin, metadata))
+        add(plugin)
     }
 
     override fun onPluginDisconnected(plugin: T) {
@@ -56,7 +55,7 @@ class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
         val iter = listIterator()
         while (iter.hasNext()) {
             val entry = iter.next()
-            if (entry.plugin == plugin) {
+            if (entry == plugin) {
                 iter.remove()
                 return
             }

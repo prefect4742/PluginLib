@@ -5,8 +5,8 @@ import android.view.View
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreference
 import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginMetadata
 import com.prefect47.pluginlib.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
 import kotlinx.android.synthetic.main.plugin_setting.view.*
@@ -16,23 +16,22 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * This preference is meant to be part of a list where only one can be selected, since it inherits
  * SwitchPreference.
  */
-class PluginSingleListEntry(context: Context, layoutResId: Int,
-                            private val metadata: PluginMetadata) : SwitchPreference(context) {
+class PluginSingleListEntry(context: Context, layoutResId: Int, private val plugin: Plugin) : SwitchPreference(context) {
     init {
         layoutResource = layoutResId
-        title = metadata.plugin.title
-        summary = metadata.plugin.description
-        icon = metadata.plugin.icon
-        key = metadata.plugin::class.qualifiedName
+        title = plugin.title
+        summary = plugin.description
+        icon = plugin.icon
+        key = plugin::class.qualifiedName
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         holder.itemView.settings_frame?.let {
-            if (metadata.plugin is PluginSettings) {
+            if (plugin is PluginSettings) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
-                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(metadata.plugin)
+                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(plugin)
                 }
             } else {
                 it.visibility = View.GONE

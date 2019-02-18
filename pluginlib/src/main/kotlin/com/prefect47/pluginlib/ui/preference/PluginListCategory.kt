@@ -9,7 +9,6 @@ import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginMetadata
 
 /**
  * Preference category that automatically adds all plugins of its type and sets their common layout.
@@ -46,23 +45,21 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
 
         val control = Dependency[PluginLibraryControl::class]
         val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
-        val creator: (Context, Int, PluginMetadata)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
+        val creator: (Context, Int, Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
-        control.getMetaDataList(className)?.forEach {
+        control.getPluginList(className)?.forEach {
             addPreference(creator(context, layoutResId, it))
         }
     }
 
-    private fun createPref(context: Context, layoutResId: Int, metadata: PluginMetadata) : Preference {
-        return PluginSingleListEntry(context, layoutResId, metadata).apply {
+    private fun createPref(context: Context, layoutResId: Int, plugin: Plugin) =
+        PluginSingleListEntry(context, layoutResId, plugin).apply {
             setOnPreferenceChangeListener { preference, newValue ->
                 preferenceChanged(preference as PluginSingleListEntry, newValue as Boolean) }
         }
-    }
 
-    private fun createMultiPref(context: Context, layoutResId: Int, metadata: PluginMetadata) : Preference {
-        return PluginMultiListEntry(context, layoutResId, metadata)
-    }
+    private fun createMultiPref(context: Context, layoutResId: Int, plugin: Plugin) =
+        PluginMultiListEntry(context, layoutResId, plugin)
 
     private fun preferenceChanged(preference: PluginSingleListEntry, newValue: Boolean): Boolean {
         return if (newValue) {

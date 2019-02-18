@@ -27,7 +27,6 @@ import kotlin.reflect.KClass
 
 @ProvidesInterface(version = PluginTracker.VERSION)
 interface PluginTracker {
-    data class Entry<T>(val plugin: T, val metadata: PluginMetadata)
     companion object {
         const val VERSION = 1
 
@@ -44,11 +43,12 @@ interface PluginTracker {
     fun stop()
 
     val pluginClass: KClass<*>
-    val pluginList: List<Entry<Plugin>>
+    val pluginList: List<Plugin>
 }
 
-typealias PluginTrackerList<T> = ArrayList<PluginTracker.Entry<T>>
+//typealias PluginTrackerList<T> = ArrayList<Plugin>
 
-fun <T: Plugin> PluginTrackerList<T>.getMetaData(): List<PluginMetadata> {
-    return map { it.metadata }
+/*fun <T: Plugin> PluginTrackerList<T>.getMetaData(): List<Plugin> {
+    return map { it }
 }
+*/

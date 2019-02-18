@@ -18,7 +18,6 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
-import com.prefect47.pluginlib.plugin.PluginMetadata
 import kotlin.reflect.KClass
 
 interface PluginInstanceManager<T: Plugin> {
@@ -34,8 +33,7 @@ interface PluginInstanceManager<T: Plugin> {
         val plugin: T,
         val pkg: String,
         val version: VersionInfo?,
-        val context: Context,
-        val metadata: PluginMetadata)
+        val context: Context)
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean

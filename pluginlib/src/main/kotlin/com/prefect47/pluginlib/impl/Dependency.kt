@@ -112,11 +112,6 @@ object Dependency {
                     PluginInstanceManagerImpl.Factory
                 }
 
-        providers[PluginMetadataFactory::class] =
-                DependencyProvider {
-                    PluginMetadataImpl.Factory
-                }
-
         // TODO: Allow app that uses library to add its own dependencies
         /*
         providers.put(PluginDependencyProvider::class,

@@ -14,30 +14,29 @@
 
 package com.prefect47.pluginlib.impl
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Bundle
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
 class PluginMetadataImpl(override val plugin: Plugin,
                          override val pluginContext: Context,
-                         override val pkg: String,
-                         override val className: String) : PluginMetadata {
+                         override val pkg: String) : PluginMetadata {
     companion object Factory: PluginMetadataFactory {
-        override fun create(plugin: Plugin, pluginContext: Context, pkg: String, cls: String
+        override fun create(plugin: Plugin, pluginContext: Context, pkg: String
         ): PluginMetadata {
-            return PluginMetadataImpl(plugin, pluginContext, pkg, cls)
+            return PluginMetadataImpl(plugin, pluginContext, pkg)
         }
     }
 
+    /*
     private val data: Bundle by lazy {
-        val myService = ComponentName(pluginContext, className)
+        val myService = ComponentName(pluginContext, plugin::class.qualifiedName)
         pluginContext.packageManager.getServiceInfo(myService, PackageManager.GET_META_DATA).metaData
     }
+    */
 
     override val enabled: Boolean
-        get() = PreferenceManager.getDefaultSharedPreferences(pluginContext).getBoolean(className, false)
+        get() = PreferenceManager.getDefaultSharedPreferences(pluginContext).getBoolean(
+            plugin::class.qualifiedName, false)
 }

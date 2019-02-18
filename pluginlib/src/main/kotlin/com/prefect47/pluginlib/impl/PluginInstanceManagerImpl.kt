@@ -133,9 +133,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin ${info.metadata.pkg}/${info.metadata.className}")
+        Log.w(TAG, "Disabling plugin ${info.metadata.pkg}/${info.plugin::class.qualifiedName}")
         pm.setComponentEnabledSetting(
-                ComponentName(info.metadata.pkg, info.metadata.className),
+                ComponentName(info.metadata.pkg, info.plugin::class.qualifiedName),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP)
     }
@@ -286,7 +286,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin, pluginContext, pkg, cls)
+                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin, pluginContext, pkg)
 
                     return PluginInfo(plugin, pluginVersion, metadata)
                 } catch (e: InvalidVersionException) {

@@ -24,7 +24,7 @@ class PluginSingleListEntry(context: Context, layoutResId: Int,
         title = metadata.plugin.title
         summary = metadata.plugin.description
         icon = metadata.plugin.icon
-        key = metadata.className
+        key = metadata.plugin::class.qualifiedName
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -33,7 +33,7 @@ class PluginSingleListEntry(context: Context, layoutResId: Int,
             if (metadata.plugin is PluginSettings) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
-                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(metadata)
+                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(metadata.plugin)
                 }
             } else {
                 it.visibility = View.GONE

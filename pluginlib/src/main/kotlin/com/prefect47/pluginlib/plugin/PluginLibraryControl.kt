@@ -21,8 +21,8 @@ import kotlin.reflect.KClass
 
 interface PluginLibraryControl {
     companion object {
-        val DEFAULT_PERMISSIONNAME = "com.prefect47.pluginlib.permission.PLUGIN"
-        val DEFAULT_DEBUGTAG = "PluginLib"
+        const val DEFAULT_PERMISSIONNAME = "com.prefect47.pluginlib.permission.PLUGIN"
+        const val DEFAULT_DEBUGTAG = "PluginLib"
     }
 
     interface StateListener {

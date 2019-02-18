@@ -110,7 +110,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         var disableAny = false
         val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
         plugins.forEach {
-            if (className.startsWith(it.metadata.pkg)) {
+            if (className.startsWith(it.pkg)) {
                 disable(it)
                 disableAny = true
             }
@@ -133,9 +133,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin ${info.metadata.pkg}/${info.plugin::class.qualifiedName}")
+        Log.w(TAG, "Disabling plugin ${info.pkg}/${info.plugin::class.qualifiedName}")
         pm.setComponentEnabledSetting(
-                ComponentName(info.metadata.pkg, info.plugin::class.qualifiedName),
+                ComponentName(info.pkg, info.plugin::class.qualifiedName),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP)
     }
@@ -168,7 +168,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     it.plugin.onDestroy()
                 //}
-                manager.pluginMetadataMap.remove(it.plugin)
+                manager.pluginContextMap.remove(it.plugin)
             }
             plugins.clear()
             handleQueryPlugins()
@@ -177,7 +177,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         fun removePackage(pkg: String) {
             launch {
                 plugins.forEach {
-                    if (it.metadata.pkg == pkg) {
+                    if (it.pkg == pkg) {
                         handlePluginDisconnected(it)
                         plugins.remove(it)
                     }
@@ -200,7 +200,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
             Dependency[PluginPrefs::class].setHasPlugins()
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
-                manager.pluginMetadataMap.put(info.plugin, info.metadata)
+                manager.pluginContextMap[info.plugin] = info.context
 
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
@@ -220,7 +220,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     info.plugin.onDestroy()
                 //}
-                manager.pluginMetadataMap.remove(info.plugin)
+                manager.pluginContextMap.remove(info.plugin)
             }
         }
 
@@ -241,10 +241,12 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
             coroutineScope {
                 result.forEach {
-                    async(coroutineContext) {
+                    launch(coroutineContext) {
                         val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
                         handleLoadPlugin(name)?.let { info ->
-                            notify.let { handlePluginConnected(info) }
+                            if (notify) {
+                                handlePluginConnected(info)
+                            }
                             plugins.add(info)
                         }
                     }
@@ -286,9 +288,9 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
                     //val plugin = pluginClass.createInstance()
 
-                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin, pluginContext, pkg)
+                    val metadata = Dependency[PluginMetadataFactory::class].create(plugin)
 
-                    return PluginInfo(plugin, pluginVersion, metadata)
+                    return PluginInfo(plugin, pkg, pluginVersion, pluginContext, metadata)
                 } catch (e: InvalidVersionException) {
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
                     // TODO: Warn user.

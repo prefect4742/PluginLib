@@ -23,7 +23,7 @@ import android.view.LayoutInflater
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 class PluginContextWrapper(private val appContext: Context, base: Context, private val myClassLoader: ClassLoader,
-                           private val pkg: String) : ContextWrapper(base) {
+                           internal val pkg: String) : ContextWrapper(base) {
     private val inflater: LayoutInflater by lazy {
         LayoutInflater.from(appContext).cloneInContext(this)
     }
@@ -33,7 +33,7 @@ class PluginContextWrapper(private val appContext: Context, base: Context, priva
     }
 
     override fun getTheme(): Resources.Theme {
-        return appContext.getTheme()
+        return appContext.theme
     }
 
     override fun getSystemService(name: String): Any {

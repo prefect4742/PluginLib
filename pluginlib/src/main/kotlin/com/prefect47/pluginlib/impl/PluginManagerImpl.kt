@@ -62,7 +62,7 @@ class PluginManagerImpl(val context: Context,
         }
     }
 
-    override val pluginMetadataMap: MutableMap<Plugin, PluginMetadata> = HashMap()
+    override val pluginContextMap: MutableMap<Plugin, Context> = HashMap()
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
 
     private val pluginMap: MutableMap<PluginListener<*>, PluginInstanceManager<out Plugin>> =
@@ -123,7 +123,7 @@ class PluginManagerImpl(val context: Context,
         Dependency[PluginPrefs::class].addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
         if (info != null) {
-            oneShotPackages.add(info.metadata.pkg)
+            oneShotPackages.add(info.pkg)
             hasOneShot = true
             startListening()
             return info.plugin
@@ -145,7 +145,7 @@ class PluginManagerImpl(val context: Context,
             result as KProperty1<Any?, EnumSet<Plugin.Flag>>
             flags = result.get(cls.companionObjectInstance)
         }
-        pluginClassFlagsMap.put(cls.qualifiedName!!, flags)
+        pluginClassFlagsMap[cls.qualifiedName!!] = flags
     }
 
     override fun removePluginListener(listener: PluginListener<*>) {
@@ -210,7 +210,7 @@ class PluginManagerImpl(val context: Context,
                     } catch (e: NameNotFoundException) {
                     }
 
-                    Dependency[PluginLibraryControl::class]?.let { control ->
+                    Dependency[PluginLibraryControl::class].let { control ->
                         control.notificationChannel?.let { channel ->
                             val nb = NotificationCompat.Builder(context, channel)
                                 .setWhen(0)

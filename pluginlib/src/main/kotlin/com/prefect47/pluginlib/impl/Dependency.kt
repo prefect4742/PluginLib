@@ -18,9 +18,7 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginTracker
 import kotlin.reflect.KClass
-import kotlin.reflect.full.companionObjectInstance
 
 /**
  * Class to handle ugly dependencies throughout pluginlib until we determine the

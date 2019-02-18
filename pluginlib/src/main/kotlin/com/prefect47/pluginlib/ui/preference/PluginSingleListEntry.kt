@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreference
-import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginMetadata

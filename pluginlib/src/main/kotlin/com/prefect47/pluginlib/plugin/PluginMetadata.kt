@@ -14,13 +14,7 @@
 
 package com.prefect47.pluginlib.plugin
 
-import android.content.Context
-
 interface PluginMetadata {
-    val pkg: String
-
-    val pluginContext: Context
     val plugin: Plugin
-
     val enabled: Boolean
 }

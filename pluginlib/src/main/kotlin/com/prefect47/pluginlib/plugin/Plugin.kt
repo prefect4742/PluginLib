@@ -124,7 +124,7 @@ interface Plugin {
     }
 
     val pluginContext: Context
-        get() = Dependency[PluginManager::class].pluginMetadataMap.get(this)!!.pluginContext
+        get() = Dependency[PluginManager::class].pluginContextMap[this]!!
     val applicationContext: Context
         get() = Dependency[PluginManager::class].getApplicationContext()
 

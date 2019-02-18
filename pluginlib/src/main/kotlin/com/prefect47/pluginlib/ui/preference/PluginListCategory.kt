@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
-import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.plugin.Plugin
@@ -66,15 +65,15 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     }
 
     private fun preferenceChanged(preference: PluginSingleListEntry, newValue: Boolean): Boolean {
-        if (newValue) {
+        return if (newValue) {
             for (index in 0 until preferenceCount) {
                 (getPreference(index) as PluginSingleListEntry).apply {
                     if (this != preference) isChecked = false
                 }
             }
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 }

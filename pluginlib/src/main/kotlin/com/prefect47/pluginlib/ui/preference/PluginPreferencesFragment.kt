@@ -10,6 +10,7 @@ import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.PluginContextWrapper
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
@@ -25,7 +26,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     }
 
     companion object {
-        val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
+        const val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }
 
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
@@ -36,7 +37,8 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         metadata = Dependency[PluginLibraryControl::class].getMetaData(className!!)!!
 
-        preferenceManager.sharedPreferencesName = "${metadata.pkg}_preferences"
+        val contextWrapper = metadata.plugin.pluginContext as PluginContextWrapper
+        preferenceManager.sharedPreferencesName = "${contextWrapper.pkg}_preferences"
 
         val preferencesResId = (metadata.plugin as PluginSettings).preferencesResId
         addPreferencesFromResource(preferencesResId)
@@ -67,11 +69,11 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
                 preference.inputType,
                 preference.digits
 
-            );
-            f.setTargetFragment(this, 0);
+            )
+            f.setTargetFragment(this, 0)
             f.show(fragmentManager!!,
                 DIALOG_FRAGMENT_TAG
-            );
+            )
         } else {
             super.onDisplayPreferenceDialog(preference)
         }

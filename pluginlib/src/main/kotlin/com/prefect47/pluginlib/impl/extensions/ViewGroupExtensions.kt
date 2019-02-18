@@ -16,7 +16,7 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
         private var done = false
         private var position: Int = 0
 
-        override public fun hasNext(): Boolean {
+        override fun hasNext(): Boolean {
             if (nextValue == null && !done) {
                 nextValue = getChildAt(position)
                 position++
@@ -36,10 +36,10 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
     }
 }
 
-public val ViewGroup.views: List<View>
+val ViewGroup.views: List<View>
     get() = asSequence().toList()
 
-public val ViewGroup.viewsRecursive: List<View>
+val ViewGroup.viewsRecursive: List<View>
     get() = views.flatMap {
         when (it) {
             is ViewGroup -> it.viewsRecursive

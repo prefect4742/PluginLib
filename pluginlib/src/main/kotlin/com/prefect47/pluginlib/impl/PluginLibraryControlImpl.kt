@@ -73,7 +73,7 @@ object PluginLibraryControlImpl: PluginLibraryControl {
     }
 
     override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
-        return Dependency[PluginManager::class].pluginClassFlagsMap.get(pluginClassName)
+        return Dependency[PluginManager::class].pluginClassFlagsMap[pluginClassName]
     }
 
     override fun getMetaData(className: String): PluginMetadata? {

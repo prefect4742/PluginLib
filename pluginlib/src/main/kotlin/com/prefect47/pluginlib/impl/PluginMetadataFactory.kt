@@ -14,11 +14,9 @@
 
 package com.prefect47.pluginlib.impl
 
-import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginMetadata
 
 interface PluginMetadataFactory {
-    fun create(plugin: Plugin, pluginContext: Context, pkg: String
-    ): PluginMetadata
+    fun create(plugin: Plugin): PluginMetadata
 }

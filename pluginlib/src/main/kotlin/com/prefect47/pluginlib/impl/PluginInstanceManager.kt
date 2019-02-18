@@ -30,7 +30,12 @@ interface PluginInstanceManager<T: Plugin> {
         ): PluginInstanceManager<T>
     }
 
-    data class PluginInfo<T: Plugin>(val plugin: T, val version: VersionInfo?, val metadata: PluginMetadata)
+    data class PluginInfo<T: Plugin>(
+        val plugin: T,
+        val pkg: String,
+        val version: VersionInfo?,
+        val context: Context,
+        val metadata: PluginMetadata)
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean

@@ -19,6 +19,7 @@ package com.prefect47.pluginlib.plugin
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import androidx.preference.PreferenceDataStore
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginManager
@@ -136,4 +137,13 @@ interface Plugin {
     fun onCreate() {}
 
     fun onDestroy() {}
+
+    val preferenceDataStore: PluginPreferenceDataStore
+        get() = Dependency[PluginPreferenceDataStoreManager::class].getPreferenceDataStore(this)
+
+    // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
+    // PreferenceDataStoreProvider
+    // wishes all its plugins to switch to another set of preferences.
+    // Plugin should reload whatever preferences it has cached.
+    fun onPreferenceDataStoreInvalidated() {}
 }

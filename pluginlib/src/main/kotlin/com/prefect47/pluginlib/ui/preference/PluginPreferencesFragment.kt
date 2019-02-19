@@ -1,7 +1,6 @@
 package com.prefect47.pluginlib.ui.preference
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.preference.Preference
@@ -10,12 +9,9 @@ import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.Dependency
-import com.prefect47.pluginlib.impl.PluginContextWrapper
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginSettings
+import com.prefect47.pluginlib.plugin.*
 
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
@@ -29,7 +25,9 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         const val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }
 
-    private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
+    private val prefsManager = Dependency[PluginPreferenceDataStoreManager::class]
+    private lateinit var prefs: PluginPreferenceDataStore
+    private lateinit var prefsListener: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
     private lateinit var plugin: Plugin
     private var activityResultHandler: ActivityResultHandler? = null
 
@@ -37,13 +35,13 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         plugin = Dependency[PluginLibraryControl::class].getPlugin(className!!)!!
 
-        val contextWrapper = plugin.pluginContext as PluginContextWrapper
-        preferenceManager.sharedPreferencesName = "${contextWrapper.pkg}_preferences"
+        prefs = prefsManager.getPreferenceDataStore(plugin)
+        preferenceManager.preferenceDataStore = prefs
 
         val preferencesResId = (plugin as PluginSettings).preferencesResId
         addPreferencesFromResource(preferencesResId)
 
-        prefsListener = plugin as SharedPreferences.OnSharedPreferenceChangeListener
+        prefsListener = plugin as PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
@@ -52,12 +50,12 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(prefsListener)
+        prefs.registerOnPluginPreferenceDataStoreChangeListener(prefsListener)
     }
 
     override fun onPause() {
         super.onPause()
-        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(prefsListener)
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {

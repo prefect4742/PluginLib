@@ -18,6 +18,7 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
 import kotlin.reflect.KClass
 
 /**
@@ -110,6 +111,14 @@ object Dependency {
         providers[PluginInstanceManager.Factory::class] =
                 DependencyProvider {
                     PluginInstanceManagerImpl.Factory
+                }
+
+        providers[PluginPreferenceDataStoreManager::class] =
+                DependencyProvider {
+                    PluginPreferenceDataStoreManagerImpl.init(
+                        PluginDefaultPreferenceDataStoreProvider
+                    )
+                    PluginPreferenceDataStoreManagerImpl
                 }
 
         // TODO: Allow app that uses library to add its own dependencies

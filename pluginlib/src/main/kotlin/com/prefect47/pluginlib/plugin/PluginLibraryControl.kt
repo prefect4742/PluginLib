@@ -32,13 +32,14 @@ interface PluginLibraryControl {
         fun onStopped()
     }
 
-    var currentSharedPreferencesHandler: PluginSharedPreferencesHandler?
     var settingsHandler: PluginListCategory.SettingsHandler?
     var permissionName: String
     var debugEnabled: Boolean
     var debugTag: String
     var notificationChannel: String?
     var notificationIconResId: Int
+
+    val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 
     fun addTracker(tracker: PluginTracker)
 
@@ -63,9 +64,11 @@ interface PluginLibraryControl {
 
     fun getPlugin(className: String): Plugin?
 
+    /*
     fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler)
     fun removeSharedPreferencesHandler(key: String)
     fun switchSharedPreferencesHandler(key: String)
+    */
 
     fun debug(msg: String) {
         if (debugEnabled) Log.d(debugTag, msg)

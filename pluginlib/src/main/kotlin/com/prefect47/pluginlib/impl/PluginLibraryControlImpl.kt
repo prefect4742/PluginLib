@@ -13,7 +13,6 @@ import kotlin.reflect.KClass
 object PluginLibraryControlImpl: PluginLibraryControl {
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
     private val trackers = HashMap<KClass<*>, PluginTracker>()
-    private val sharedPreferencesHandlers: ArrayMap<String, PluginSharedPreferencesHandler> = ArrayMap()
 
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
@@ -22,7 +21,8 @@ object PluginLibraryControlImpl: PluginLibraryControl {
     override var notificationChannel: String? = null
     override var notificationIconResId: Int = 0
 
-    override var currentSharedPreferencesHandler: PluginSharedPreferencesHandler? = null
+    override val preferenceDataStoreManager
+        get() = Dependency[PluginPreferenceDataStoreManager::class]
 
     override fun addClassFilter(filter: (String) -> Boolean) {
         Dependency[PluginManager::class].addClassFilter(filter)
@@ -81,6 +81,7 @@ object PluginLibraryControlImpl: PluginLibraryControl {
         return null
     }
 
+    /*
     override fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler) {
         sharedPreferencesHandlers[key] = handler
     }
@@ -96,4 +97,5 @@ object PluginLibraryControlImpl: PluginLibraryControl {
             tracker.pluginList.filterIsInstance<PluginSettings>().forEach { it.onSharedPreferenceHandlerChanged() }
         }
     }
+    */
 }

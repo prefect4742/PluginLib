@@ -44,14 +44,12 @@ class PluginContextWrapper(private val appContext: Context, base: Context, priva
     }
 
     override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
-        val handler = Dependency[PluginLibraryControl::class].currentSharedPreferencesHandler
-        handler?.let { return it.getSharedPreferences(name, mode) }
+        //val handler = Dependency[PluginLibraryControl::class].currentSharedPreferencesHandler
+        //handler?.let { return it.getSharedPreferences(name, mode) }
 
         // If there is no handler set, use common sense.
-        name?.equals("${pkg}_preferences")?.let {
-            // TODO Prevent plugins from reading anything outside or their own settings
-            return super.getSharedPreferences(name, mode)
-        }
-        return null
+
+        // Prevent plugins from reading anything outside or their own settings
+        return super.getSharedPreferences("${pkg}_${name}", mode)
     }
 }

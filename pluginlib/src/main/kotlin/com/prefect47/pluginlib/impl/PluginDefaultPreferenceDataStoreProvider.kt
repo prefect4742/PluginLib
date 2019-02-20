@@ -8,9 +8,9 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manage
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
 object PluginDefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
-    private val served = mutableMapOf<Plugin, PluginPreferenceDataStore>()
+    private val served = mutableMapOf<String, PluginPreferenceDataStore>()
 
-    private class DataStore(val plugin: Plugin): PluginPreferenceDataStore() {
+    private class DataStore(plugin: Plugin): PluginPreferenceDataStore() {
         private val listener = OnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
         private val prefs = plugin.pluginContext.getSharedPreferences("preferences", Context.MODE_PRIVATE).also {
             it.registerOnSharedPreferenceChangeListener(listener)
@@ -34,10 +34,9 @@ object PluginDefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvid
     }
 
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
-        TODO("Map to package, not plugin - plugins in the same package shall be able to read each others data")
-        served[plugin]?.let { return it }
+        served[plugin.pkgName]?.let { return it }
         val newStore = DataStore(plugin)
-        served.put(plugin, newStore)
+        served.put(plugin.pkgName, newStore)
         return newStore
     }
 }

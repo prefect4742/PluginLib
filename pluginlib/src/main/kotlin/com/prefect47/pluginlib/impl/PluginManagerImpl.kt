@@ -62,7 +62,7 @@ class PluginManagerImpl(val context: Context,
         }
     }
 
-    override val pluginContextMap: MutableMap<Plugin, Context> = HashMap()
+    override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = HashMap()
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
 
     private val pluginMap: MutableMap<PluginListener<*>, PluginInstanceManager<out Plugin>> =

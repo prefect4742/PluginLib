@@ -61,7 +61,8 @@ abstract class PluginFilePickerPreference @JvmOverloads constructor(context: Con
     }
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        setUri(Uri.parse(getPersistedString(defaultValue as? String)))
+        val initialValue = getPersistedString(defaultValue as? String)
+        initialValue?.let { setUri(Uri.parse(it)) }
     }
 
     override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {

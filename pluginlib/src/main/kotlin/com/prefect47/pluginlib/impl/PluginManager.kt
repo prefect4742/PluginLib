@@ -69,7 +69,7 @@ interface PluginManager {
             get() = nextNotificationIdInt++
     }
 
-    val pluginContextMap: MutableMap<Plugin, Context>
+    val pluginInfoMap: MutableMap<Plugin, PluginInstanceManager.PluginInfo<*>>
     val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(cls)) : T?

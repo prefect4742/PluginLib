@@ -9,7 +9,12 @@ object PluginPreferenceDataStoreManagerImpl: Manager {
 
     override lateinit var provider: Provider
 
+    // Remember which plugins have asked so that they can be invalidated id needed.
     private val served = mutableSetOf<Plugin>()
+
+    // Cache the data stores returned by the provider on a per-package basis. Plugins in the same package should get
+    // the same data store so that they can share data.
+    private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
 
     internal fun init(defaultProvider: Provider) {
         provider = defaultProvider
@@ -17,7 +22,10 @@ object PluginPreferenceDataStoreManagerImpl: Manager {
 
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
         served.add(plugin)
-        return provider.getPreferenceDataStore(plugin)
+        cache[plugin.pkgName]?.let { return it }
+        val newStore = provider.getPreferenceDataStore(plugin)
+        cache.put(plugin.pkgName, newStore)
+        return newStore
     }
 
     /**
@@ -25,7 +33,9 @@ object PluginPreferenceDataStoreManagerImpl: Manager {
      * use the ones they have.
      */
     override fun invalidate() {
-        served.forEach { it.onPreferenceDataStoreInvalidated() }
+        val oldServed = served.toSet()
         served.clear()
+        cache.clear()
+        oldServed.forEach { it.onPreferenceDataStoreInvalidated() }
     }
 }

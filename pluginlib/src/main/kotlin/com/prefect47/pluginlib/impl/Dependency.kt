@@ -17,6 +17,9 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.util.ArrayMap
+import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
+import com.prefect47.pluginlib.impl.di.component.PluginLibraryComponent
+import com.prefect47.pluginlib.impl.di.module.PluginLibraryModule
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
 import kotlin.reflect.KClass
@@ -37,6 +40,8 @@ import kotlin.reflect.KClass
  * services, registered receivers, etc.
  */
 object Dependency {
+
+    lateinit var component: PluginLibraryComponent
 
     class DependencyProvider<T>( val createDependency: () -> T )
 
@@ -77,10 +82,13 @@ object Dependency {
             throw IllegalStateException("Can only be called once")
         }
 
+        component = DaggerPluginLibraryComponent.builder().context(context).build()
+
         providers[PluginPrefs::class] =
                 DependencyProvider {
-                    PluginPrefs(context)
+                    component.getPluginPrefs()
                 }
+
         providers[PluginManager::class] =
                 DependencyProvider {
                     PluginManagerImpl.create(

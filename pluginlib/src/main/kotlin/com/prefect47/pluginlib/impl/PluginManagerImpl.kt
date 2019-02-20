@@ -40,6 +40,8 @@ import dalvik.system.PathClassLoader
 import kotlinx.coroutines.*
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.companionObject
@@ -61,6 +63,8 @@ class PluginManagerImpl(val context: Context,
             return PluginManagerImpl(PluginAppContextWrapper(context), defaultHandler)
         }
     }
+
+    @Inject lateinit var pluginPrefs: PluginPrefs
 
     override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = HashMap()
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
@@ -89,6 +93,7 @@ class PluginManagerImpl(val context: Context,
     private val factory: PluginInstanceManager.Factory by lazy { Dependency[PluginInstanceManager.Factory::class] }
 
     init {
+        Dependency.component.inject(this)
 
         val uncaughtExceptionHandler = PluginExceptionHandler(defaultHandler)
         //Thread.setUncaughtExceptionPreHandler(uncaughtExceptionHandler)
@@ -120,7 +125,8 @@ class PluginManagerImpl(val context: Context,
             throw RuntimeException("Must be called from UI thread")
         }
         val p: PluginInstanceManager<T> = factory.create(context, action, null, false, cls, this)
-        Dependency[PluginPrefs::class].addAction(action)
+        pluginPrefs.addAction(action)
+        //Dependency[PluginPrefs::class].addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
         if (info != null) {
             oneShotPackages.add(info.pkg)
@@ -133,7 +139,8 @@ class PluginManagerImpl(val context: Context,
 
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
                                                allowMultiple: Boolean) {
-        Dependency[PluginPrefs::class].addAction(action)
+        pluginPrefs.addAction(action)
+        //Dependency[PluginPrefs::class].addAction(action)
         val p: PluginInstanceManager<T> = factory.create(context, action, listener, allowMultiple, cls, this)
         p.loadAll()
         pluginMap[listener] = p

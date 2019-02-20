@@ -32,11 +32,14 @@ import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
+import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
+import dagger.android.AndroidInjection
 import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import kotlinx.coroutines.*
 import java.util.*
+import javax.inject.Inject
 import kotlin.reflect.full.createInstance
 
 class PluginInstanceManagerImpl<T: Plugin>(
@@ -63,6 +66,12 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
     }
 
+    init {
+        //Dependency.component.inject(this)
+    }
+
+    //@Inject lateinit var pluginPrefs: PluginPrefs
+
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
 
@@ -77,6 +86,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
+            //pluginPrefs.setHasPlugins()
             Dependency[PluginPrefs::class].setHasPlugins()
             info.plugin.onCreate()
             return info
@@ -197,6 +207,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
 
         private fun handlePluginConnected(info: PluginInfo<T>) {
+            //pluginPrefs.setHasPlugins()
             Dependency[PluginPrefs::class].setHasPlugins()
             launch(Dispatchers.Main) {
                 manager.handleWtfs()

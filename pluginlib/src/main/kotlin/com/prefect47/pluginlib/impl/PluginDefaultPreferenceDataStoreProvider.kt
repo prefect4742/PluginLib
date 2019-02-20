@@ -8,7 +8,6 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manage
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
 object PluginDefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
-    private val served = mutableMapOf<String, PluginPreferenceDataStore>()
 
     private class DataStore(plugin: Plugin): PluginPreferenceDataStore() {
         private val listener = OnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
@@ -34,9 +33,6 @@ object PluginDefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvid
     }
 
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
-        served[plugin.pkgName]?.let { return it }
-        val newStore = DataStore(plugin)
-        served.put(plugin.pkgName, newStore)
-        return newStore
+        return DataStore(plugin)
     }
 }

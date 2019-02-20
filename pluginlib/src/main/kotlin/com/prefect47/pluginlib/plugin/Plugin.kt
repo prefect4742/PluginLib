@@ -124,8 +124,12 @@ interface Plugin {
         ALLOW_SIMULTANEOUS_USE // Allow multiple plugins of this type to be enabled at the same time
     }
 
+    val className: String
+        get() = this::class.qualifiedName!!
+    val pkgName: String
+        get() = Dependency[PluginManager::class].pluginInfoMap[this]!!.pkg
     val pluginContext: Context
-        get() = Dependency[PluginManager::class].pluginContextMap[this]!!
+        get() = Dependency[PluginManager::class].pluginInfoMap[this]!!.context
     val applicationContext: Context
         get() = Dependency[PluginManager::class].getApplicationContext()
 

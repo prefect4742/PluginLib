@@ -168,7 +168,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     it.plugin.onDestroy()
                 //}
-                manager.pluginContextMap.remove(it.plugin)
+                manager.pluginInfoMap.remove(it.plugin)
             }
             plugins.clear()
             handleQueryPlugins()
@@ -200,7 +200,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
             Dependency[PluginPrefs::class].setHasPlugins()
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
-                manager.pluginContextMap[info.plugin] = info.context
+                manager.pluginInfoMap[info.plugin] = info
 
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
@@ -220,7 +220,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     // will get the onDestroy as part of the fragment lifecycle.
                     info.plugin.onDestroy()
                 //}
-                manager.pluginContextMap.remove(info.plugin)
+                manager.pluginInfoMap.remove(info.plugin)
             }
         }
 

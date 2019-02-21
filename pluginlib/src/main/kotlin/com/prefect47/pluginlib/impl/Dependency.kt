@@ -91,14 +91,18 @@ object Dependency {
 
         providers[PluginManager::class] =
                 DependencyProvider {
+                    component.getPluginManager()
+                    /*
                     PluginManagerImpl.create(
                         context
                     )
+                    */
                 }
 
         providers[PluginLibraryControl::class] =
                 DependencyProvider {
-                    PluginLibraryControlImpl
+                    component.getPluginLibraryControl()
+                    //PluginLibraryControlImpl
                 }
 
         providers[PluginTrackerFactory::class] =
@@ -118,7 +122,8 @@ object Dependency {
 
         providers[PluginInstanceManager.Factory::class] =
                 DependencyProvider {
-                    PluginInstanceManagerImpl.Factory
+                    component.getPluginInstanceManagerFactory()
+                    //PluginInstanceManagerImpl.Factory
                 }
 
         providers[PluginPreferenceDataStoreManager::class] =

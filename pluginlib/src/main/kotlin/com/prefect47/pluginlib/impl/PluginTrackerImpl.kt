@@ -18,6 +18,7 @@ import kotlin.reflect.KClass
 
 class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
             PluginTracker, PluginListener<T>, ArrayList<Plugin>() {
+
     companion object Factory: PluginTrackerFactory {
         init {
             Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTrackerFactory::class)

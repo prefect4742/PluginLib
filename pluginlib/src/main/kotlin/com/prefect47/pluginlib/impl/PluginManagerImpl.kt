@@ -124,7 +124,8 @@ class PluginManagerImpl(val context: Context,
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw RuntimeException("Must be called from UI thread")
         }
-        val p: PluginInstanceManager<T> = factory.create(context, action, null, false, cls, this)
+        val p: PluginInstanceManager<T> = factory.create(action, null, false, cls)
+        //val p: PluginInstanceManager<T> = factory.create(context, action, null, false, cls, this)
         pluginPrefs.addAction(action)
         //Dependency[PluginPrefs::class].addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
@@ -141,7 +142,8 @@ class PluginManagerImpl(val context: Context,
                                                allowMultiple: Boolean) {
         pluginPrefs.addAction(action)
         //Dependency[PluginPrefs::class].addAction(action)
-        val p: PluginInstanceManager<T> = factory.create(context, action, listener, allowMultiple, cls, this)
+        val p: PluginInstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
+        //val p: PluginInstanceManager<T> = factory.create(context, action, listener, allowMultiple, cls, this)
         p.loadAll()
         pluginMap[listener] = p
         startListening()

@@ -9,5 +9,9 @@ import javax.inject.Singleton
 abstract class PluginLibraryFactoryModule {
     @Singleton
     @Binds
+    abstract fun bindPluginManagerFactory(factory: PluginManagerImpl.Factory): PluginManager.Factory
+
+    @Singleton
+    @Binds
     abstract fun bindPluginInstanceManagerFactory(factory: PluginInstanceManagerImpl.Factory): PluginInstanceManager.Factory
 }

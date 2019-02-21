@@ -84,25 +84,21 @@ object Dependency {
 
         component = DaggerPluginLibraryComponent.builder().context(context).build()
 
+        /*
         providers[PluginPrefs::class] =
                 DependencyProvider {
                     component.getPluginPrefs()
                 }
+        */
 
         providers[PluginManager::class] =
                 DependencyProvider {
                     component.getPluginManager()
-                    /*
-                    PluginManagerImpl.create(
-                        context
-                    )
-                    */
                 }
 
         providers[PluginLibraryControl::class] =
                 DependencyProvider {
                     component.getPluginLibraryControl()
-                    //PluginLibraryControlImpl
                 }
 
         providers[PluginTrackerFactory::class] =
@@ -120,11 +116,13 @@ object Dependency {
                     PluginDependencyProvider
                 }
 
+        /*
         providers[PluginInstanceManager.Factory::class] =
                 DependencyProvider {
                     component.getPluginInstanceManagerFactory()
                     //PluginInstanceManagerImpl.Factory
                 }
+        */
 
         providers[PluginPreferenceDataStoreManager::class] =
                 DependencyProvider {

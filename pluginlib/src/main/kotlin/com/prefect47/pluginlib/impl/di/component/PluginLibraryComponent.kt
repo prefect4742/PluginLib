@@ -27,9 +27,6 @@ interface PluginLibraryComponent {
         fun build(): PluginLibraryComponent
     }
 
-    //fun inject(target: PluginInstanceManager<*>)
-    fun inject(target: PluginManagerImpl)
-
     fun getPluginLibraryControl(): PluginLibraryControl
     fun getPluginPrefs(): PluginPrefs
     fun getPluginManager(): PluginManager

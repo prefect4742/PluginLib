@@ -51,19 +51,16 @@ class PluginInstanceManagerImpl<T: Plugin>(
             private val pluginPrefs: PluginPrefs): PluginInstanceManager.Factory {
 
         override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
-                allowMultiple: Boolean, cls: KClass<*>
-        ): PluginInstanceManager<T> {
-            return PluginInstanceManagerImpl(
-                context,
-                manager,
-                pluginPrefs,
-                action,
-                listener,
-                allowMultiple,
-                VersionInfo().addClass(cls),
-                control.debugEnabled
-            )
-        }
+                allowMultiple: Boolean, cls: KClass<*>) = PluginInstanceManagerImpl(
+            context,
+            manager,
+            pluginPrefs,
+            action,
+            listener,
+            allowMultiple,
+            VersionInfo().addClass(cls),
+            control.debugEnabled
+        )
     }
 
     companion object {

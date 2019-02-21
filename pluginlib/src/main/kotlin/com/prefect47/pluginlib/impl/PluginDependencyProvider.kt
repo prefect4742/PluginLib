@@ -47,7 +47,7 @@ object PluginDependencyProvider : DependencyProvider() {
     override operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {
         // TODO: Check classloader used on annotations, it should be the system one right?
         // Reload the class with our own classloader
-        val ourCls = Class.forName(cls.qualifiedName).kotlin
+        val ourCls = Class.forName(cls.qualifiedName!!).kotlin
         if (!manager!!.dependsOn(p, ourCls)) {
             throw IllegalArgumentException(p.javaClass.simpleName + " does not depend on " + cls)
         }

@@ -32,9 +32,7 @@ import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
-import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import dagger.android.AndroidInjection
 import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import kotlinx.coroutines.*
@@ -43,34 +41,34 @@ import javax.inject.Inject
 import kotlin.reflect.full.createInstance
 
 class PluginInstanceManagerImpl<T: Plugin>(
-    val context: Context, val action: String, val listener: PluginListener<T>?, val allowMultiple: Boolean,
-    val version: VersionInfo, val manager: PluginManager
+        private val context: Context, private val manager: PluginManager, private val pluginPrefs: PluginPrefs,
+        private val action: String, private val listener: PluginListener<T>?, private val allowMultiple: Boolean,
+        private val version: VersionInfo, private val debug: Boolean
 ): PluginInstanceManager<T> {
 
-    companion object Factory: PluginInstanceManager.Factory {
-        private val DEBUG = Dependency[PluginLibraryControl::class].debugEnabled
-        private const val TAG = "PluginInstanceManager"
+    class Factory @Inject constructor(private val context: Context, private val manager: PluginManager,
+            private val control: PluginLibraryControl,
+            private val pluginPrefs: PluginPrefs): PluginInstanceManager.Factory {
 
-        override fun <T: Plugin> create(context: Context, action: String, listener: PluginListener<T>?,
-                allowMultiple: Boolean, cls: KClass<*>,
-                manager: PluginManager
+        override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
+                allowMultiple: Boolean, cls: KClass<*>
         ): PluginInstanceManager<T> {
             return PluginInstanceManagerImpl(
                 context,
+                manager,
+                pluginPrefs,
                 action,
                 listener,
                 allowMultiple,
                 VersionInfo().addClass(cls),
-                manager
+                control.debugEnabled
             )
         }
     }
 
-    init {
-        //Dependency.component.inject(this)
+    companion object {
+        private const val TAG = "PluginInstanceManager"
     }
-
-    //@Inject lateinit var pluginPrefs: PluginPrefs
 
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
@@ -86,8 +84,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         }
         if (pluginHandler.plugins.size > 0) {
             val info = pluginHandler.plugins[0]
-            //pluginPrefs.setHasPlugins()
-            Dependency[PluginPrefs::class].setHasPlugins()
+            pluginPrefs.setHasPlugins()
             info.plugin.onCreate()
             return info
         }
@@ -95,12 +92,12 @@ class PluginInstanceManagerImpl<T: Plugin>(
     }
 
     override suspend fun loadAll() {
-        if (DEBUG) Log.d(TAG, "loadAll")
+        if (debug) Log.d(TAG, "loadAll")
         pluginHandler.queryAll()
     }
 
     override fun destroy() {
-        if (DEBUG) Log.d(TAG, "destroy")
+        if (debug) Log.d(TAG, "destroy")
         val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
         plugins.forEach {
             pluginHandler.handlePluginDisconnected(it)
@@ -145,7 +142,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         // assuming one of them must be bad.
         Log.w(TAG, "Disabling plugin ${info.pkg}/${info.plugin::class.qualifiedName}")
         pm.setComponentEnabledSetting(
-                ComponentName(info.pkg, info.plugin::class.qualifiedName),
+                ComponentName(info.pkg, info.plugin.className),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP)
     }
@@ -170,7 +167,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
         override val coroutineContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
 
         suspend fun queryAll() {
-            if (DEBUG) Log.d(TAG, "queryAll $action")
+            if (debug) Log.d(TAG, "queryAll $action")
             plugins.forEach {
                 listener!!.onPluginDisconnected(it.plugin)
                 //if (!(it.plugin is PluginFragment)) {
@@ -197,18 +194,17 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
         fun queryPackage(pkg: String) {
             launch {
-                if (DEBUG) Log.d(TAG, "queryPkg $pkg $action")
+                if (debug) Log.d(TAG, "queryPkg $pkg $action")
                 if (allowMultiple || (plugins.size == 0)) {
                     handleQueryPlugins(pkg)
                 } else {
-                    if (DEBUG) Log.d(TAG, "Too many of $action")
+                    if (debug) Log.d(TAG, "Too many of $action")
                 }
             }
         }
 
         private fun handlePluginConnected(info: PluginInfo<T>) {
-            //pluginPrefs.setHasPlugins()
-            Dependency[PluginPrefs::class].setHasPlugins()
+            pluginPrefs.setHasPlugins()
             launch(Dispatchers.Main) {
                 manager.handleWtfs()
                 manager.pluginInfoMap[info.plugin] = info
@@ -224,7 +220,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
 
         fun handlePluginDisconnected(info: PluginInfo<T>) {
             launch(Dispatchers.Main) {
-                if (DEBUG) Log.d(TAG, "onPluginDisconnected")
+                if (debug) Log.d(TAG, "onPluginDisconnected")
                 listener!!.onPluginDisconnected(info.plugin)
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onDestroy for plugins that aren't fragments, as fragments
@@ -243,7 +239,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 intent.setPackage(pkgName)
             }
             val result: MutableList<ResolveInfo> = pm.queryIntentServices(intent, 0)
-            if (DEBUG) Log.d(TAG, "Found ${result.size} plugins for $action")
+            if (debug) Log.d(TAG, "Found ${result.size} plugins for $action")
             if (result.size > 1 && !allowMultiple) {
                 // TODO: Show warning.
                 Log.w(TAG, "Multiple plugins found for $action")
@@ -291,7 +287,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                 try {
                     pluginVersion = checkVersion(pluginClass, version)
                     //val pluginVersion: VersionInfo? = checkVersion(pluginClass, plugin, version)
-                    if (DEBUG) Log.d(TAG, "createPlugin")
+                    if (debug) Log.d(TAG, "createPlugin")
 
                     // We support object/singleton plugins as well
                     //@Suppress("UNCHECKED_CAST")

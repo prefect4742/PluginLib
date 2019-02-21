@@ -23,10 +23,8 @@ import kotlin.reflect.KClass
 interface PluginInstanceManager<T: Plugin> {
 
     interface Factory {
-        fun <T: Plugin> create(
-            context: Context, action: String, listener: PluginListener<T>?,
-            allowMultiple: Boolean, cls: KClass<*>, manager: PluginManager
-        ): PluginInstanceManager<T>
+        fun <T: Plugin> create(action: String, listener: PluginListener<T>?, allowMultiple: Boolean,
+                cls: KClass<*>): PluginInstanceManager<T>
     }
 
     data class PluginInfo<T: Plugin>(

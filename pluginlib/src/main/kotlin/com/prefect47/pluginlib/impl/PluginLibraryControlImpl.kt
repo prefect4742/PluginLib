@@ -1,6 +1,5 @@
 package com.prefect47.pluginlib.impl
 
-import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import kotlinx.coroutines.Dispatchers

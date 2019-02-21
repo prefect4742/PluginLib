@@ -18,7 +18,7 @@ import com.prefect47.pluginlib.plugin.*
  */
 class PluginPreferencesFragment : PreferenceFragmentCompat() {
     interface ActivityResultHandler {
-        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+        fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?)
     }
 
     companion object {

@@ -21,6 +21,7 @@ import kotlin.reflect.KClass
 @ProvidesInterface(version = PluginDependency.VERSION)
 object PluginDependency {
     const val VERSION = 1
+
     lateinit var sProvider: DependencyProvider
 
     operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {

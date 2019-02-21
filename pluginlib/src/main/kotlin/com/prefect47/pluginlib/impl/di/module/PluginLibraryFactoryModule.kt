@@ -14,4 +14,8 @@ abstract class PluginLibraryFactoryModule {
     @Singleton
     @Binds
     abstract fun bindPluginInstanceManagerFactory(factory: PluginInstanceManagerImpl.Factory): PluginInstanceManager.Factory
+
+    @Singleton
+    @Binds
+    abstract fun bindPluginTrackerFactory(factory: PluginTrackerImpl.Factory): PluginTrackerFactory
 }

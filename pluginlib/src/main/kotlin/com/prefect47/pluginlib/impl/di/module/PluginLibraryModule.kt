@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.impl.di.module
 
 import android.content.Context
 import com.prefect47.pluginlib.impl.*
+import com.prefect47.pluginlib.plugin.PluginDependency
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import dagger.Lazy
 import dagger.Module
@@ -32,4 +33,20 @@ class PluginLibraryModule {
     @Provides
     fun providePluginInstanceManagerFactory(context: Context, manager: PluginManager, control: PluginLibraryControl,
         pluginPrefs: PluginPrefs) = PluginInstanceManagerImpl.Factory(context, manager, control, pluginPrefs)
+
+    @Singleton
+    @Provides
+    fun providePluginTrackerFactory(manager: PluginManager, control: PluginLibraryControl,
+        dependencyProvider: PluginDependencyProvider) = PluginTrackerImpl.Factory(manager, control, dependencyProvider)
+
+    // TODO: Circular depeendency between PluginTrackerImpl and PluginDependencyProvider via the allowPluginDependency() method...
+    /*
+    @Singleton
+    @Provides
+    fun provideDependencyProvider() = PluginDependency
+    */
+
+    @Singleton
+    @Provides
+    fun providePluginDependencyProvider(manager: PluginManager) = PluginDependencyProvider(manager, PluginDependency)
 }

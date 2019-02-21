@@ -3,7 +3,7 @@ package com.prefect47.pluginlib.impl.di.module
 import android.content.Context
 import com.prefect47.pluginlib.impl.*
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import dagger.Binds
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -12,7 +12,7 @@ import javax.inject.Singleton
 class PluginLibraryModule {
     @Singleton
     @Provides
-    fun providsPluginLibraryControl(): PluginLibraryControl = PluginLibraryControlImpl
+    fun providePluginLibraryControl(): PluginLibraryControl = PluginLibraryControlImpl
 
     @Singleton
     @Provides
@@ -20,7 +20,13 @@ class PluginLibraryModule {
 
     @Singleton
     @Provides
-    fun providePluginManager(context: Context) = PluginManagerImpl.create(context)
+    fun providePluginManager(factory: PluginManager.Factory) = factory.create()
+
+    @Singleton
+    @Provides
+    fun providePluginManagerFactory(context: Context, control: PluginLibraryControl, pluginPrefs: PluginPrefs,
+            factoryLazy: Lazy<PluginInstanceManager.Factory>) =
+        PluginManagerImpl.Factory(context, control, pluginPrefs, factoryLazy)
 
     @Singleton
     @Provides

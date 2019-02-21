@@ -36,12 +36,12 @@ import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.*
+import dagger.Lazy
 import dalvik.system.PathClassLoader
 import kotlinx.coroutines.*
 import java.lang.Thread.UncaughtExceptionHandler
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Named
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.companionObject
@@ -51,20 +51,21 @@ import kotlin.reflect.full.declaredMemberProperties
 /**
  * @see Plugin
  */
-class PluginManagerImpl(val context: Context,
-                        defaultHandler: UncaughtExceptionHandler
-        ) : BroadcastReceiver(), PluginManager {
+class PluginManagerImpl(private val context: Context, private val control: PluginLibraryControl,
+        private val pluginPrefs: PluginPrefs, private val factoryLazy: Lazy<PluginInstanceManager.Factory>,
+        defaultHandler: UncaughtExceptionHandler) : BroadcastReceiver(), PluginManager {
 
-    companion object: PluginManager.Factory {
-        override fun create(
-            context: Context,
-            defaultHandler: Thread.UncaughtExceptionHandler
-        ): PluginManager {
-            return PluginManagerImpl(PluginAppContextWrapper(context), defaultHandler)
-        }
+    class Factory @Inject constructor(private val context: Context, private val control: PluginLibraryControl,
+            private val pluginPrefs: PluginPrefs,
+            private val factoryLazy: Lazy<PluginInstanceManager.Factory>): PluginManager.Factory {
+        override fun create(defaultHandler: Thread.UncaughtExceptionHandler) = PluginManagerImpl(
+            PluginAppContextWrapper(context),
+            control,
+            pluginPrefs,
+            factoryLazy,
+            defaultHandler
+        )
     }
-
-    @Inject lateinit var pluginPrefs: PluginPrefs
 
     override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = HashMap()
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
@@ -90,17 +91,14 @@ class PluginManagerImpl(val context: Context,
 
     private val notificationId = PluginManager.nextNotificationId
 
-    private val factory: PluginInstanceManager.Factory by lazy { Dependency[PluginInstanceManager.Factory::class] }
+    // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
+    // circular call loop and exhaust the stack.
+    private val factory: PluginInstanceManager.Factory by lazy { factoryLazy.get() }
 
     init {
-        Dependency.component.inject(this)
-
         val uncaughtExceptionHandler = PluginExceptionHandler(defaultHandler)
         //Thread.setUncaughtExceptionPreHandler(uncaughtExceptionHandler)
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler) // TODO: What is the difference here?
-
-        // Needed
-        //Dependency.get(PluginDependencyProvider::class)
 
         /*
         Handler(looper).post(() -> {
@@ -125,9 +123,7 @@ class PluginManagerImpl(val context: Context,
             throw RuntimeException("Must be called from UI thread")
         }
         val p: PluginInstanceManager<T> = factory.create(action, null, false, cls)
-        //val p: PluginInstanceManager<T> = factory.create(context, action, null, false, cls, this)
         pluginPrefs.addAction(action)
-        //Dependency[PluginPrefs::class].addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
         if (info != null) {
             oneShotPackages.add(info.pkg)
@@ -141,9 +137,7 @@ class PluginManagerImpl(val context: Context,
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
                                                allowMultiple: Boolean) {
         pluginPrefs.addAction(action)
-        //Dependency[PluginPrefs::class].addAction(action)
         val p: PluginInstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
-        //val p: PluginInstanceManager<T> = factory.create(context, action, listener, allowMultiple, cls, this)
         p.loadAll()
         pluginMap[listener] = p
         startListening()
@@ -219,27 +213,25 @@ class PluginManagerImpl(val context: Context,
                     } catch (e: NameNotFoundException) {
                     }
 
-                    Dependency[PluginLibraryControl::class].let { control ->
-                        control.notificationChannel?.let { channel ->
-                            val nb = NotificationCompat.Builder(context, channel)
-                                .setWhen(0)
-                                .setShowWhen(false)
-                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                                .setColor(context.getColor(color))
-                                .setContentTitle("Plugin \"$label\" has updated")
-                                .setContentText("Restart ExtScanner for changes to take effect.")
+                    control.notificationChannel?.let { channel ->
+                        val nb = NotificationCompat.Builder(context, channel)
+                            .setWhen(0)
+                            .setShowWhen(false)
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                            .setColor(context.getColor(color))
+                            .setContentTitle("Plugin \"$label\" has updated")
+                            .setContentText("Restart ExtScanner for changes to take effect.")
 
-                            control.notificationIconResId.let {
-                                if (it != 0) nb.setSmallIcon(it)
-                            }
-
-                            val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
-                                Uri.parse("package://$pkg")
-                            )
-                            val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
-                            nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
-                            NotificationManagerCompat.from(context).notify(notificationId, nb.build())
+                        control.notificationIconResId.let {
+                            if (it != 0) nb.setSmallIcon(it)
                         }
+
+                        val i: Intent = Intent("com.sony.extendablemediascanner.action.RESTART").setData(
+                            Uri.parse("package://$pkg")
+                        )
+                        val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)
+                        nb.addAction(Action.Builder(0, "Restart ExtScanner", pi).build())
+                        NotificationManagerCompat.from(context).notify(notificationId, nb.build())
                     }
                 }
                 if (clearClassLoader(pkg)) {
@@ -320,7 +312,7 @@ class PluginManagerImpl(val context: Context,
         override fun uncaughtException(thread: Thread, throwable: Throwable) {
             var theThrowable: Throwable = throwable
 
-            if (Dependency[PluginLibraryControl::class].debugEnabled) {
+            if (control.debugEnabled) {
                 handler.uncaughtException(thread, throwable)
                 return
             }

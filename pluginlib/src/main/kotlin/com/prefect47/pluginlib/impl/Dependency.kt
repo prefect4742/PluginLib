@@ -103,17 +103,21 @@ object Dependency {
 
         providers[PluginTrackerFactory::class] =
                 DependencyProvider {
-                    PluginTrackerImpl.Factory
+                    component.getPluginTrackerFactory()
+                    //PluginTrackerImpl.Factory
                 }
 
         providers[PluginDependencyProvider::class] =
                 DependencyProvider {
+                    component.getPluginDependencyProvider()
+                    /*
                     PluginDependencyProvider.init(
                         get(
                             PluginManager::class
                         )
                     )
                     PluginDependencyProvider
+                    */
                 }
 
         /*

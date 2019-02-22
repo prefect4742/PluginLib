@@ -2,7 +2,6 @@ package com.prefect47.pluginlib.impl.di.component
 
 import android.content.Context
 import com.prefect47.pluginlib.impl.*
-import com.prefect47.pluginlib.impl.di.AppContext
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryFactoryModule
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryModule
 import com.prefect47.pluginlib.plugin.PluginDependency
@@ -31,6 +30,6 @@ interface PluginLibraryComponent {
     fun getPluginInstanceManagerFactory(): PluginInstanceManager.Factory
     fun getPluginTrackerFactory(): PluginTrackerFactory
 
-    //fun getDependencyProvider(): PluginDependency.DependencyProvider
+    fun getDependencyProvider(): PluginDependency.DependencyProvider
     fun getPluginDependencyProvider(): PluginDependencyProvider
 }

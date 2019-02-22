@@ -15,8 +15,8 @@
 
 package com.prefect47.pluginlib.plugin
 
-import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginTrackerFactory
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
@@ -30,12 +30,14 @@ interface PluginTracker {
     companion object {
         const val VERSION = 1
 
-        inline fun <reified T : Plugin> create(p: Plugin): PluginTracker {
-            return PluginDependency[p, PluginTrackerFactory::class].create(T::class)
+        val factory: PluginTrackerFactory by lazy { PluginLibraryDI.component.getPluginTrackerFactory() }
+
+        fun create(p: Plugin): PluginTracker {
+            return factory.create(p::class)
         }
 
-        inline fun <reified T : Plugin> create(cls: KClass<T>): PluginTracker {
-            return Dependency[PluginTrackerFactory::class].create(cls)
+        fun create(cls: KClass<out Plugin>): PluginTracker {
+            return factory.create(cls)
         }
     }
 
@@ -45,10 +47,3 @@ interface PluginTracker {
     val pluginClass: KClass<*>
     val pluginList: List<Plugin>
 }
-
-//typealias PluginTrackerList<T> = ArrayList<Plugin>
-
-/*fun <T: Plugin> PluginTrackerList<T>.getMetaData(): List<Plugin> {
-    return map { it }
-}
-*/

@@ -22,23 +22,9 @@ import com.prefect47.pluginlib.plugin.PluginDependency.DependencyProvider
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class PluginDependencyProvider @Inject constructor(private val manager: PluginManager,
-        private val dependency: PluginDependency
-): DependencyProvider() {
+class PluginDependencyProvider @Inject constructor(private val manager: PluginManager): DependencyProvider() {
 
     private val dependencies = ArrayMap<Any, Any>()
-
-    init {
-        dependency.sProvider = this
-    }
-    /*
-    fun <T: Any> allowPluginDependency(cls: KClass<T>) {
-        allowPluginDependency(
-            cls,
-            Dependency[cls]
-        )
-    }
-    */
 
     fun <T: Any> allowPluginDependency(cls: KClass<T>, obj: T) {
         synchronized (dependencies) {

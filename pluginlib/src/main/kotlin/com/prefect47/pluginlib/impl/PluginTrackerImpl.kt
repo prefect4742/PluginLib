@@ -14,45 +14,49 @@
 package com.prefect47.pluginlib.impl
 
 import com.prefect47.pluginlib.plugin.*
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class PluginTrackerImpl<T: Plugin>(override val pluginClass: KClass<*>) :
-            PluginTracker, PluginListener<T>, ArrayList<Plugin>() {
-    companion object Factory: PluginTrackerFactory {
+class PluginTrackerImpl<T: Plugin>(private val manager: PluginManager, private val control: PluginLibraryControl,
+            override val pluginClass: KClass<*>) : PluginTracker, PluginListener<T> {
+
+    class Factory @Inject constructor(private val manager: PluginManager, private val control: PluginLibraryControl,
+            dependencyProvider: PluginDependencyProvider): PluginTrackerFactory {
+
         init {
-            Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTrackerFactory::class)
+            dependencyProvider.allowPluginDependency(PluginTrackerFactory::class, this)
         }
 
         override fun <T : Plugin> create(cls: KClass<T>): PluginTracker {
-            val tracker = PluginTrackerImpl<T>(cls)
+            val tracker = PluginTrackerImpl<T>(manager, control, cls)
             tracker.startFunc = {
-                Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
+                manager.addPluginListener(tracker, cls, allowMultiple = true)
             }
             return tracker
         }
     }
 
     private lateinit var startFunc : suspend () -> Unit
-    override val pluginList = this
+    override val pluginList = ArrayList<T>()
 
     override suspend fun start() {
-        Dependency[PluginLibraryControl::class].debug("PluginLib starting tracker ${pluginClass.qualifiedName}")
+        control.debug("PluginLib starting tracker ${pluginClass.qualifiedName}")
         startFunc.invoke()
-        Dependency[PluginLibraryControl::class].debug("PluginLib started tracker ${pluginClass.qualifiedName}")
+        control.debug("PluginLib started tracker ${pluginClass.qualifiedName}")
     }
 
     override fun stop() {
-        Dependency[PluginManager::class].removePluginListener(this)
+        manager.removePluginListener(this)
     }
 
     override fun onPluginConnected(plugin: T) {
-        Dependency[PluginLibraryControl::class].debug("Plugin $plugin connected")
-        add(plugin)
+        control.debug("Plugin $plugin connected")
+        pluginList.add(plugin)
     }
 
     override fun onPluginDisconnected(plugin: T) {
-        Dependency[PluginLibraryControl::class].debug("Plugin $plugin disconnected")
-        val iter = listIterator()
+        control.debug("Plugin $plugin disconnected")
+        val iter = pluginList.listIterator()
         while (iter.hasNext()) {
             val entry = iter.next()
             if (entry == plugin) {

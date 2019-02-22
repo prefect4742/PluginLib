@@ -1,18 +1,24 @@
 package com.prefect47.pluginlib.impl
 
-import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
+import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
-object PluginLibraryControlImpl: PluginLibraryControl {
+class PluginLibraryControlImpl @Inject constructor(private val managerLazy: Lazy<PluginManager>,
+        override val preferenceDataStoreManager: PluginPreferenceDataStoreManager): PluginLibraryControl {
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
     private val trackers = HashMap<KClass<*>, PluginTracker>()
+
+    // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
+    // circular call loop and exhaust the stack.
+    private val manager: PluginManager by lazy { managerLazy.get() }
 
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
@@ -21,11 +27,8 @@ object PluginLibraryControlImpl: PluginLibraryControl {
     override var notificationChannel: String? = null
     override var notificationIconResId: Int = 0
 
-    override val preferenceDataStoreManager
-        get() = Dependency[PluginPreferenceDataStoreManager::class]
-
     override fun addClassFilter(filter: (String) -> Boolean) {
-        Dependency[PluginManager::class].addClassFilter(filter)
+        manager.addClassFilter(filter)
     }
 
     override fun addTracker(tracker: PluginTracker) {
@@ -43,11 +46,13 @@ object PluginLibraryControlImpl: PluginLibraryControl {
 
     override suspend fun start() {
         debug("PluginLib starting")
+
         GlobalScope.async(Dispatchers.Default) {
             for ((_, tracker) in trackers) {
                 launch { tracker.start() }
             }
         }.join()
+
         debug("PluginLib started")
         listeners.forEach { it.onStarted() }
     }
@@ -66,13 +71,11 @@ object PluginLibraryControlImpl: PluginLibraryControl {
 
     override fun getPluginList(cls: KClass<*>): List<Plugin>? = trackers[cls]?.pluginList
 
-    override fun getPluginList(pluginClassName: String): List<Plugin>? {
-        return getPluginList(Class.forName(pluginClassName).kotlin)
-    }
+    override fun getPluginList(pluginClassName: String): List<Plugin>? =
+        getPluginList(Class.forName(pluginClassName).kotlin)
 
-    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
-        return Dependency[PluginManager::class].pluginClassFlagsMap[pluginClassName]
-    }
+    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? =
+        manager.pluginClassFlagsMap[pluginClassName]
 
     override fun getPlugin(className: String): Plugin? {
         for ((_, tracker) in trackers) {

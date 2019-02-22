@@ -15,16 +15,18 @@
 
 package com.prefect47.pluginlib.plugin
 
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
 @ProvidesInterface(version = PluginDependency.VERSION)
 object PluginDependency {
     const val VERSION = 1
-    lateinit var sProvider: DependencyProvider
+
+    private val provider: DependencyProvider by lazy { PluginLibraryDI.component.getDependencyProvider() }
 
     operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {
-        return sProvider[p, cls]
+        return provider[p, cls]
     }
 
     abstract class DependencyProvider {

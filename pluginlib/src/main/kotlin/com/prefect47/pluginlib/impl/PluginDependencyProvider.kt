@@ -19,24 +19,12 @@ import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginDependency
 import com.prefect47.pluginlib.plugin.PluginDependency.DependencyProvider
+import javax.inject.Inject
 import kotlin.reflect.KClass
 
-object PluginDependencyProvider : DependencyProvider() {
-    private var manager: PluginManager? = null
-
-    fun init(manager: PluginManager) {
-        PluginDependencyProvider.manager = manager
-        PluginDependency.sProvider = this
-    }
+class PluginDependencyProvider @Inject constructor(private val manager: PluginManager): DependencyProvider() {
 
     private val dependencies = ArrayMap<Any, Any>()
-
-    fun <T: Any> allowPluginDependency(cls: KClass<T>) {
-        allowPluginDependency(
-            cls,
-            Dependency[cls]
-        )
-    }
 
     fun <T: Any> allowPluginDependency(cls: KClass<T>, obj: T) {
         synchronized (dependencies) {
@@ -47,8 +35,8 @@ object PluginDependencyProvider : DependencyProvider() {
     override operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {
         // TODO: Check classloader used on annotations, it should be the system one right?
         // Reload the class with our own classloader
-        val ourCls = Class.forName(cls.qualifiedName).kotlin
-        if (!manager!!.dependsOn(p, ourCls)) {
+        val ourCls = Class.forName(cls.qualifiedName!!).kotlin
+        if (!manager.dependsOn(p, ourCls)) {
             throw IllegalArgumentException(p.javaClass.simpleName + " does not depend on " + cls)
         }
         synchronized (dependencies) {

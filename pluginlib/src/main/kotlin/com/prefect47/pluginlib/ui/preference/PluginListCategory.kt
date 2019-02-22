@@ -6,9 +6,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 /**
  * Preference category that automatically adds all plugins of its type and sets their common layout.
@@ -43,7 +42,7 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
     override fun onAttachedToHierarchy(preferenceManager: PreferenceManager?) {
         super.onAttachedToHierarchy(preferenceManager)
 
-        val control = Dependency[PluginLibraryControl::class]
+        val control = PluginLibraryDI.component.getControl()
         val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
         val creator: (Context, Int, Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 

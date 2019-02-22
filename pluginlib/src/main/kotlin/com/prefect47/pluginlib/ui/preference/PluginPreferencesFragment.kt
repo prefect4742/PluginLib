@@ -8,7 +8,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
 import com.prefect47.pluginlib.plugin.*
@@ -18,14 +18,13 @@ import com.prefect47.pluginlib.plugin.*
  */
 class PluginPreferencesFragment : PreferenceFragmentCompat() {
     interface ActivityResultHandler {
-        fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?)
+        fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?)
     }
 
     companion object {
         const val DIALOG_FRAGMENT_TAG = "com.prefect47.pluginlib.ui.PreferenceFragment.DIALOG"
     }
 
-    private val prefsManager = Dependency[PluginPreferenceDataStoreManager::class]
     private lateinit var prefs: PluginPreferenceDataStore
     private lateinit var prefsListener: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
     private lateinit var plugin: Plugin
@@ -33,9 +32,9 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        plugin = Dependency[PluginLibraryControl::class].getPlugin(className!!)!!
+        plugin = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
 
-        prefs = prefsManager.getPreferenceDataStore(plugin)
+        prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(plugin)
         preferenceManager.preferenceDataStore = prefs
 
         val preferencesResId = (plugin as PluginSettings).preferencesResId

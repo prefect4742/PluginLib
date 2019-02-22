@@ -39,14 +39,7 @@ class PluginLibraryModule {
     fun providePluginTrackerFactory(manager: PluginManager, control: PluginLibraryControl,
         dependencyProvider: PluginDependencyProvider) = PluginTrackerImpl.Factory(manager, control, dependencyProvider)
 
-    // TODO: Circular depeendency between PluginTrackerImpl and PluginDependencyProvider via the allowPluginDependency() method...
-    /*
     @Singleton
     @Provides
-    fun provideDependencyProvider() = PluginDependency
-    */
-
-    @Singleton
-    @Provides
-    fun providePluginDependencyProvider(manager: PluginManager) = PluginDependencyProvider(manager, PluginDependency)
+    fun providePluginDependencyProvider(manager: PluginManager) = PluginDependencyProvider(manager)
 }

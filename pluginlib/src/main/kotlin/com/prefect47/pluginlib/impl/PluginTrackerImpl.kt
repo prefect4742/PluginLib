@@ -18,10 +18,11 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 class PluginTrackerImpl<T: Plugin>(private val manager: PluginManager, private val control: PluginLibraryControl,
-            override val pluginClass: KClass<*>) : PluginTracker, PluginListener<T>, ArrayList<Plugin>() {
+            override val pluginClass: KClass<*>) : PluginTracker, PluginListener<T> {
 
     class Factory @Inject constructor(private val manager: PluginManager, private val control: PluginLibraryControl,
-            private val dependencyProvider: PluginDependencyProvider): PluginTrackerFactory {
+            dependencyProvider: PluginDependencyProvider): PluginTrackerFactory {
+
         init {
             dependencyProvider.allowPluginDependency(PluginTrackerFactory::class, this)
         }
@@ -35,24 +36,8 @@ class PluginTrackerImpl<T: Plugin>(private val manager: PluginManager, private v
         }
     }
 
-    /*
-    companion object Factory: PluginTrackerFactory {
-        init {
-            Dependency[PluginDependencyProvider::class].allowPluginDependency(PluginTrackerFactory::class)
-        }
-
-        override fun <T : Plugin> create(cls: KClass<T>): PluginTracker {
-            val tracker = PluginTrackerImpl<T>(cls)
-            tracker.startFunc = {
-                Dependency[PluginManager::class].addPluginListener(tracker, cls, allowMultiple = true)
-            }
-            return tracker
-        }
-    }
-    */
-
     private lateinit var startFunc : suspend () -> Unit
-    override val pluginList = this
+    override val pluginList = ArrayList<T>()
 
     override suspend fun start() {
         control.debug("PluginLib starting tracker ${pluginClass.qualifiedName}")
@@ -66,12 +51,12 @@ class PluginTrackerImpl<T: Plugin>(private val manager: PluginManager, private v
 
     override fun onPluginConnected(plugin: T) {
         control.debug("Plugin $plugin connected")
-        add(plugin)
+        pluginList.add(plugin)
     }
 
     override fun onPluginDisconnected(plugin: T) {
         control.debug("Plugin $plugin disconnected")
-        val iter = listIterator()
+        val iter = pluginList.listIterator()
         while (iter.hasNext()) {
             val entry = iter.next()
             if (entry == plugin) {

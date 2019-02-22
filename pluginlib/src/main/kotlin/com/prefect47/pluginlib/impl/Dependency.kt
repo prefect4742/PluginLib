@@ -17,9 +17,9 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.util.ArrayMap
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
 import com.prefect47.pluginlib.impl.di.component.PluginLibraryComponent
-import com.prefect47.pluginlib.impl.di.module.PluginLibraryModule
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
 import kotlin.reflect.KClass
@@ -82,14 +82,7 @@ object Dependency {
             throw IllegalStateException("Can only be called once")
         }
 
-        component = DaggerPluginLibraryComponent.builder().context(context).build()
-
-        /*
-        providers[PluginPrefs::class] =
-                DependencyProvider {
-                    component.getPluginPrefs()
-                }
-        */
+        component = PluginLibraryDI.component
 
         providers[PluginManager::class] =
                 DependencyProvider {
@@ -101,33 +94,6 @@ object Dependency {
                     component.getPluginLibraryControl()
                 }
 
-        providers[PluginTrackerFactory::class] =
-                DependencyProvider {
-                    component.getPluginTrackerFactory()
-                    //PluginTrackerImpl.Factory
-                }
-
-        providers[PluginDependencyProvider::class] =
-                DependencyProvider {
-                    component.getPluginDependencyProvider()
-                    /*
-                    PluginDependencyProvider.init(
-                        get(
-                            PluginManager::class
-                        )
-                    )
-                    PluginDependencyProvider
-                    */
-                }
-
-        /*
-        providers[PluginInstanceManager.Factory::class] =
-                DependencyProvider {
-                    component.getPluginInstanceManagerFactory()
-                    //PluginInstanceManagerImpl.Factory
-                }
-        */
-
         providers[PluginPreferenceDataStoreManager::class] =
                 DependencyProvider {
                     PluginPreferenceDataStoreManagerImpl.init(
@@ -135,12 +101,6 @@ object Dependency {
                     )
                     PluginPreferenceDataStoreManagerImpl
                 }
-
-        // TODO: Allow app that uses library to add its own dependencies
-        /*
-        providers.put(PluginDependencyProvider::class,
-                DependencyProvider { PluginDependencyProvider(get(PluginManager::class)) })
-        */
     }
 
     @Synchronized

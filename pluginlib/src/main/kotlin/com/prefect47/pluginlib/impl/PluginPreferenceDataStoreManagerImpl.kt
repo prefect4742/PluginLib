@@ -2,12 +2,14 @@ package com.prefect47.pluginlib.impl
 
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
+import javax.inject.Inject
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider as Provider
 
-object PluginPreferenceDataStoreManagerImpl: Manager {
+class PluginPreferenceDataStoreManagerImpl @Inject constructor(): Manager {
 
-    override lateinit var provider: Provider
+    override var provider: com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider =
+        PluginDefaultPreferenceDataStoreProvider
 
     // Remember which plugins have asked so that they can be invalidated id needed.
     private val served = mutableSetOf<Plugin>()
@@ -16,15 +18,11 @@ object PluginPreferenceDataStoreManagerImpl: Manager {
     // the same data store so that they can share data.
     private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
 
-    internal fun init(defaultProvider: Provider) {
-        provider = defaultProvider
-    }
-
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
         served.add(plugin)
         cache[plugin.pkgName]?.let { return it }
         val newStore = provider.getPreferenceDataStore(plugin)
-        cache.put(plugin.pkgName, newStore)
+        cache[plugin.pkgName] = newStore
         return newStore
     }
 

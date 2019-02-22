@@ -67,13 +67,13 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
         )
     }
 
-    override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = HashMap()
-    override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = HashMap()
+    override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = Collections.synchronizedMap(HashMap())
+    override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = Collections.synchronizedMap(HashMap())
 
     private val pluginMap: MutableMap<PluginListener<*>, PluginInstanceManager<out Plugin>> =
-            ArrayMap<PluginListener<*>, PluginInstanceManager<*>>()
-    private val classLoaders: MutableMap<String, ClassLoader> = ArrayMap<String, ClassLoader>()
-    private val oneShotPackages: MutableSet<String> = ArraySet<String>()
+            Collections.synchronizedMap(HashMap())
+    private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
+    private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
 
     // Lazily load this so it doesn't have any effect on devices without plugins.
     private val parentClassLoader: ClassLoaderFilterInternal by lazy {

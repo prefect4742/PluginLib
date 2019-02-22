@@ -15,7 +15,6 @@
 package com.prefect47.pluginlib
 
 import android.content.Context
-import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 object PluginLibrary {
@@ -23,7 +22,6 @@ object PluginLibrary {
 
     fun init(context: Context) {
         PluginLibraryDI.init(context)
-        Dependency.init(context)
     }
 
     fun getControl() = PluginLibraryDI.component.getControl()

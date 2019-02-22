@@ -17,7 +17,6 @@ package com.prefect47.pluginlib
 import android.content.Context
 import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 object PluginLibrary {
     const val ARG_CLASSNAME = "pluginClassName"
@@ -27,5 +26,5 @@ object PluginLibrary {
         Dependency.init(context)
     }
 
-    fun getControl() = Dependency[PluginLibraryControl::class]
+    fun getControl() = PluginLibraryDI.component.getControl()
 }

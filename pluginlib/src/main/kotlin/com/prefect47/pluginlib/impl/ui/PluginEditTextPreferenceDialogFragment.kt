@@ -5,9 +5,8 @@ import android.text.method.DigitsKeyListener
 import android.view.View
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import kotlinx.android.synthetic.main.plugin_pref_inline_edittext.*
 
 /**
@@ -34,7 +33,7 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        plugin = Dependency[PluginLibraryControl::class].getPlugin(className!!)!!
+        plugin = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
         super.onCreate(savedInstanceState)
     }
 

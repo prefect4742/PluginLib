@@ -18,7 +18,6 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.util.ArrayMap
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
 import com.prefect47.pluginlib.impl.di.component.PluginLibraryComponent
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
@@ -86,12 +85,7 @@ object Dependency {
 
         providers[PluginManager::class] =
                 DependencyProvider {
-                    component.getPluginManager()
-                }
-
-        providers[PluginLibraryControl::class] =
-                DependencyProvider {
-                    component.getPluginLibraryControl()
+                    component.getManager()
                 }
 
         providers[PluginPreferenceDataStoreManager::class] =

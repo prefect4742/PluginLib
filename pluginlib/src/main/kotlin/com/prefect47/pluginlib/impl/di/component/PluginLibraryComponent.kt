@@ -24,10 +24,10 @@ interface PluginLibraryComponent {
         fun build(): PluginLibraryComponent
     }
 
-    fun getPluginLibraryControl(): PluginLibraryControl
+    fun getControl(): PluginLibraryControl
     fun getPluginPrefs(): PluginPrefs
-    fun getPluginManager(): PluginManager
-    fun getPluginInstanceManagerFactory(): PluginInstanceManager.Factory
+    fun getManager(): PluginManager
+    fun getInstanceManagerFactory(): PluginInstanceManager.Factory
     fun getPluginTrackerFactory(): PluginTrackerFactory
 
     fun getDependencyProvider(): PluginDependency.DependencyProvider

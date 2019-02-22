@@ -4,9 +4,8 @@ import android.content.Context
 import android.view.View
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreference
-import com.prefect47.pluginlib.impl.Dependency
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
 import kotlinx.android.synthetic.main.plugin_setting.view.*
@@ -31,7 +30,7 @@ class PluginSingleListEntry(context: Context, layoutResId: Int, private val plug
             if (plugin is PluginSettings) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
-                    Dependency[PluginLibraryControl::class].settingsHandler?.openSettings(plugin)
+                    PluginLibraryDI.component.getControl().settingsHandler?.openSettings(plugin)
                 }
             } else {
                 it.visibility = View.GONE

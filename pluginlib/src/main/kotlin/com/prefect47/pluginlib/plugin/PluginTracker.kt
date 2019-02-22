@@ -30,7 +30,7 @@ interface PluginTracker {
     companion object {
         const val VERSION = 1
 
-        val factory: PluginTrackerFactory by lazy { PluginLibraryDI.component.getPluginTrackerFactory() }
+        private val factory: PluginTrackerFactory by lazy { PluginLibraryDI.component.getPluginTrackerFactory() }
 
         fun create(p: Plugin): PluginTracker {
             return factory.create(p::class)

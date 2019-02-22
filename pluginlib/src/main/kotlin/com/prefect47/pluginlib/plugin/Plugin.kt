@@ -19,10 +19,9 @@ package com.prefect47.pluginlib.plugin
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceDataStore
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.Dependency
 import com.prefect47.pluginlib.impl.PluginManager
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -111,6 +110,11 @@ import com.prefect47.pluginlib.impl.PluginManager
 */
 
 interface Plugin {
+    companion object {
+        private val manager: PluginManager by lazy { PluginLibraryDI.component.getManager() }
+        private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
+    }
+
     /**
      * Behavioral flags that apply to the Plugin type.
      * Declare these as a companion object member EnumSet called "FLAGS" in your Plugin class interface.
@@ -127,11 +131,11 @@ interface Plugin {
     val className: String
         get() = this::class.qualifiedName!!
     val pkgName: String
-        get() = Dependency[PluginManager::class].pluginInfoMap[this]!!.pkg
+        get() = manager.pluginInfoMap[this]!!.pkg
     val pluginContext: Context
-        get() = Dependency[PluginManager::class].pluginInfoMap[this]!!.context
+        get() = manager.pluginInfoMap[this]!!.context
     val applicationContext: Context
-        get() = Dependency[PluginManager::class].getApplicationContext()
+        get() = manager.getApplicationContext()
 
     val title: String
     val description: String
@@ -143,7 +147,7 @@ interface Plugin {
     fun onDestroy() {}
 
     val preferenceDataStore: PluginPreferenceDataStore
-        get() = Dependency[PluginPreferenceDataStoreManager::class].getPreferenceDataStore(this)
+        get() = prefsManager.getPreferenceDataStore(this)
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
     // PreferenceDataStoreProvider

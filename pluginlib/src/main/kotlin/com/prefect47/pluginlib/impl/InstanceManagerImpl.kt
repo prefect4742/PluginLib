@@ -28,7 +28,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
+import com.prefect47.pluginlib.impl.InstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
@@ -40,18 +40,19 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.full.createInstance
 
-class PluginInstanceManagerImpl<T: Plugin>(
-        private val context: Context, private val manager: PluginManager, private val pluginPrefs: PluginPrefs,
-        private val control: PluginLibraryControl, private val action: String, private val listener: PluginListener<T>?,
-        private val allowMultiple: Boolean, private val version: VersionInfo
-): PluginInstanceManager<T> {
+class InstanceManagerImpl<T: Plugin>(
+    private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
+    private val control: PluginLibraryControl, private val action: String, private val listener: PluginListener<T>?,
+    private val allowMultiple: Boolean, private val version: VersionInfo
+): InstanceManager<T> {
 
-    class Factory @Inject constructor(private val context: Context, private val manager: PluginManager,
-            private val control: PluginLibraryControl,
-            private val pluginPrefs: PluginPrefs): PluginInstanceManager.Factory {
+    class Factory @Inject constructor(
+        private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
+        private val pluginPrefs: PluginPrefs
+    ): InstanceManager.Factory {
 
         override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
-                allowMultiple: Boolean, cls: KClass<*>) = PluginInstanceManagerImpl(
+                allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
             context,
             manager,
             pluginPrefs,
@@ -64,13 +65,13 @@ class PluginInstanceManagerImpl<T: Plugin>(
     }
 
     companion object {
-        private const val TAG = "PluginInstanceManager"
+        private const val TAG = "InstanceManager"
     }
 
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
 
-    private val notificationId = PluginManager.nextNotificationId
+    private val notificationId = Manager.nextNotificationId
 
     override fun getPlugin(): PluginInfo<T>? {
         if (Looper.myLooper() != Looper.getMainLooper()) {
@@ -334,7 +335,7 @@ class PluginInstanceManagerImpl<T: Plugin>(
                     nb.setContentTitle("Plugin \"$label\" is too new")
                         .setContentText("Check to see if an OTA is available.\n$msg")
                 }
-                val i: Intent = Intent(PluginManager.DISABLE_PLUGIN).setData(
+                val i: Intent = Intent(Manager.DISABLE_PLUGIN).setData(
                     Uri.parse("package://" + component.flattenToString())
                 )
                 val pi: PendingIntent = PendingIntent.getBroadcast(context, 0, i, 0)

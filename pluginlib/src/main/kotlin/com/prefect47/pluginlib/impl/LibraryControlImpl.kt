@@ -11,14 +11,15 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class PluginLibraryControlImpl @Inject constructor(private val managerLazy: Lazy<PluginManager>,
-        override val preferenceDataStoreManager: PluginPreferenceDataStoreManager): PluginLibraryControl {
+class LibraryControlImpl @Inject constructor(
+    private val managerLazy: Lazy<Manager>, override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
+): PluginLibraryControl {
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
     private val trackers = HashMap<KClass<*>, PluginTracker>()
 
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.
-    private val manager: PluginManager by lazy { managerLazy.get() }
+    private val manager: Manager by lazy { managerLazy.get() }
 
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME

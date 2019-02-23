@@ -20,11 +20,11 @@ import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import kotlin.reflect.KClass
 
-interface PluginInstanceManager<T: Plugin> {
+interface InstanceManager<T: Plugin> {
 
     interface Factory {
         fun <T: Plugin> create(action: String, listener: PluginListener<T>?, allowMultiple: Boolean,
-                cls: KClass<*>): PluginInstanceManager<T>
+                cls: KClass<*>): InstanceManager<T>
     }
 
     data class PluginInfo<T: Plugin>(

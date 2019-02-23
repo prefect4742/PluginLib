@@ -17,12 +17,11 @@ package com.prefect47.pluginlib.impl
 
 import android.util.ArrayMap
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginDependency
 import com.prefect47.pluginlib.plugin.PluginDependency.DependencyProvider
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class PluginDependencyProvider @Inject constructor(private val manager: PluginManager): DependencyProvider() {
+class DependencyProviderImpl @Inject constructor(private val manager: Manager): DependencyProvider() {
 
     private val dependencies = ArrayMap<Any, Any>()
 

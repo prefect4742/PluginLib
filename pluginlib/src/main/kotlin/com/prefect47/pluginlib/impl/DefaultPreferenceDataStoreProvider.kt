@@ -7,7 +7,7 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
-object PluginDefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
+object DefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
 
     private class DataStore(plugin: Plugin): PluginPreferenceDataStore() {
         private val listener = OnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }

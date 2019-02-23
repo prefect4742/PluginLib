@@ -18,6 +18,6 @@ import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginTracker
 import kotlin.reflect.KClass
 
-interface PluginTrackerFactory {
+interface TrackerFactory {
     fun <T: Plugin> create(cls: KClass<T>): PluginTracker
 }

@@ -20,17 +20,16 @@ import android.text.TextUtils
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
-import dagger.Component
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-interface PluginManager {
+interface Manager {
 
     interface Factory {
         fun create(
             defaultHandler: Thread.UncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
-        ): PluginManager
+        ): Manager
     }
 
     companion object {
@@ -69,7 +68,7 @@ interface PluginManager {
             get() = nextNotificationIdInt++
     }
 
-    val pluginInfoMap: MutableMap<Plugin, PluginInstanceManager.PluginInfo<*>>
+    val pluginInfoMap: MutableMap<Plugin, InstanceManager.PluginInfo<*>>
     val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(cls)) : T?

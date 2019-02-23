@@ -17,18 +17,21 @@ import com.prefect47.pluginlib.plugin.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class PluginTrackerImpl<T: Plugin>(private val manager: PluginManager, private val control: PluginLibraryControl,
-            override val pluginClass: KClass<*>) : PluginTracker, PluginListener<T> {
+class TrackerImpl<T: Plugin>(
+    private val manager: Manager, private val control: PluginLibraryControl, override val pluginClass: KClass<*>
+) : PluginTracker, PluginListener<T> {
 
-    class Factory @Inject constructor(private val manager: PluginManager, private val control: PluginLibraryControl,
-            dependencyProvider: PluginDependencyProvider): PluginTrackerFactory {
+    class Factory @Inject constructor(
+        private val manager: Manager, private val control: PluginLibraryControl,
+        dependencyProvider: DependencyProviderImpl
+    ): TrackerFactory {
 
         init {
-            dependencyProvider.allowPluginDependency(PluginTrackerFactory::class, this)
+            dependencyProvider.allowPluginDependency(TrackerFactory::class, this)
         }
 
         override fun <T : Plugin> create(cls: KClass<T>): PluginTracker {
-            val tracker = PluginTrackerImpl<T>(manager, control, cls)
+            val tracker = TrackerImpl<T>(manager, control, cls)
             tracker.startFunc = {
                 manager.addPluginListener(tracker, cls, allowMultiple = true)
             }

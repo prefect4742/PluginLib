@@ -12,25 +12,25 @@ import javax.inject.Singleton
 abstract class PluginLibraryBindings {
     @Singleton
     @Binds
-    abstract fun bindControl(control: PluginLibraryControlImpl): PluginLibraryControl
+    abstract fun bindControl(control: LibraryControlImpl): PluginLibraryControl
 
     @Singleton
     @Binds
-    abstract fun bindManagerFactory(factory: PluginManagerImpl.Factory): PluginManager.Factory
+    abstract fun bindManagerFactory(factory: ManagerImpl.Factory): Manager.Factory
 
     @Singleton
     @Binds
-    abstract fun bindInstanceManagerFactory(factory: PluginInstanceManagerImpl.Factory): PluginInstanceManager.Factory
+    abstract fun bindInstanceManagerFactory(factory: InstanceManagerImpl.Factory): InstanceManager.Factory
 
     @Singleton
     @Binds
-    abstract fun bindPluginTrackerFactory(factory: PluginTrackerImpl.Factory): PluginTrackerFactory
+    abstract fun bindPluginTrackerFactory(factory: TrackerImpl.Factory): TrackerFactory
 
     @Singleton
     @Binds
-    abstract fun bindDependencyProvider(provider: PluginDependencyProvider): PluginDependency.DependencyProvider
+    abstract fun bindDependencyProvider(provider: DependencyProviderImpl): PluginDependency.DependencyProvider
 
     @Singleton
     @Binds
-    abstract fun bindPrefsManager(manager: PluginPreferenceDataStoreManagerImpl): PluginPreferenceDataStoreManager
+    abstract fun bindPrefsManager(manager: PreferenceDataStoreManagerImpl): PluginPreferenceDataStoreManager
 }

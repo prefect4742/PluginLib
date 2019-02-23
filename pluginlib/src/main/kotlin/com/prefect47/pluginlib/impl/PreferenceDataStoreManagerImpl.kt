@@ -3,13 +3,12 @@ package com.prefect47.pluginlib.impl
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
-import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
-import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider as Provider
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
-class PluginPreferenceDataStoreManagerImpl @Inject constructor(): Manager {
+class PreferenceDataStoreManagerImpl @Inject constructor(): PluginPreferenceDataStoreManager {
 
-    override var provider: com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider =
-        PluginDefaultPreferenceDataStoreProvider
+    override var provider: PluginPreferenceDataStoreProvider = DefaultPreferenceDataStoreProvider
 
     // Remember which plugins have asked so that they can be invalidated id needed.
     private val served = mutableSetOf<Plugin>()

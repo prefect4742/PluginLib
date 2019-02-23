@@ -24,8 +24,8 @@ interface PluginLibraryComponent {
     }
 
     fun getControl(): PluginLibraryControl
-    fun getManager(): PluginManager
-    fun getPluginTrackerFactory(): PluginTrackerFactory
+    fun getManager(): Manager
+    fun getPluginTrackerFactory(): TrackerFactory
     fun getDependencyProvider(): PluginDependency.DependencyProvider
     fun getDataStoreManager(): PluginPreferenceDataStoreManager
 }

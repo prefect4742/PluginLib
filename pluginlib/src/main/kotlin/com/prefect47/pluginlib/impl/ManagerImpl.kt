@@ -30,11 +30,10 @@ import android.net.Uri
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.Action
-import android.util.ArrayMap
 import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.impl.PluginInstanceManager.PluginInfo
+import com.prefect47.pluginlib.impl.InstanceManager.PluginInfo
 import com.prefect47.pluginlib.plugin.*
 import dagger.Lazy
 import dalvik.system.PathClassLoader
@@ -51,14 +50,16 @@ import kotlin.reflect.full.declaredMemberProperties
 /**
  * @see Plugin
  */
-class PluginManagerImpl(private val context: Context, private val control: PluginLibraryControl,
-        private val pluginPrefs: PluginPrefs, private val factoryLazy: Lazy<PluginInstanceManager.Factory>,
-        defaultHandler: UncaughtExceptionHandler) : BroadcastReceiver(), PluginManager {
+class ManagerImpl(
+    private val context: Context, private val control: PluginLibraryControl, private val pluginPrefs: PluginPrefs,
+    private val factoryLazy: Lazy<InstanceManager.Factory>, defaultHandler: UncaughtExceptionHandler
+) : BroadcastReceiver(), Manager {
 
-    class Factory @Inject constructor(private val context: Context, private val control: PluginLibraryControl,
-            private val pluginPrefs: PluginPrefs,
-            private val factoryLazy: Lazy<PluginInstanceManager.Factory>): PluginManager.Factory {
-        override fun create(defaultHandler: Thread.UncaughtExceptionHandler) = PluginManagerImpl(
+    class Factory @Inject constructor(
+        private val context: Context, private val control: PluginLibraryControl, private val pluginPrefs: PluginPrefs,
+        private val factoryLazy: Lazy<InstanceManager.Factory>
+    ): Manager.Factory {
+        override fun create(defaultHandler: Thread.UncaughtExceptionHandler) = ManagerImpl(
             PluginAppContextWrapper(context),
             control,
             pluginPrefs,
@@ -70,7 +71,7 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
     override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = Collections.synchronizedMap(HashMap())
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = Collections.synchronizedMap(HashMap())
 
-    private val pluginMap: MutableMap<PluginListener<*>, PluginInstanceManager<out Plugin>> =
+    private val pluginMap: MutableMap<PluginListener<*>, InstanceManager<out Plugin>> =
             Collections.synchronizedMap(HashMap())
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
@@ -89,11 +90,11 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
     private var hasOneShot: Boolean = false
     private var isWtfsSet : Boolean = false
 
-    private val notificationId = PluginManager.nextNotificationId
+    private val notificationId = Manager.nextNotificationId
 
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.
-    private val factory: PluginInstanceManager.Factory by lazy { factoryLazy.get() }
+    private val factory: InstanceManager.Factory by lazy { factoryLazy.get() }
 
     init {
         val uncaughtExceptionHandler = PluginExceptionHandler(defaultHandler)
@@ -104,14 +105,14 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
         Handler(looper).post(() -> {
             // Plugin dependencies that don't have another good home can go here, but
             // dependencies that have better places to init can happen elsewhere.
-            Dependency.get(PluginDependencyProvider.class)
+            Dependency.get(DependencyProviderImpl.class)
                     .allowPluginDependency(ActivityStarter.class)
         }
         */
 
         /*
         val r = context.resources
-        val channel = NotificationChannel(PluginManager.NOTIFICATION_CHANNEL_ID,
+        val channel = NotificationChannel(Manager.NOTIFICATION_CHANNEL_ID,
             r.getString(R.string.plugin_channel_name), NotificationManager.IMPORTANCE_HIGH )
         channel.metadata = r.getString(R.string.plugin_channel_description)
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
@@ -122,7 +123,7 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw RuntimeException("Must be called from UI thread")
         }
-        val p: PluginInstanceManager<T> = factory.create(action, null, false, cls)
+        val p: InstanceManager<T> = factory.create(action, null, false, cls)
         pluginPrefs.addAction(action)
         val info: PluginInfo<T>? = p.getPlugin()
         if (info != null) {
@@ -137,7 +138,7 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
                                                allowMultiple: Boolean) {
         pluginPrefs.addAction(action)
-        val p: PluginInstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
+        val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
         pluginMap[listener] = p
         startListening()
@@ -165,8 +166,8 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
         var filter = IntentFilter(Intent.ACTION_PACKAGE_ADDED)
         filter.addAction(Intent.ACTION_PACKAGE_CHANGED)
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED)
-        filter.addAction(PluginManager.PLUGIN_CHANGED)
-        filter.addAction(PluginManager.DISABLE_PLUGIN)
+        filter.addAction(Manager.PLUGIN_CHANGED)
+        filter.addAction(Manager.DISABLE_PLUGIN)
         filter.addDataScheme("package")
         context.registerReceiver(this, filter)
         filter = IntentFilter(Intent.ACTION_USER_UNLOCKED)
@@ -189,7 +190,7 @@ class PluginManagerImpl(private val context: Context, private val control: Plugi
                     pluginMap.values.forEach { it.loadAll() }
                 }
             }
-            PluginManager.DISABLE_PLUGIN -> {
+            Manager.DISABLE_PLUGIN -> {
                 val uri: Uri = intent.data!!
                 val component = ComponentName.unflattenFromString(uri.toString().substring(10))!!
                 context.packageManager.setComponentEnabledSetting(

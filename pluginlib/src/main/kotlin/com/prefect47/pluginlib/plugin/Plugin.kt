@@ -20,7 +20,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.PluginManager
+import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 /**
@@ -65,7 +65,7 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
  * updated, or enabled.  Like this example:
  *
  * <pre class="prettyprint">
- * PluginManager.getInstance(this).addPluginListener(MyPlugin.COMPONENT,
+ * Manager.getInstance(this).addPluginListener(MyPlugin.COMPONENT,
  * new PluginListener&lt;MyPlugin&gt;() {
  *
  * public void onPluginConnected(MyPlugin plugin) {
@@ -111,7 +111,7 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 interface Plugin {
     companion object {
-        private val manager: PluginManager by lazy { PluginLibraryDI.component.getManager() }
+        private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
     }
 

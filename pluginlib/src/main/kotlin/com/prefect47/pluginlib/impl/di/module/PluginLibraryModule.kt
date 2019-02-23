@@ -14,9 +14,9 @@ class PluginLibraryModule {
 
     @Singleton
     @Provides
-    fun provideManager(factory: PluginManager.Factory) = factory.create()
+    fun provideManager(factory: Manager.Factory) = factory.create()
 
     @Singleton
     @Provides
-    fun providePluginDependencyProvider(manager: PluginManager) = PluginDependencyProvider(manager)
+    fun providePluginDependencyProvider(manager: Manager) = DependencyProviderImpl(manager)
 }

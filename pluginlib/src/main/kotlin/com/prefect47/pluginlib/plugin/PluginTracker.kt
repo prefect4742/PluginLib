@@ -15,7 +15,7 @@
 
 package com.prefect47.pluginlib.plugin
 
-import com.prefect47.pluginlib.impl.PluginTrackerFactory
+import com.prefect47.pluginlib.impl.TrackerFactory
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
@@ -30,7 +30,7 @@ interface PluginTracker {
     companion object {
         const val VERSION = 1
 
-        private val factory: PluginTrackerFactory by lazy { PluginLibraryDI.component.getPluginTrackerFactory() }
+        private val factory: TrackerFactory by lazy { PluginLibraryDI.component.getPluginTrackerFactory() }
 
         fun create(p: Plugin): PluginTracker {
             return factory.create(p::class)

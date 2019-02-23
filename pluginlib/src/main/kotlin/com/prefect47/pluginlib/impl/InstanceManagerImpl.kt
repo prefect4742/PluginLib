@@ -68,6 +68,8 @@ class InstanceManagerImpl<T: Plugin>(
         private const val TAG = "InstanceManager"
     }
 
+    override val plugins: MutableList<PluginInfo<T>> = Collections.synchronizedList(ArrayList())
+
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
 
@@ -80,8 +82,8 @@ class InstanceManagerImpl<T: Plugin>(
         runBlocking {
             pluginHandler.handleQueryPlugins( notify = false ) // Don't call listeners
         }
-        if (pluginHandler.plugins.size > 0) {
-            val info = pluginHandler.plugins[0]
+        if (plugins.size > 0) {
+            val info = plugins[0]
             pluginPrefs.setHasPlugins()
             info.plugin.onCreate()
             return info
@@ -96,8 +98,7 @@ class InstanceManagerImpl<T: Plugin>(
 
     override fun destroy() {
         if (control.debugEnabled) Log.d(TAG, "destroy")
-        val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
-        plugins.forEach {
+        ArrayList(plugins).forEach {
             pluginHandler.handlePluginDisconnected(it)
         }
     }
@@ -113,8 +114,7 @@ class InstanceManagerImpl<T: Plugin>(
 
     override fun checkAndDisable(className: String): Boolean {
         var disableAny = false
-        val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
-        plugins.forEach {
+        ArrayList(plugins).forEach {
             if (className.startsWith(it.pkg)) {
                 disable(it)
                 disableAny = true
@@ -124,8 +124,7 @@ class InstanceManagerImpl<T: Plugin>(
     }
 
     override fun disableAll(): Boolean {
-        val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
-        plugins.forEach {
+        ArrayList(plugins).forEach {
             disable(it)
         }
         return plugins.size != 0
@@ -146,7 +145,7 @@ class InstanceManagerImpl<T: Plugin>(
     }
 
     override fun <P: Any> dependsOn(p: Plugin, cls: KClass<P>): Boolean {
-        val plugins = ArrayList<PluginInfo<T>>(pluginHandler.plugins)
+        val plugins = ArrayList<PluginInfo<T>>(plugins)
         plugins.forEach {
             if (it.plugin::class.simpleName.equals(p::class.simpleName)) {
                 return (it.version != null && it.version.hasClass(cls))
@@ -160,8 +159,6 @@ class InstanceManagerImpl<T: Plugin>(
     }
 
     inner class PluginHandler: CoroutineScope {
-        val plugins = ArrayList<PluginInfo<T>>()
-
         override val coroutineContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
 
         suspend fun queryAll() {

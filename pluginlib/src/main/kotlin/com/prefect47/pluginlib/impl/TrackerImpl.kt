@@ -39,12 +39,14 @@ class TrackerImpl<T: Plugin>(
         }
     }
 
-    private lateinit var startFunc : suspend () -> Unit
-    override val pluginList = ArrayList<T>()
+    private lateinit var instanceManager: InstanceManager<T>
+    private lateinit var startFunc : suspend () -> InstanceManager<T>
+    override val pluginList
+        get() = instanceManager.plugins.map { it.plugin }
 
     override suspend fun start() {
         control.debug("PluginLib starting tracker ${pluginClass.qualifiedName}")
-        startFunc.invoke()
+        instanceManager = startFunc.invoke()
         control.debug("PluginLib started tracker ${pluginClass.qualifiedName}")
     }
 
@@ -54,18 +56,9 @@ class TrackerImpl<T: Plugin>(
 
     override fun onPluginConnected(plugin: T) {
         control.debug("Plugin $plugin connected")
-        pluginList.add(plugin)
     }
 
     override fun onPluginDisconnected(plugin: T) {
         control.debug("Plugin $plugin disconnected")
-        val iter = pluginList.listIterator()
-        while (iter.hasNext()) {
-            val entry = iter.next()
-            if (entry == plugin) {
-                iter.remove()
-                return
-            }
-        }
     }
 }

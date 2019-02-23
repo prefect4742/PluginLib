@@ -15,6 +15,8 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
+import com.prefect47.pluginlib.impl.InstanceManager
+import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import java.util.EnumSet
 import kotlin.reflect.KClass
@@ -40,6 +42,10 @@ interface PluginLibraryControl {
     var notificationIconResId: Int
 
     val preferenceDataStoreManager: PluginPreferenceDataStoreManager
+
+    suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
+        action: String = Manager.getAction(cls), allowMultiple : Boolean = false)
+    fun removePluginListener(listener: PluginListener<*>)
 
     fun addTracker(tracker: PluginTracker)
 

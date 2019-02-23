@@ -32,6 +32,15 @@ class LibraryControlImpl @Inject constructor(
         manager.addClassFilter(filter)
     }
 
+    override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
+        action: String, allowMultiple : Boolean) {
+        manager.addPluginListener(listener, cls, action, allowMultiple)
+    }
+
+    override fun removePluginListener(listener: PluginListener<*>) {
+        manager.removePluginListener(listener)
+    }
+
     override fun addTracker(tracker: PluginTracker) {
         trackers[tracker.pluginClass] = tracker
         debug("PluginLib tracking ${tracker.pluginClass.qualifiedName}")
@@ -84,22 +93,4 @@ class LibraryControlImpl @Inject constructor(
         }
         return null
     }
-
-    /*
-    override fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler) {
-        sharedPreferencesHandlers[key] = handler
-    }
-
-    override fun removeSharedPreferencesHandler(key: String) {
-        sharedPreferencesHandlers.remove(key)
-    }
-
-    override fun switchSharedPreferencesHandler(key: String) {
-        currentSharedPreferencesHandler = sharedPreferencesHandlers[key] ?:
-                throw IllegalArgumentException("PluginSharedPreferencesHandler with key $key not found")
-        for ((_, tracker) in trackers) {
-            tracker.pluginList.filterIsInstance<PluginSettings>().forEach { it.onSharedPreferenceHandlerChanged() }
-        }
-    }
-    */
 }

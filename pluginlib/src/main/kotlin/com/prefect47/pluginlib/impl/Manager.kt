@@ -74,7 +74,7 @@ interface Manager {
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(cls)) : T?
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-            action: String = getAction(cls), allowMultiple : Boolean = false)
+            action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
 
     fun removePluginListener(listener: PluginListener<*>)
 

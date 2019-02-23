@@ -136,7 +136,7 @@ class ManagerImpl(
     }
 
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
-                                               allowMultiple: Boolean) {
+                                               allowMultiple: Boolean): InstanceManager<T> {
         pluginPrefs.addAction(action)
         val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
@@ -150,6 +150,8 @@ class ManagerImpl(
             flags = result.get(cls.companionObjectInstance)
         }
         pluginClassFlagsMap[cls.qualifiedName!!] = flags
+
+        return p
     }
 
     override fun removePluginListener(listener: PluginListener<*>) {

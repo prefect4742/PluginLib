@@ -33,6 +33,8 @@ interface InstanceManager<T: Plugin> {
         val version: VersionInfo?,
         val context: Context)
 
+    val plugins: List<PluginInfo<T>>
+
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean

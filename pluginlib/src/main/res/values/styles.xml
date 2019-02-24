@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="PluginPreference.Category" parent="Preference.Category">
+        <item name="pluginEntryLayout">@layout/plugin_pref</item>
+    </style>
+
+    <style name="PluginPreference.Category.Material" parent="Preference.Category.Material">
+        <item name="pluginEntryLayout">@layout/plugin_pref_material</item>
+    </style>
+
+    <style name="PluginListCategory" parent="PluginPreference.Category">
+        <item name="pluginEntryLayout">@layout/plugin_pref</item>
+    </style>
+
+    <style name="PluginListCategory.Material" parent="PluginPreference.Category.Material">
+        <item name="pluginEntryLayout">@layout/plugin_pref_material</item>
+    </style>
+
+    <style name="PluginPreference" parent="Preference">
+        <item name="android:layout">@layout/plugin_pref</item>
+    </style>
+
+     <style name="PluginPreference.Material" parent="Preference.Material">
+        <item name="android:layout">@layout/plugin_pref_material</item>
+     </style>
+
+    <style name="PluginInlineEditTextPreference" parent="PluginPreference">
+        <item name="android:layout">@layout/plugin_pref_inline_edittext</item>
+    </style>
+
+    <style name="PluginInlineEditTextPreference.Material" parent="PluginPreference.Material">
+        <item name="android:layout">@layout/plugin_pref_inline_edittext_material</item>
+    </style>
+
+</resources>

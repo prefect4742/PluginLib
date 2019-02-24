@@ -15,7 +15,9 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * This preference is meant to be part of a list where more than one can be selected, since it inherits
  * CheckBoxPreference.
  */
-class PluginMultiListEntry(context: Context, layoutResId: Int, private val plugin: Plugin) : CheckBoxPreference(context) {
+class PluginMultiListEntry(
+    context: Context, layoutResId: Int, private val plugin: Plugin
+): CheckBoxPreference(context) {
     init {
         layoutResource = layoutResId
         title = plugin.title

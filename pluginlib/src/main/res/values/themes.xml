@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PluginPreferenceThemeOverlay">
+        <item name="inlineEditTextPreferenceStyle">@style/PluginInlineEditTextPreference</item>
+        <item name="preferenceCategoryStyle">@style/PluginPreference.Category</item>
+        <item name="preferenceStyle">@style/PluginPreference</item>
+    </style>
+
+    <style name="PreferenceThemeOverlay2">
+        <item name="inlineEditTextPreferenceStyle">@style/PluginInlineEditTextPreference.Material</item>
+        <item name="preferenceCategoryStyle">@style/PluginPreference.Category.Material</item>
+        <item name="preferenceStyle">@style/PluginPreference.Material</item>
+    </style>
+
+    <style name="PreferenceThemeOverlay">
+        <item name="inlineEditTextPreferenceStyle">@style/PluginInlineEditTextPreference.Material</item>
+        <item name="pluginListCategoryStyle">@style/PluginListCategory.Material</item>
+        <item name="preferenceCategoryStyle">@style/PluginPreference.Category.Material</item>
+        <item name="pluginPreferenceStyle">@style/PluginPreference.Material</item>
+        <item name="preferenceStyle">@style/PluginPreference.Material</item>
+        <item name="preferenceCategoryTitleTextAppearance">@style/TextAppearance.AppCompat.Body2</item>
+    </style>
+</resources>

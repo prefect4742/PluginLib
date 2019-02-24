@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+    <declare-styleable name="PluginPreferenceTheme">
+        <attr name="inlineEditTextPreferenceStyle" format="reference" />
+        <attr name="pluginListCategoryStyle" format="reference" />
+        <attr name="pluginPreferenceStyle" format="reference" />
+    </declare-styleable>
+
     <declare-styleable name="PluginListCategory">
         <attr name="pluginClassName" format="string" />
         <attr name="pluginEntryLayout" format="reference" />

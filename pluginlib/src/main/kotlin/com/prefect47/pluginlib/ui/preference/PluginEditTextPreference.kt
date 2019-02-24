@@ -9,10 +9,11 @@ import com.prefect47.pluginlib.R
 /**
  * EditText Preference wrapper since we need a dialog that has en editText.
  */
-class PluginEditTextPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = android.R.attr.editTextPreferenceStyle,
-        defStyleRes: Int = android.R.attr.editTextPreferenceStyle)
-            : EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {
+class PluginEditTextPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.pluginPreferenceStyle,
+    defStyleRes: Int = R.style.PluginPreference
+): EditTextPreference(context, attrs, defStyleAttr, defStyleRes) {
     var inputType: Int = InputType.TYPE_CLASS_TEXT
     var digits: String? = null
 

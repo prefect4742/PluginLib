@@ -11,9 +11,11 @@ import com.prefect47.pluginlib.R
 /**
  * Preference that lets user pick a file from the storage framework.
  */
-abstract class PluginFilePickerPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = android.R.attr.preferenceStyle, defStyleRes: Int = android.R.attr.preferenceStyle)
-            : PluginPreference(context, attrs, defStyleAttr, defStyleRes) {
+abstract class PluginFilePickerPreference @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.pluginPreferenceStyle,
+    defStyleRes: Int = R.style.PluginPreference
+): PluginPreference(context, attrs, defStyleAttr, defStyleRes) {
 
     private var value: Uri? = null
     private var pickerRequestCode: Int = 0

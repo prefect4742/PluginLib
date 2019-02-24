@@ -3,11 +3,11 @@ package com.prefect47.pluginlib.impl.ui
 import android.os.Bundle
 import android.text.method.DigitsKeyListener
 import android.view.View
+import android.widget.EditText
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
-import kotlinx.android.synthetic.main.plugin_pref_inline_edittext.*
 
 /**
  * EditTextPreference.
@@ -38,7 +38,7 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
     }
 
     override fun onBindDialogView(view: View) {
-        edit.apply {
+        view.findViewById<EditText>(android.R.id.edit)?.apply {
             inputType = arguments!!.getInt(ARG_INPUTTYPE)
             arguments!!.getString(ARG_DIGITS)?.let { keyListener = DigitsKeyListener.getInstance(it) }
         }

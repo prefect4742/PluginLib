@@ -13,10 +13,11 @@ import com.prefect47.pluginlib.plugin.Plugin
  * Preference category that automatically adds all plugins of its type and sets their common layout.
  */
 
-class PluginListCategory @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null,
-        defStyleAttr: Int = android.R.attr.preferenceCategoryStyle,
-        defStyleRes: Int = android.R.attr.preferenceCategoryStyle)
-            : PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
+class PluginListCategory @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null,
+    defStyleAttr: Int = R.attr.pluginListCategoryStyle,
+    defStyleRes: Int = R.style.PluginListCategory
+): PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
 
@@ -31,7 +32,10 @@ class PluginListCategory @JvmOverloads constructor(context: Context, attrs: Attr
                 try {
                     getString(R.styleable.PluginListCategory_pluginClassName)?.let { className = it }
                     layoutResId = getResourceId(R.styleable.PluginListCategory_pluginEntryLayout,
-                            R.layout.plugin_pref)
+                            0)
+                    if (layoutResId == 0) {
+                        layoutResId = R.layout.plugin_pref
+                    }
                 } finally {
                     recycle()
                 }

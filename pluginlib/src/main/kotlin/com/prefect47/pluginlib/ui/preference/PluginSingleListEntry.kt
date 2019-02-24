@@ -15,7 +15,9 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * This preference is meant to be part of a list where only one can be selected, since it inherits
  * SwitchPreference.
  */
-class PluginSingleListEntry(context: Context, layoutResId: Int, private val plugin: Plugin) : SwitchPreference(context) {
+class PluginSingleListEntry(
+    context: Context, layoutResId: Int, private val plugin: Plugin
+): SwitchPreference(context) {
     init {
         layoutResource = layoutResId
         title = plugin.title

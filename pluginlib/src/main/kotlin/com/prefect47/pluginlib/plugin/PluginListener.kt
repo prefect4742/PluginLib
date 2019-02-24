@@ -20,6 +20,16 @@ package com.prefect47.pluginlib.plugin
  */
 interface PluginListener<T : Plugin> {
     /**
+     * Called when library starts looking for plugins of the given type. Should be used at application start.
+     */
+    fun onStartLoading()
+
+    /**
+     * Called when library has finished loading plugins. Should be used at application start.
+     */
+    fun onDoneLoading()
+
+    /**
      * Called when the plugin has been loaded and is ready to be used.
      * This may be called multiple times if multiple plugins are allowed.
      * It may also be called in the future if the plugin package changes

@@ -1,15 +1,23 @@
 package com.prefect47.pluginlib.impl.di.module
 
+import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.*
+import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.PluginDependency
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
+import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
 
 @Module
 abstract class PluginLibraryBindings {
+    @Singleton
+    @Binds
+    abstract fun bindContext(activity: FragmentActivity): Context
+
     @Singleton
     @Binds
     abstract fun bindControl(control: LibraryControlImpl): PluginLibraryControl
@@ -24,7 +32,7 @@ abstract class PluginLibraryBindings {
 
     @Singleton
     @Binds
-    abstract fun bindPluginTrackerFactory(factory: TrackerImpl.Factory): TrackerFactory
+    abstract fun bindPluginTrackerFactory(model: PluginListViewModelImpl): PluginListViewModel
 
     @Singleton
     @Binds

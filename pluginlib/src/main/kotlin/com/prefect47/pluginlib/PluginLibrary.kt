@@ -14,14 +14,14 @@
 
 package com.prefect47.pluginlib
 
-import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 object PluginLibrary {
     const val ARG_CLASSNAME = "pluginClassName"
 
-    fun init(context: Context) {
-        PluginLibraryDI.init(context)
+    fun init(activity: FragmentActivity) {
+        PluginLibraryDI.init(activity)
     }
 
     fun getControl() = PluginLibraryDI.component.getControl()

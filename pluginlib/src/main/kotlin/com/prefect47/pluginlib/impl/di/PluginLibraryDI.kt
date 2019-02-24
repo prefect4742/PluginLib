@@ -14,14 +14,14 @@
 
 package com.prefect47.pluginlib.impl.di
 
-import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
 import com.prefect47.pluginlib.impl.di.component.PluginLibraryComponent
 
 internal object PluginLibraryDI {
     lateinit var component: PluginLibraryComponent
 
-    internal fun init(context: Context) {
-        component = DaggerPluginLibraryComponent.builder().context(context).build()
+    internal fun init(activity: FragmentActivity) {
+        component = DaggerPluginLibraryComponent.builder().activity(activity).build()
     }
 }

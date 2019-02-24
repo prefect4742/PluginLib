@@ -1,6 +1,6 @@
 package com.prefect47.pluginlib.impl.di.component
 
-import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.*
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryBindings
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryModule
@@ -18,14 +18,13 @@ interface PluginLibraryComponent {
     interface Builder {
 
         @BindsInstance
-        fun context(context: Context): Builder
+        fun activity(activity: FragmentActivity): Builder
 
         fun build(): PluginLibraryComponent
     }
 
     fun getControl(): PluginLibraryControl
     fun getManager(): Manager
-    fun getPluginTrackerFactory(): TrackerFactory
     fun getDependencyProvider(): PluginDependency.DependencyProvider
     fun getDataStoreManager(): PluginPreferenceDataStoreManager
 }

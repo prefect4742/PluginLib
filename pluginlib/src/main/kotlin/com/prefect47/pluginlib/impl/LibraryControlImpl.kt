@@ -1,21 +1,30 @@
 package com.prefect47.pluginlib.impl
 
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
+import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
+import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
+import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Lazy
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
 class LibraryControlImpl @Inject constructor(
-    private val managerLazy: Lazy<Manager>, override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
+    private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
+    override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
-    private val trackers = HashMap<KClass<*>, PluginTracker>()
+
+    override val viewModel: PluginListViewModel
+        get() = viewModelInner
+
+    private val viewModelInner: PluginListViewModelImpl by lazy {
+        ViewModelProviders.of(activity, PluginListViewModelFactory(manager, this))
+            .get(PluginListViewModelImpl::class.java)
+    }
 
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.
@@ -41,9 +50,8 @@ class LibraryControlImpl @Inject constructor(
         manager.removePluginListener(listener)
     }
 
-    override fun addTracker(tracker: PluginTracker) {
-        trackers[tracker.pluginClass] = tracker
-        debug("PluginLib tracking ${tracker.pluginClass.qualifiedName}")
+    override fun track(cls: KClass<out Plugin>) {
+        viewModelInner.track(cls)
     }
 
     override fun addStateListener(listener: PluginLibraryControl.StateListener) {
@@ -56,13 +64,7 @@ class LibraryControlImpl @Inject constructor(
 
     override suspend fun start() {
         debug("PluginLib starting")
-
-        GlobalScope.async(Dispatchers.Default) {
-            for ((_, tracker) in trackers) {
-                launch { tracker.start() }
-            }
-        }.join()
-
+        viewModelInner.start()
         debug("PluginLib started")
         listeners.forEach { it.onStarted() }
     }
@@ -79,17 +81,17 @@ class LibraryControlImpl @Inject constructor(
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getPluginList(cls: KClass<*>): List<Plugin>? = trackers[cls]?.pluginList
+    override fun getPluginList(cls: KClass<out Plugin>): List<Plugin>? = viewModelInner.list[cls]?.plugins?.value
 
     override fun getPluginList(pluginClassName: String): List<Plugin>? =
-        getPluginList(Class.forName(pluginClassName).kotlin)
+        getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
     override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? =
         manager.pluginClassFlagsMap[pluginClassName]
 
     override fun getPlugin(className: String): Plugin? {
-        for ((_, tracker) in trackers) {
-            tracker.pluginList.find { it::class.qualifiedName == className }?.let { return it }
+        viewModelInner.list.values.forEach { model ->
+            model.plugins.value?.find { plugin -> plugin::class.qualifiedName == className }?.let { return it }
         }
         return null
     }

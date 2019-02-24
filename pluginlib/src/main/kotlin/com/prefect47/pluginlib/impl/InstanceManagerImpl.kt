@@ -241,7 +241,9 @@ class InstanceManagerImpl<T: Plugin>(
                 return
             }
 
-            coroutineScope {
+            listener!!.onStartLoading()
+
+            GlobalScope.async(Dispatchers.Default) {
                 result.forEach {
                     launch(coroutineContext) {
                         val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
@@ -253,7 +255,9 @@ class InstanceManagerImpl<T: Plugin>(
                         }
                     }
                 }
-            }
+            }.join()
+
+            listener.onDoneLoading()
         }
 
         private fun handleLoadPlugin(component: ComponentName): PluginInfo<T>? {

@@ -15,9 +15,9 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.impl.InstanceManager
 import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
+import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import java.util.EnumSet
 import kotlin.reflect.KClass
 
@@ -43,11 +43,13 @@ interface PluginLibraryControl {
 
     val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 
+    val viewModel: PluginListViewModel
+
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)
     fun removePluginListener(listener: PluginListener<*>)
 
-    fun addTracker(tracker: PluginTracker)
+    fun track(cls: KClass<out Plugin>)
 
     fun addStateListener(listener: StateListener)
     fun removeStateListener(listener: StateListener)
@@ -63,7 +65,7 @@ interface PluginLibraryControl {
      */
     fun addClassFilter(filter: (String) -> Boolean)
 
-    fun getPluginList(cls: KClass<*>): List<Plugin>?
+    fun getPluginList(cls: KClass<out Plugin>): List<Plugin>?
     fun getPluginList(pluginClassName: String): List<Plugin>?
 
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?

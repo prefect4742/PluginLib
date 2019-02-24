@@ -20,7 +20,6 @@ import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.view.LayoutInflater
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 class PluginContextWrapper(private val appContext: Context, base: Context, private val myClassLoader: ClassLoader,
                            internal val pkg: String) : ContextWrapper(base) {
@@ -50,6 +49,6 @@ class PluginContextWrapper(private val appContext: Context, base: Context, priva
         // If there is no handler set, use common sense.
 
         // Prevent plugins from reading anything outside or their own settings
-        return super.getSharedPreferences("${pkg}_${name}", mode)
+        return super.getSharedPreferences("${pkg}_$name", mode)
     }
 }

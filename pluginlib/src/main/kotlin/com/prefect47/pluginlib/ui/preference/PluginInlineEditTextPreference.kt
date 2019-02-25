@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.widget.EditText
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.extensions.afterTextChanged
+import com.prefect47.pluginlib.extensions.afterTextChanged
 
 /**
  * Inline EditText Preference.

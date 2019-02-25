@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.impl.extensions
+package com.prefect47.pluginlib.extensions
 
 import android.text.Editable
 import android.text.TextWatcher

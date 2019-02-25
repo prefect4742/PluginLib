@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.extensions
+package com.prefect47.pluginlib.impl.extensions
 
 import android.view.View
 

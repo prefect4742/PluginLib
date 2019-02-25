@@ -50,7 +50,6 @@ class PluginListCategory @JvmOverloads constructor(
         val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
         val creator: (Context, Int, Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
-        val list = control.getPluginList(className)
         control.getPluginList(className)?.forEach {
             addPreference(creator(context, layoutResId, it))
         }

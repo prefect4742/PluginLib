@@ -35,7 +35,7 @@ class PluginMultiListEntry(
                     PluginLibraryDI.component.getControl().settingsHandler?.openSettings(plugin)
                 }
             } else {
-                it.visibility = View.GONE
+                it.visibility = View.INVISIBLE
                 it.setOnClickListener(null)
             }
         }

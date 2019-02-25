@@ -3,7 +3,8 @@ package com.prefect47.pluginlib.ui.preference
 import android.content.Context
 import android.view.View
 import androidx.preference.PreferenceViewHolder
-import androidx.preference.SwitchPreference
+import androidx.preference.SwitchPreferenceCompat
+import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginSettings
@@ -17,9 +18,10 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  */
 class PluginSingleListEntry(
     context: Context, layoutResId: Int, private val plugin: Plugin
-): SwitchPreference(context) {
+): SwitchPreferenceCompat(context) {
     init {
         layoutResource = layoutResId
+        widgetLayoutResource = R.layout.plugin_radiobutton
         title = plugin.title
         summary = plugin.description
         icon = plugin.icon
@@ -35,7 +37,7 @@ class PluginSingleListEntry(
                     PluginLibraryDI.component.getControl().settingsHandler?.openSettings(plugin)
                 }
             } else {
-                it.visibility = View.GONE
+                it.visibility = View.INVISIBLE
                 it.setOnClickListener(null)
             }
         }

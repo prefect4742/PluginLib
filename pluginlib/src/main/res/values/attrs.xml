@@ -19,6 +19,7 @@
 
     <declare-styleable name="PluginInlineEditTextPreference">
         <attr name="android:inputType" />
+        <attr name="android:singleLine" />
         <attr name="android:digits" />
         <attr name="android:hint" />
     </declare-styleable>

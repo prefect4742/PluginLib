@@ -20,7 +20,8 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(
 ): PluginPreference(context, attrs, defStyleAttr, defStyleRes) {
     var value: String? = null
 
-    var inputTypeAttr: Int = InputType.TYPE_CLASS_TEXT
+    var inputTypeAttr = InputType.TYPE_CLASS_TEXT
+    var singleLineAttr = false
     var digitsAttr: String? = null
     var hintAttr: String? = null
 
@@ -31,6 +32,7 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(
                 try {
                     inputTypeAttr = getInt(R.styleable.PluginInlineEditTextPreference_android_inputType,
                         InputType.TYPE_CLASS_TEXT)
+                    singleLineAttr = getBoolean(R.styleable.PluginInlineEditTextPreference_android_singleLine, false)
                     digitsAttr = getString(R.styleable.PluginInlineEditTextPreference_android_digits)
                     hintAttr = getString(R.styleable.PluginInlineEditTextPreference_android_hint)
                 } finally {
@@ -45,6 +47,7 @@ class PluginInlineEditTextPreference @JvmOverloads constructor(
 
         holder.itemView.findViewById<EditText>(android.R.id.edit)?.apply {
             inputType = inputTypeAttr
+            if (singleLineAttr) setSingleLine() // must be called after inputtype is set, and not if false...
             digitsAttr?.let { keyListener = DigitsKeyListener.getInstance(it) }
             hintAttr?.let { hint = hintAttr }
             setText(value)

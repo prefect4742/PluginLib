@@ -1,5 +1,6 @@
 package com.prefect47.pluginlib.impl.di.component
 
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.*
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryBindings
@@ -22,6 +23,8 @@ interface PluginLibraryComponent {
 
         fun build(): PluginLibraryComponent
     }
+
+    fun inject(fragment: Fragment)
 
     fun getControl(): PluginLibraryControl
     fun getManager(): Manager

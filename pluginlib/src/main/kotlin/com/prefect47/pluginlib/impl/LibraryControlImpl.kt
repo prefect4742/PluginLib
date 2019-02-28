@@ -4,10 +4,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
-import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
+import com.prefect47.pluginlib.plugin.PluginListener
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Lazy
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -79,6 +84,18 @@ class LibraryControlImpl @Inject constructor(
 
     override fun stop() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override suspend fun startPlugin(plugin: Plugin) {
+        withContext(Dispatchers.Main) {
+            plugin.onStart()
+        }
+    }
+
+    override suspend fun stopPlugin(plugin: Plugin) {
+        withContext(Dispatchers.Main) {
+            plugin.onStop()
+        }
     }
 
     override fun getPluginList(cls: KClass<out Plugin>): List<Plugin>? = viewModelInner.list[cls]?.plugins?.value

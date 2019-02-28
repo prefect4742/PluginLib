@@ -142,16 +142,27 @@ interface Plugin {
     val icon: Drawable?
         get() = ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)
 
+    // Called when plugin is loaded, either at app start or when the plugin is installed while app is running.
+    // pluginContext and applicationContext is available until onDestroy is called.
     fun onCreate() {}
 
+    // Called when app wishes to use the plugin.
+    // preferenceDataStore is available until onStop is called.
+    fun onStart() {}
+
+    // Called when app wishes to stop using the plugin.
+    // preferenceDataStore may no longer be valid (for example if the app implements a PluginPreferenceDataStoreProvider
+    // and has invalidated any currently used PluginPreferenceDataStore instances).
+    fun onStop() {}
+
+    // Called when app shuts down, or if plugin is uninstalled while app is running.
     fun onDestroy() {}
 
     val preferenceDataStore: PluginPreferenceDataStore
         get() = prefsManager.getPreferenceDataStore(this)
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
-    // PreferenceDataStoreProvider
-    // wishes all its plugins to switch to another set of preferences.
+    // PreferenceDataStoreProvider and wishes all its plugins to switch to another set of preferences.
     // Plugin should reload whatever preferences it has cached.
     fun onPreferenceDataStoreInvalidated() {}
 }

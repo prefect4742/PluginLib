@@ -59,6 +59,9 @@ interface PluginLibraryControl {
     fun resume()
     fun stop()
 
+    suspend fun startPlugin(plugin: Plugin)
+    suspend fun stopPlugin(plugin: Plugin)
+
     /**
      * Add a [filter] to the plugin classloader that lets plugins use libraries or code where class names might
      * conflict with those of the app.
@@ -71,12 +74,6 @@ interface PluginLibraryControl {
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
 
     fun getPlugin(className: String): Plugin?
-
-    /*
-    fun addSharedPreferencesHandler(key: String, handler: PluginSharedPreferencesHandler)
-    fun removeSharedPreferencesHandler(key: String)
-    fun switchSharedPreferencesHandler(key: String)
-    */
 
     fun debug(msg: String) {
         if (debugEnabled) Log.d(debugTag, msg)

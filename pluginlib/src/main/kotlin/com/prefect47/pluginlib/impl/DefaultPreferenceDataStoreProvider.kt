@@ -7,13 +7,10 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
-object DefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
+class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPreferenceDataStoreProvider {
 
-    private class DataStore(plugin: Plugin): PluginPreferenceDataStore() {
-        private val listener = OnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
-        private val prefs = plugin.pluginContext.getSharedPreferences("preferences", Context.MODE_PRIVATE).also {
-            it.registerOnSharedPreferenceChangeListener(listener)
-        }
+    private open class DataStore(context: Context, name: String): PluginPreferenceDataStore() {
+        protected val prefs = context.getSharedPreferences(name, Context.MODE_PRIVATE)
 
         override fun getBoolean(key: String?, defValue: Boolean) = prefs.getBoolean(key, defValue)
         override fun getFloat(key: String?, defValue: Float) = prefs.getFloat(key, defValue)
@@ -32,7 +29,17 @@ object DefaultPreferenceDataStoreProvider: PluginPreferenceDataStoreProvider {
                 prefs.edit().putStringSet(key, values).apply()
     }
 
+    private class PluginDataStore(plugin: Plugin): DataStore(plugin.pluginContext, "preferences") {
+        init {
+            prefs.registerOnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
+        }
+    }
+
+    override fun getPreferenceDataStore(): PluginPreferenceDataStore {
+        return DataStore(context, "preferences")
+    }
+
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
-        return DataStore(plugin)
+        return PluginDataStore(plugin)
     }
 }

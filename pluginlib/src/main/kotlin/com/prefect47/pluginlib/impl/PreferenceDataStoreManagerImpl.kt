@@ -1,14 +1,15 @@
 package com.prefect47.pluginlib.impl
 
+import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
 
-class PreferenceDataStoreManagerImpl @Inject constructor(): PluginPreferenceDataStoreManager {
+class PreferenceDataStoreManagerImpl @Inject constructor(context: Context): PluginPreferenceDataStoreManager {
 
-    override var provider: PluginPreferenceDataStoreProvider = DefaultPreferenceDataStoreProvider
+    override var provider: PluginPreferenceDataStoreProvider = DefaultPreferenceDataStoreProvider(context)
 
     // Remember which plugins have asked so that they can be invalidated id needed.
     private val served = mutableSetOf<Plugin>()
@@ -16,6 +17,8 @@ class PreferenceDataStoreManagerImpl @Inject constructor(): PluginPreferenceData
     // Cache the data stores returned by the provider on a per-package basis. Plugins in the same package should get
     // the same data store so that they can share data.
     private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
+
+    override fun getPreferenceDataStore(): PluginPreferenceDataStore = provider.getPreferenceDataStore()
 
     override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
         served.add(plugin)

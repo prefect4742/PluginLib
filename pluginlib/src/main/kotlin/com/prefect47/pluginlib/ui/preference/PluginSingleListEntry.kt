@@ -7,6 +7,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
 import kotlinx.android.synthetic.main.plugin_setting.view.*
@@ -17,15 +18,16 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * SwitchPreference.
  */
 class PluginSingleListEntry(
-    context: Context, overrideKey: String, layoutResId: Int, private val plugin: Plugin
+    context: Context, private val overrideKey: String, layoutResId: Int, private val plugin: Plugin
 ): SwitchPreferenceCompat(context) {
+    private val prefs: PluginPreferenceDataStore by lazy { preferenceDataStore as PluginPreferenceDataStore }
+
     init {
         layoutResource = layoutResId
         widgetLayoutResource = R.layout.plugin_radiobutton
         title = plugin.title
         summary = plugin.description
         icon = plugin.icon
-        key = overrideKey
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -43,9 +45,12 @@ class PluginSingleListEntry(
         }
     }
 
-    override fun persistBoolean(value: Boolean): Boolean =
-        if (value) persistString(plugin.className) else true
+    override fun persistBoolean(value: Boolean): Boolean {
+        if (value) prefs.putString(overrideKey, plugin.className)
+        return true
+    }
+
 
     override fun getPersistedBoolean(defaultReturnValue: Boolean): Boolean =
-        plugin.className == getPersistedString(null)
+        plugin.className == prefs.getString(overrideKey, null)
 }

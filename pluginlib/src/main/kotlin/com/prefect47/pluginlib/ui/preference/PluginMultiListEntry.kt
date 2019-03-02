@@ -6,6 +6,7 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
 import kotlinx.android.synthetic.main.plugin_setting.view.*
@@ -16,14 +17,15 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * CheckBoxPreference.
  */
 class PluginMultiListEntry(
-    context: Context, overrideKey: String, layoutResId: Int, private val plugin: Plugin
+    context: Context, private val overrideKey: String, layoutResId: Int, private val plugin: Plugin
 ): CheckBoxPreference(context) {
+    private val prefs: PluginPreferenceDataStore by lazy { preferenceDataStore as PluginPreferenceDataStore }
+
     init {
         layoutResource = layoutResId
         title = plugin.title
         summary = plugin.description
         icon = plugin.icon
-        key = overrideKey
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -42,15 +44,16 @@ class PluginMultiListEntry(
     }
 
     override fun persistBoolean(value: Boolean): Boolean {
-        val current = getPersistedStringSet(mutableSetOf())
+        val current = prefs.getStringSet(overrideKey, mutableSetOf())!!
         if (value) {
             current.add(plugin.className)
         } else {
             current.remove(plugin.className)
         }
-        return persistStringSet(current)
+        prefs.putStringSet(overrideKey, current)
+        return true
     }
 
     override fun getPersistedBoolean(defaultReturnValue: Boolean): Boolean =
-        getPersistedStringSet(emptySet()).contains(plugin.className)
+        prefs.getStringSet(overrideKey, emptySet())!!.contains(plugin.className)
 }

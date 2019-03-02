@@ -16,14 +16,14 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * CheckBoxPreference.
  */
 class PluginMultiListEntry(
-    context: Context, layoutResId: Int, private val plugin: Plugin
+    context: Context, overrideKey: String, layoutResId: Int, private val plugin: Plugin
 ): CheckBoxPreference(context) {
     init {
         layoutResource = layoutResId
         title = plugin.title
         summary = plugin.description
         icon = plugin.icon
-        key = plugin::class.qualifiedName
+        key = overrideKey
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -40,4 +40,17 @@ class PluginMultiListEntry(
             }
         }
     }
+
+    override fun persistBoolean(value: Boolean): Boolean {
+        val current = getPersistedStringSet(mutableSetOf())
+        if (value) {
+            current.add(plugin.className)
+        } else {
+            current.remove(plugin.className)
+        }
+        return persistStringSet(current)
+    }
+
+    override fun getPersistedBoolean(defaultReturnValue: Boolean): Boolean =
+        getPersistedStringSet(emptySet()).contains(plugin.className)
 }

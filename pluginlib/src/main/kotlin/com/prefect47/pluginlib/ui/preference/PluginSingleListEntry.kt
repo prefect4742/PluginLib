@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * SwitchPreference.
  */
 class PluginSingleListEntry(
-    context: Context, layoutResId: Int, private val plugin: Plugin
+    context: Context, overrideKey: String, layoutResId: Int, private val plugin: Plugin
 ): SwitchPreferenceCompat(context) {
     init {
         layoutResource = layoutResId
@@ -25,7 +25,7 @@ class PluginSingleListEntry(
         title = plugin.title
         summary = plugin.description
         icon = plugin.icon
-        key = plugin::class.qualifiedName
+        key = overrideKey
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -42,4 +42,10 @@ class PluginSingleListEntry(
             }
         }
     }
+
+    override fun persistBoolean(value: Boolean): Boolean =
+        if (value) persistString(plugin.className) else true
+
+    override fun getPersistedBoolean(defaultReturnValue: Boolean): Boolean =
+        plugin.className == getPersistedString(null)
 }

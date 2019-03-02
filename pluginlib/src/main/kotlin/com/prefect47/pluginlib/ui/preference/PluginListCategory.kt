@@ -48,21 +48,21 @@ class PluginListCategory @JvmOverloads constructor(
 
         val control = PluginLibraryDI.component.getControl()
         val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
-        val creator: (Context, Int, Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
+        val creator: (Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
         control.getPluginList(className)?.forEach {
-            addPreference(creator(context, layoutResId, it))
+            addPreference(creator(it))
         }
     }
 
-    private fun createPref(context: Context, layoutResId: Int, plugin: Plugin) =
-        PluginSingleListEntry(context, layoutResId, plugin).apply {
+    private fun createPref(plugin: Plugin) =
+        PluginSingleListEntry(context, key, layoutResId, plugin).apply {
             setOnPreferenceChangeListener { preference, newValue ->
                 preferenceChanged(preference as PluginSingleListEntry, newValue as Boolean) }
         }
 
-    private fun createMultiPref(context: Context, layoutResId: Int, plugin: Plugin) =
-        PluginMultiListEntry(context, layoutResId, plugin)
+    private fun createMultiPref(plugin: Plugin) =
+        PluginMultiListEntry(context, key, layoutResId, plugin)
 
     private fun preferenceChanged(preference: PluginSingleListEntry, newValue: Boolean): Boolean {
         return if (newValue) {

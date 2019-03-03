@@ -22,27 +22,19 @@ import kotlin.reflect.full.findAnnotation
 class VersionInfo {
 
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
-    private var default: KClass<*>? = null
 
     fun hasVersionInfo(): Boolean{
         return !versions.isEmpty()
     }
 
-    fun getDefaultVersion(): Int {
-        return versions[default]!!.version
-    }
-
     fun addClass(cls: KClass<*>): VersionInfo {
-        if (default == null) {
-            // The legacy default version is from the first class we add.
-            default = cls
-        }
         addClass(cls, false)
         return this
     }
 
     fun addClass(cls: KClass<*>, required: Boolean) {
         if (versions.containsKey(cls)) return
+
         cls.findAnnotation<ProvidesInterface>()?.let { a -> versions[cls] =
                 Version(a.version, true)
         }

@@ -29,15 +29,15 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.InstanceManager.PluginInfo
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
+import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import java.util.concurrent.Executors
-import kotlin.reflect.KClass
+import com.prefect47.pluginlib.plugin.PluginListener
 import kotlinx.coroutines.*
 import java.util.*
+import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 class InstanceManagerImpl<T: Plugin>(
@@ -198,9 +198,9 @@ class InstanceManagerImpl<T: Plugin>(
             }
         }
 
-        private fun handlePluginConnected(info: PluginInfo<T>) {
+        private suspend fun handlePluginConnected(info: PluginInfo<T>) {
             pluginPrefs.setHasPlugins()
-            launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 manager.handleWtfs()
                 manager.pluginInfoMap[info.plugin] = info
 
@@ -243,7 +243,7 @@ class InstanceManagerImpl<T: Plugin>(
 
             listener!!.onStartLoading()
 
-            GlobalScope.async(Dispatchers.Default) {
+            withContext(Dispatchers.Default) {
                 result.forEach {
                     launch(coroutineContext) {
                         val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
@@ -255,7 +255,7 @@ class InstanceManagerImpl<T: Plugin>(
                         }
                     }
                 }
-            }.join()
+            }
 
             listener.onDoneLoading()
         }

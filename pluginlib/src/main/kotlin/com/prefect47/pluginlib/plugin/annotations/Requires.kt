@@ -12,6 +12,7 @@ import kotlin.reflect.KClass
  * for the plugin interface that they are implementing. They will also
  * need an @Requires for each class that the plugin interface @DependsOn.
  */
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @Repeatable
 annotation class Requires(val target: KClass<*>, val version: Int)

@@ -71,7 +71,7 @@ class ManagerImpl(
     override val pluginInfoMap: MutableMap<Plugin, PluginInfo<*>> = Collections.synchronizedMap(HashMap())
     override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = Collections.synchronizedMap(HashMap())
 
-    private val pluginMap: MutableMap<PluginListener<*>, InstanceManager<out Plugin>> =
+    private val instancesMap: MutableMap<PluginListener<*>, InstanceManager<out Plugin>> =
             Collections.synchronizedMap(HashMap())
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
@@ -140,7 +140,7 @@ class ManagerImpl(
         pluginPrefs.addAction(action)
         val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
-        pluginMap[listener] = p
+        instancesMap[listener] = p
         startListening()
 
         var flags = EnumSet.noneOf(Plugin.Flag::class.java)
@@ -149,15 +149,15 @@ class ManagerImpl(
             result as KProperty1<Any?, EnumSet<Plugin.Flag>>
             flags = result.get(cls.companionObjectInstance)
         }
-        pluginClassFlagsMap[cls.qualifiedName!!] = flags
+        pluginClassFlagsMap[cls.qualifiedName!!] = flags ?: EnumSet.noneOf(Plugin.Flag::class.java)
 
         return p
     }
 
     override fun removePluginListener(listener: PluginListener<*>) {
-        if (!pluginMap.containsKey(listener)) return
-        pluginMap.remove(listener)?.destroy()
-        if (pluginMap.isEmpty()) {
+        if (!instancesMap.containsKey(listener)) return
+        instancesMap.remove(listener)?.destroy()
+        if (instancesMap.isEmpty()) {
             stopListening()
         }
     }
@@ -189,7 +189,7 @@ class ManagerImpl(
         when (intent.action) {
             Intent.ACTION_USER_UNLOCKED -> {
                 GlobalScope.launch(Dispatchers.Default) {
-                    pluginMap.values.forEach { it.loadAll() }
+                    instancesMap.values.forEach { it.loadAll() }
                 }
             }
             Manager.DISABLE_PLUGIN -> {
@@ -241,9 +241,9 @@ class ManagerImpl(
                     Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()
                 }
                 if (Intent.ACTION_PACKAGE_REMOVED != intent.action) {
-                    pluginMap.values.forEach { it.onPackageChange(pkg) }
+                    instancesMap.values.forEach { it.onPackageChange(pkg) }
                 } else {
-                    pluginMap.values.forEach { it.onPackageRemoved(pkg) }
+                    instancesMap.values.forEach { it.onPackageRemoved(pkg) }
                 }
             }
         }
@@ -269,7 +269,7 @@ class ManagerImpl(
     }
 
     override fun <T: Any> dependsOn(p: Plugin, cls: KClass<T>): Boolean {
-        pluginMap.forEach {
+        instancesMap.forEach {
             if (it.value.dependsOn(p, cls)) return true
         }
         return false
@@ -326,7 +326,7 @@ class ManagerImpl(
                 // We couldn't find any plugins involved in this crash, just to be safe
                 // disable all the plugins, so we can be sure that the app is running as
                 // best as possible.
-                pluginMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
+                instancesMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
             }
 
             if (disabledAny) {
@@ -341,7 +341,7 @@ class ManagerImpl(
             if (throwable == null) return false
             var disabledAny = false
             throwable.stackTrace.forEach { element ->
-                pluginMap.values.forEach {
+                instancesMap.values.forEach {
                     disabledAny = disabledAny || it.checkAndDisable(element.className)
                 }
             }

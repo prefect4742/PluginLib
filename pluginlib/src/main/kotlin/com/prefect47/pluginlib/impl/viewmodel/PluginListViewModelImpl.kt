@@ -10,9 +10,8 @@ import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.viewmodel.PluginListModel
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -63,11 +62,12 @@ class PluginListViewModelImpl @Inject constructor(
     }
 
     suspend fun start() {
-        GlobalScope.async(Dispatchers.Default) {
+        withContext(Dispatchers.Default) {
             for ((_, model) in list) {
-                launch { (model as PluginListModelImpl).start() }
+                launch {
+                    (model as PluginListModelImpl).start() }
             }
-        }.join()
+        }
     }
 
     fun stop() {

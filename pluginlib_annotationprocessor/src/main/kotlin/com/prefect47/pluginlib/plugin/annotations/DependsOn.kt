@@ -11,6 +11,7 @@ import kotlin.reflect.KClass
  * that all plugins that @Requires the annotated interface also @Requires
  * the specified class as well.
  */
+@Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 @Repeatable
 annotation class DependsOn(val target: KClass<*>)

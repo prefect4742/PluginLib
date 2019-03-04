@@ -2,14 +2,9 @@ package com.prefect47.pluginlib.impl
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
-import com.prefect47.pluginlib.PluginLibDependencies
-import com.prefect47.pluginlib.PluginLibDependenciesImpl
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginListener
-import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
+import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Lazy
@@ -37,7 +32,6 @@ class LibraryControlImpl @Inject constructor(
     // circular call loop and exhaust the stack.
     private val manager: Manager by lazy { managerLazy.get() }
 
-    override var staticPluginDependencies: PluginLibDependencies = PluginLibDependenciesImpl
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
     override var debugEnabled: Boolean = false
@@ -47,6 +41,10 @@ class LibraryControlImpl @Inject constructor(
 
     override fun addClassFilter(filter: (String) -> Boolean) {
         manager.addClassFilter(filter)
+    }
+
+    override fun addStaticDependencies(dependencies: PluginLibDependencies) {
+        VersionInfo.addStaticDependencies(dependencies)
     }
 
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,

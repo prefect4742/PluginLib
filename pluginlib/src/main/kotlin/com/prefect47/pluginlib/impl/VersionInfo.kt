@@ -15,13 +15,31 @@
 
 package com.prefect47.pluginlib.impl
 
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
+import com.prefect47.pluginlib.PluginLibDependenciesImpl
+import com.prefect47.pluginlib.plugin.PluginLibDependencies
 import com.prefect47.pluginlib.plugin.annotations.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 class VersionInfo {
-    private val staticData by lazy { PluginLibraryDI.component.getControl().staticPluginDependencies }
+    companion object {
+        private var staticPluginDependencies = object: PluginLibDependencies {
+            override val providers = mutableMapOf<KClass<*>, PluginLibDependencies.Provider>()
+            override val dependencies = mutableMapOf<KClass<*>, List<KClass<*>>>()
+        }
+
+        init {
+            addStaticDependencies(PluginLibDependenciesImpl)
+        }
+
+        internal fun addStaticDependencies(dependencies: PluginLibDependencies) {
+            staticPluginDependencies.providers.putAll(dependencies.providers)
+            staticPluginDependencies.dependencies.putAll(dependencies.dependencies)
+        }
+
+        internal fun getAction(cls: KClass<*>): String? = staticPluginDependencies.providers[cls]?.action
+    }
+
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
 
     fun hasVersionInfo(): Boolean{
@@ -37,12 +55,12 @@ class VersionInfo {
         if (versions.containsKey(cls)) return
 
         // Use static data if we have it as it's much faster
-        if (staticData.providers.containsKey(cls)) {
-            staticData.providers[cls]?.let {
+        if (staticPluginDependencies.providers.containsKey(cls)) {
+            staticPluginDependencies.providers[cls]?.let {
                 versions[cls] = Version(it.version, true)
             }
 
-            staticData.dependencies[cls]?.let {
+            staticPluginDependencies.dependencies[cls]?.let {
                 it.forEach { depCls -> addClass(depCls, true) }
             }
         } else {

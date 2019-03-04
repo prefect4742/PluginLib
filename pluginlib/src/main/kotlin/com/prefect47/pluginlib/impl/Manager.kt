@@ -39,6 +39,11 @@ interface Manager {
         fun <P: Plugin> getAction(cls: KClass<P>) : String {
             // TODO: Due to KT-7186 we cannot access the members of a subclass inside a loop over the superclass (yet).
 
+            // Try the static dependencies first
+            VersionInfo.getAction(cls)?.let {
+                return it
+            }
+
             cls.findAnnotation<ProvidesInterface>()?.let { info ->
                 if (TextUtils.isEmpty(info.action)) {
                     throw RuntimeException(cls.simpleName + " doesn't provide an action")

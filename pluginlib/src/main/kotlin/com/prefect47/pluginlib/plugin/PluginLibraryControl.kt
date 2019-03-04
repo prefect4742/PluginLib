@@ -15,7 +15,6 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.PluginLibDependencies
 import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
@@ -35,7 +34,6 @@ interface PluginLibraryControl {
         fun onStopped()
     }
 
-    var staticPluginDependencies: PluginLibDependencies
     var settingsHandler: PluginListCategory.SettingsHandler?
     var permissionName: String
     var debugEnabled: Boolean
@@ -46,6 +44,8 @@ interface PluginLibraryControl {
     val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 
     val viewModel: PluginListViewModel
+
+    fun addStaticDependencies(dependencies: PluginLibDependencies)
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)

@@ -1,1 +1,1 @@
-include ':pluginlib'
+include ':pluginlib_annotationprocessor', ':pluginlib'

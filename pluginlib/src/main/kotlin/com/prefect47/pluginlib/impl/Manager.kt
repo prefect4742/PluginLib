@@ -47,19 +47,6 @@ interface Manager {
             }
 
             throw RuntimeException(cls.simpleName + " doesn't provide an interface")
-
-            /*
-            var info: ProvidesInterface? = null
-            for (it in cls.annotations) { if (it is ProvidesInterface) { info = it; break } }
-
-            if (info == null) {
-                throw RuntimeException(cls.simpleName + " doesn't provide an interface")
-            }
-            if (TextUtils.isEmpty(info.action)) {
-                throw RuntimeException(cls.simpleName + " doesn't provide an action")
-            }
-            return info.action
-            */
         }
 
         private var nextNotificationIdInt = 0

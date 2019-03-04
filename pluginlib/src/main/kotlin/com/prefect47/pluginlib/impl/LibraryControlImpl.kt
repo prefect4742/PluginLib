@@ -2,6 +2,8 @@ package com.prefect47.pluginlib.impl
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
+import com.prefect47.pluginlib.PluginLibDependencies
+import com.prefect47.pluginlib.PluginLibDependenciesImpl
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.Plugin
@@ -35,6 +37,7 @@ class LibraryControlImpl @Inject constructor(
     // circular call loop and exhaust the stack.
     private val manager: Manager by lazy { managerLazy.get() }
 
+    override var staticPluginDependencies: PluginLibDependencies = PluginLibDependenciesImpl
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
     override var debugEnabled: Boolean = false

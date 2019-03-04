@@ -42,9 +42,7 @@ class VersionInfo {
 
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
 
-    fun hasVersionInfo(): Boolean{
-        return !versions.isEmpty()
-    }
+    fun hasVersionInfo() = !versions.isEmpty()
 
     fun addClass(cls: KClass<*>): VersionInfo {
         addClass(cls, false)
@@ -54,7 +52,7 @@ class VersionInfo {
     fun addClass(cls: KClass<*>, required: Boolean) {
         if (versions.containsKey(cls)) return
 
-        // Use static data if we have it as it's much faster
+        // Use static data if we have it
         if (staticPluginDependencies.providers.containsKey(cls)) {
             staticPluginDependencies.providers[cls]?.let {
                 versions[cls] = Version(it.version, true)
@@ -64,12 +62,18 @@ class VersionInfo {
                 it.forEach { depCls -> addClass(depCls, true) }
             }
         } else {
-            cls.findAnnotation<ProvidesInterface>()?.let { a -> versions[cls] = Version(a.version, true) }
-            cls.findAnnotation<DependsOn>()?.let { a -> addClass(a.target, true) }
-            cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
+            // Most plugins will only implement one interface and have one Requires
+            // Otherwise they might have more than one Requirements
+            // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
+            // DependsOn/Dependencies.
             cls.findAnnotation<Requires>()?.let { a -> versions[a.target] = Version(a.version, required) }
-            cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
-        }
+                ?: cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
+                ?: cls.findAnnotation<ProvidesInterface>()?.let { a ->
+                    versions[cls] = Version(a.version, true)
+                    cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
+                        ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
+                }
+       }
 
     }
 

@@ -15,45 +15,44 @@
 
 package com.prefect47.pluginlib.impl
 
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.annotations.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 class VersionInfo {
-
+    private val staticData by lazy { PluginLibraryDI.component.getControl().staticPluginDependencies }
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
-    private var default: KClass<*>? = null
 
     fun hasVersionInfo(): Boolean{
         return !versions.isEmpty()
     }
 
-    fun getDefaultVersion(): Int {
-        return versions[default]!!.version
-    }
-
     fun addClass(cls: KClass<*>): VersionInfo {
-        if (default == null) {
-            // The legacy default version is from the first class we add.
-            default = cls
-        }
         addClass(cls, false)
         return this
     }
 
     fun addClass(cls: KClass<*>, required: Boolean) {
         if (versions.containsKey(cls)) return
-        cls.findAnnotation<ProvidesInterface>()?.let { a -> versions[cls] =
-                Version(a.version, true)
+
+        // Use static data if we have it as it's much faster
+        if (staticData.providers.containsKey(cls)) {
+            staticData.providers[cls]?.let {
+                versions[cls] = Version(it.version, true)
+            }
+
+            staticData.dependencies[cls]?.let {
+                it.forEach { depCls -> addClass(depCls, true) }
+            }
+        } else {
+            cls.findAnnotation<ProvidesInterface>()?.let { a -> versions[cls] = Version(a.version, true) }
+            cls.findAnnotation<DependsOn>()?.let { a -> addClass(a.target, true) }
+            cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
+            cls.findAnnotation<Requires>()?.let { a -> versions[a.target] = Version(a.version, required) }
+            cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
         }
-        cls.findAnnotation<Requires>()?.let { a -> versions[a.target] =
-                Version(a.version, required)
-        }
-        cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] =
-                Version(it.version, required)
-        }
-        cls.findAnnotation<DependsOn>()?.let { a -> addClass(a.target, true) }
-        cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
+
     }
 
     @Throws(InvalidVersionException::class)

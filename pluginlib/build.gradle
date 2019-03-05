@@ -6,7 +6,7 @@ apply plugin: "kotlin-kapt"
 ext {
     versionMajor = 0
     versionMinor = 1
-    versionPatch = 20
+    versionPatch = 21
 }
 
 android {

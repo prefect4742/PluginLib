@@ -45,7 +45,7 @@ interface PluginLibraryControl {
 
     val viewModel: PluginListViewModel
 
-    fun addStaticDependencies(dependencies: PluginLibDependencies)
+    fun addStaticProviders(providers: PluginLibProviders)
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)

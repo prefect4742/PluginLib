@@ -43,8 +43,8 @@ class LibraryControlImpl @Inject constructor(
         manager.addClassFilter(filter)
     }
 
-    override fun addStaticDependencies(dependencies: PluginLibDependencies) {
-        VersionInfo.addStaticDependencies(dependencies)
+    override fun addStaticProviders(providers: PluginLibProviders) {
+        VersionInfo.addStaticProviders(providers)
     }
 
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,

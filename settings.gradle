@@ -1,1 +1,9 @@
 include ':pluginlib'
+
+if (file("../PluginLibAnnotations").exists()) {
+    includeBuild ('../PluginLibAnnotations')
+}
+
+if (file("../PluginLibAP").exists()) {
+    includeBuild ('../PluginLibAP')
+}

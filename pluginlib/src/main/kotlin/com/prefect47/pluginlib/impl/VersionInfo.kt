@@ -15,9 +15,9 @@
 
 package com.prefect47.pluginlib.impl
 
+import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.plugin.PluginLibProviders
 import com.prefect47.pluginlib.plugin.annotations.*
-import com.prefect47.pluginlib.PluginLibProvidersImpl
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 

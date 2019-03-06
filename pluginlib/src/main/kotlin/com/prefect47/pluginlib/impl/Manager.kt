@@ -17,6 +17,7 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import android.text.TextUtils
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginListener
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
@@ -40,8 +41,10 @@ interface Manager {
             // TODO: Due to KT-7186 we cannot access the members of a subclass inside a loop over the superclass (yet).
 
             // Try the static dependencies first
-            VersionInfo.getAction(cls)?.let {
-                return it
+            PluginLibraryDI.component.getControl().staticProviders.forEach {
+                it.providers[cls]?.let {
+                    return it.action
+                }
             }
 
             cls.findAnnotation<ProvidesInterface>()?.let { info ->

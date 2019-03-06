@@ -18,6 +18,7 @@ import android.util.Log
 import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
+import java.util.ArrayList
 import java.util.EnumSet
 import kotlin.reflect.KClass
 
@@ -34,6 +35,9 @@ interface PluginLibraryControl {
         fun onStopped()
     }
 
+    val staticProviders: List<PluginLibProviders>
+    val factories: List<PluginFactory>
+
     var settingsHandler: PluginListCategory.SettingsHandler?
     var permissionName: String
     var debugEnabled: Boolean
@@ -46,6 +50,8 @@ interface PluginLibraryControl {
     val viewModel: PluginListViewModel
 
     fun addStaticProviders(providers: PluginLibProviders)
+    fun addFactory(factory: PluginFactory)
+    fun removeFactory(factory: PluginFactory)
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)

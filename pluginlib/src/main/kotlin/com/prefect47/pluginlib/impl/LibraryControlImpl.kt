@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.impl
 
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
+import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
@@ -19,6 +20,10 @@ class LibraryControlImpl @Inject constructor(
     override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
+    override val staticProviders = ArrayList<PluginLibProviders>().apply {
+        add(PluginLibProvidersImpl)
+    }
+    override val factories = ArrayList<PluginFactory>()
 
     override val viewModel: PluginListViewModel
         get() = viewModelInner
@@ -44,7 +49,15 @@ class LibraryControlImpl @Inject constructor(
     }
 
     override fun addStaticProviders(providers: PluginLibProviders) {
-        VersionInfo.addStaticProviders(providers)
+        staticProviders.add(providers)
+    }
+
+    override fun addFactory(factory: PluginFactory) {
+        factories.add(factory)
+    }
+
+    override fun removeFactory(factory: PluginFactory) {
+        factories.remove(factory)
     }
 
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,

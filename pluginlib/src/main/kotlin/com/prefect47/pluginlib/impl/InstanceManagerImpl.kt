@@ -60,7 +60,7 @@ class InstanceManagerImpl<T: Plugin>(
             action,
             listener,
             allowMultiple,
-            VersionInfo().addClass(cls)
+            VersionInfo(control).addClass(cls)
         )
     }
 
@@ -347,7 +347,7 @@ class InstanceManagerImpl<T: Plugin>(
 
         @Throws(InvalidVersionException::class)
         private fun checkVersion(pluginClass: KClass<*>, version: VersionInfo): VersionInfo? {
-            val pv: VersionInfo = VersionInfo().addClass(pluginClass)
+            val pv: VersionInfo = VersionInfo(control).addClass(pluginClass)
             if (pv.hasVersionInfo()) {
                 version.checkVersion(pv)
             } else {

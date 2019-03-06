@@ -15,31 +15,12 @@
 
 package com.prefect47.pluginlib.impl
 
-import com.prefect47.pluginlib.PluginLibProvidersImpl
-import com.prefect47.pluginlib.plugin.PluginLibProviders
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.annotations.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-class VersionInfo {
-    companion object {
-        private var staticPluginProviders = object: PluginLibProviders {
-            override val providers = mutableMapOf<KClass<*>, PluginLibProviders.Provider>()
-            override val dependencies = mutableMapOf<KClass<*>, List<KClass<*>>>()
-        }
-
-        init {
-            addStaticProviders(PluginLibProvidersImpl)
-        }
-
-        internal fun addStaticProviders(providers: PluginLibProviders) {
-            staticPluginProviders.providers.putAll(providers.providers)
-            staticPluginProviders.dependencies.putAll(providers.dependencies)
-        }
-
-        internal fun getAction(cls: KClass<*>): String? = staticPluginProviders.providers[cls]?.action
-    }
-
+class VersionInfo(private val control: PluginLibraryControl) {
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
 
     fun hasVersionInfo() = !versions.isEmpty()
@@ -53,28 +34,27 @@ class VersionInfo {
         if (versions.containsKey(cls)) return
 
         // Use static data if we have it
-        if (staticPluginProviders.providers.containsKey(cls)) {
-            staticPluginProviders.providers[cls]?.let {
-                versions[cls] = Version(it.version, true)
+        control.staticProviders.forEach {
+            if (it.providers.containsKey(cls)) {
+                it.providers[cls]?.let { versions[cls] = Version(it.version, true) }
+                it.dependencies[cls]?.let { it.forEach { depCls -> addClass(depCls, true) } }
+                return
             }
+        }
 
-            staticPluginProviders.dependencies[cls]?.let {
-                it.forEach { depCls -> addClass(depCls, true) }
+        // TODO: Use static "Requires"
+
+        // Most plugins will only implement one interface and have one Requires
+        // Otherwise they might have more than one Requirements
+        // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
+        // DependsOn/Dependencies.
+        cls.findAnnotation<Requires>()?.let { a -> versions[a.target] = Version(a.version, required) }
+            ?: cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
+            ?: cls.findAnnotation<ProvidesInterface>()?.let { a ->
+                versions[cls] = Version(a.version, true)
+                cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
+                    ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
             }
-        } else {
-            // Most plugins will only implement one interface and have one Requires
-            // Otherwise they might have more than one Requirements
-            // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
-            // DependsOn/Dependencies.
-            cls.findAnnotation<Requires>()?.let { a -> versions[a.target] = Version(a.version, required) }
-                ?: cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
-                ?: cls.findAnnotation<ProvidesInterface>()?.let { a ->
-                    versions[cls] = Version(a.version, true)
-                    cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
-                        ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
-                }
-       }
-
     }
 
     @Throws(InvalidVersionException::class)

@@ -23,6 +23,7 @@ class LibraryControlImpl @Inject constructor(
     override val staticProviders = ArrayList<PluginLibProviders>().apply {
         add(PluginLibProvidersImpl)
     }
+    override val staticRequirements = ArrayList<PluginLibRequirements>()
     override val factories = ArrayList<PluginFactory>()
 
     override val viewModel: PluginListViewModel
@@ -50,6 +51,14 @@ class LibraryControlImpl @Inject constructor(
 
     override fun addStaticProviders(providers: PluginLibProviders) {
         staticProviders.add(providers)
+    }
+
+    override fun addStaticRequirements(requirements: PluginLibRequirements) {
+        staticRequirements.add(requirements)
+    }
+
+    override fun removeStaticRequirements(requirements: PluginLibRequirements) {
+        staticRequirements.remove(requirements)
     }
 
     override fun addFactory(factory: PluginFactory) {

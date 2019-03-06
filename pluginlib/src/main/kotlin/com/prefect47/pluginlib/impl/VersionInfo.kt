@@ -33,16 +33,22 @@ class VersionInfo(private val control: PluginLibraryControl) {
     fun addClass(cls: KClass<*>, required: Boolean) {
         if (versions.containsKey(cls)) return
 
-        // Use static data if we have it
-        control.staticProviders.forEach {
-            if (it.providers.containsKey(cls)) {
-                it.providers[cls]?.let { versions[cls] = Version(it.version, true) }
-                it.dependencies[cls]?.let { it.forEach { depCls -> addClass(depCls, true) } }
+        // Use static providers data if we have it
+        control.staticProviders.forEach { list ->
+            if (list.providers.containsKey(cls)) {
+                list.providers[cls]?.let { versions[cls] = Version(it.version, true) }
+                list.dependencies[cls]?.let { it.forEach { depCls -> addClass(depCls, true) } }
                 return
             }
         }
 
-        // TODO: Use static "Requires"
+        // Use static requirements data if we have it
+        control.staticRequirements.forEach {
+            it.requirements[cls]?.let { list ->
+                list.forEach { versions[it.target] = Version(it.version, required) }
+                return
+            }
+        }
 
         // Most plugins will only implement one interface and have one Requires
         // Otherwise they might have more than one Requirements

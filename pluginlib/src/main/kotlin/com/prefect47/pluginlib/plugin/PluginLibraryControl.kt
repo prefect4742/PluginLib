@@ -36,6 +36,7 @@ interface PluginLibraryControl {
     }
 
     val staticProviders: List<PluginLibProviders>
+    val staticRequirements: List<PluginLibRequirements>
     val factories: List<PluginFactory>
 
     var settingsHandler: PluginListCategory.SettingsHandler?
@@ -50,6 +51,10 @@ interface PluginLibraryControl {
     val viewModel: PluginListViewModel
 
     fun addStaticProviders(providers: PluginLibProviders)
+
+    fun addStaticRequirements(requirements: PluginLibRequirements)
+    fun removeStaticRequirements(requirements: PluginLibRequirements)
+
     fun addFactory(factory: PluginFactory)
     fun removeFactory(factory: PluginFactory)
 

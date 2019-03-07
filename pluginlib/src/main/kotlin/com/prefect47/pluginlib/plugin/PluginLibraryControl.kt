@@ -64,9 +64,11 @@ interface PluginLibraryControl {
     fun addFactory(factory: PluginFactory)
     fun removeFactory(factory: PluginFactory)
 
+    /*
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)
     fun removePluginListener(listener: PluginListener<*>)
+    */
 
     fun track(factoryAction: String)
     fun track(cls: KClass<out Plugin>)

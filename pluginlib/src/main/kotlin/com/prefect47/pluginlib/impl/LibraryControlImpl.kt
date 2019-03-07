@@ -10,8 +10,10 @@ import com.prefect47.pluginlib.ui.preference.PluginListCategory
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -19,6 +21,8 @@ class LibraryControlImpl @Inject constructor(
     private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
     override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
+    private val isStarted = AtomicBoolean(false)
+    private val factoryActions = ArrayList<String>()
     private val listeners = ArrayList<PluginLibraryControl.StateListener>()
     override val staticProviders = ArrayList<PluginLibProviders>().apply {
         add(PluginLibProvidersImpl)
@@ -46,7 +50,16 @@ class LibraryControlImpl @Inject constructor(
     override var notificationChannel: String? = null
     override var notificationIconResId: Int = 0
 
+    private fun assertNotStarted() {
+        if (isStarted.get()) throw IllegalStateException("Not allowed after library has been started")
+    }
+
+    private fun assertStarted() {
+        if (!isStarted.get()) throw IllegalStateException("Not allowed before library has been started")
+    }
+
     override fun addClassFilter(filter: (String) -> Boolean) {
+        assertNotStarted()
         manager.addClassFilter(filter)
     }
 
@@ -70,6 +83,7 @@ class LibraryControlImpl @Inject constructor(
         factories.remove(factory)
     }
 
+    /*
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
         action: String, allowMultiple : Boolean) {
         manager.addPluginListener(listener, cls, action, allowMultiple)
@@ -78,13 +92,16 @@ class LibraryControlImpl @Inject constructor(
     override fun removePluginListener(listener: PluginListener<*>) {
         manager.removePluginListener(listener)
     }
+    */
 
     override fun track(cls: KClass<out Plugin>) {
+        assertNotStarted()
         viewModelInner.track(cls)
     }
 
     override fun track(factoryAction: String) {
-        viewModelInner.track(factoryAction)
+        assertNotStarted()
+        factoryActions.add(factoryAction)
     }
 
     override fun addStateListener(listener: PluginLibraryControl.StateListener) {
@@ -96,8 +113,21 @@ class LibraryControlImpl @Inject constructor(
     }
 
     override suspend fun start() {
+        assertNotStarted()
         debug("PluginLib starting")
+
+        withContext(Dispatchers.Default) {
+            factoryActions.forEach {
+                launch {
+                    // TODO: manager.addPluginFactoryListener()
+                    // TODO: Also remember to check the factories in the instance Manager when one is told to start
+                    // TODO: tracking a class.
+                }
+            }
+        }
+
         viewModelInner.start()
+        isStarted.set(true)
         debug("PluginLib started")
         listeners.forEach { it.onStarted() }
     }
@@ -115,26 +145,34 @@ class LibraryControlImpl @Inject constructor(
     }
 
     override suspend fun startPlugin(plugin: Plugin) {
+        assertStarted()
         withContext(Dispatchers.Main) {
             plugin.onStart()
         }
     }
 
     override suspend fun stopPlugin(plugin: Plugin) {
+        assertStarted()
         withContext(Dispatchers.Main) {
             plugin.onStop()
         }
     }
 
-    override fun getPluginList(cls: KClass<out Plugin>): List<Plugin>? = viewModelInner.list[cls]?.plugins?.value
+    override fun getPluginList(cls: KClass<out Plugin>): List<Plugin>? {
+        assertStarted()
+        return viewModelInner.list[cls]?.plugins?.value
+    }
 
     override fun getPluginList(pluginClassName: String): List<Plugin>? =
         getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
-    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? =
-        manager.pluginClassFlagsMap[pluginClassName]
+    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
+        assertStarted()
+        return manager.pluginClassFlagsMap[pluginClassName]
+    }
 
     override fun getPlugin(className: String): Plugin? {
+        assertStarted()
         viewModelInner.list.values.forEach { model ->
             model.plugins.value?.find { plugin -> plugin::class.qualifiedName == className }?.let { return it }
         }

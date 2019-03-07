@@ -17,30 +17,28 @@ package com.prefect47.pluginlib.impl
 
 import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginFactory
 import com.prefect47.pluginlib.plugin.PluginListener
 import kotlin.reflect.KClass
 
-interface InstanceManager<T: Plugin> {
+interface PluginFactoryManager {
 
     interface Factory {
-        fun <T: Plugin> create(action: String, listener: PluginListener<T>?, allowMultiple: Boolean,
-                cls: KClass<*>): InstanceManager<T>
+        fun create(action: String, listener: PluginFactory.Listener?): PluginFactoryManager
     }
 
-    data class PluginInfo<T: Plugin>(
-        val plugin: T,
+    data class PluginFactoryInfo (
+        val factory: PluginFactory,
         val pkg: String,
         val version: VersionInfo?,
         val context: Context)
 
-    //val plugins: List<PluginInfo<T>>
+    //val factories: List<PluginFactory>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean
     fun destroy()
-
-    fun getPlugin(): PluginInfo<T>?
 
     fun <P: Any> dependsOn(p: Plugin, cls: KClass<P>): Boolean
 

@@ -24,15 +24,14 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.content.res.Resources
 import android.net.Uri
-import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.impl.InstanceManager.PluginInfo
+import com.prefect47.pluginlib.impl.PluginFactoryManager.PluginFactoryInfo
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginFactory
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginListener
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executors
@@ -40,41 +39,31 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-class InstanceManagerImpl<T: Plugin>(
-    private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
-    private val control: PluginLibraryControl, private val action: String, private val listener: PluginListener<T>?,
-    private val allowMultiple: Boolean, private val version: VersionInfo
-): InstanceManager<T> {
+class PluginFactoryManagerImpl(
+    private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
+    private val action: String, private val listener: PluginFactory.Listener?
+): PluginFactoryManager {
 
     class Factory @Inject constructor(
-        private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
-        private val pluginPrefs: PluginPrefs
-    ): InstanceManager.Factory {
+        private val context: Context, private val manager: Manager, private val control: PluginLibraryControl
+    ): PluginFactoryManager.Factory {
 
-        override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
-                allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
-            context,
-            manager,
-            pluginPrefs,
-            control,
-            action,
-            listener,
-            allowMultiple,
-            VersionInfo(control).addClass(cls)
-        )
+        override fun create(action: String, listener: PluginFactory.Listener?): PluginFactoryManager =
+            PluginFactoryManagerImpl(context, manager, control, action, listener)
     }
 
     companion object {
-        private const val TAG = "InstanceManager"
+        private const val TAG = "PluginFactoryManager"
     }
 
-    private val plugins: MutableList<PluginInfo<T>> = Collections.synchronizedList(ArrayList())
+    private val factories: MutableList<PluginFactoryInfo> = Collections.synchronizedList(ArrayList())
 
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
 
     private val notificationId = Manager.nextNotificationId
 
+    /*
     override fun getPlugin(): PluginInfo<T>? {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw RuntimeException("Must be called from UI thread")
@@ -90,6 +79,7 @@ class InstanceManagerImpl<T: Plugin>(
         }
         return null
     }
+    */
 
     override suspend fun loadAll() {
         if (control.debugEnabled) Log.d(TAG, "loadAll")
@@ -98,7 +88,7 @@ class InstanceManagerImpl<T: Plugin>(
 
     override fun destroy() {
         if (control.debugEnabled) Log.d(TAG, "destroy")
-        ArrayList(plugins).forEach {
+        ArrayList(factories).forEach {
             pluginHandler.handlePluginDisconnected(it)
         }
     }
@@ -114,7 +104,7 @@ class InstanceManagerImpl<T: Plugin>(
 
     override fun checkAndDisable(className: String): Boolean {
         var disableAny = false
-        ArrayList(plugins).forEach {
+        ArrayList(factories).forEach {
             if (className.startsWith(it.pkg)) {
                 disable(it)
                 disableAny = true
@@ -124,20 +114,20 @@ class InstanceManagerImpl<T: Plugin>(
     }
 
     override fun disableAll(): Boolean {
-        ArrayList(plugins).forEach {
+        ArrayList(factories).forEach {
             disable(it)
         }
-        return plugins.size != 0
+        return factories.size != 0
     }
 
-    private fun disable(info: PluginInfo<*>) {
+    private fun disable(info: PluginFactoryInfo) {
         // Live by the sword, die by the sword.
-        // Misbehaving plugins get disabled and won't come back until uninstall/reinstall.
+        // Misbehaving factories get disabled and won't come back until uninstall/reinstall.
 
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin ${info.pkg}/${info.plugin::class.qualifiedName}")
+        Log.w(TAG, "Disabling plugin factory ${info.pkg}/${info.factory::class.qualifiedName}")
         pm.setComponentEnabledSetting(
                 ComponentName(info.pkg, info.plugin.className),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -158,30 +148,30 @@ class InstanceManagerImpl<T: Plugin>(
         return String.format("%s@%s (action=%s)", this::class.simpleName, hashCode(), action)
     }
 
-    inner class PluginHandler: CoroutineScope {
+    inner class FactoryHandler: CoroutineScope {
         override val coroutineContext = Executors.newFixedThreadPool(4).asCoroutineDispatcher()
 
         suspend fun queryAll() {
             if (control.debugEnabled) Log.d(TAG, "queryAll $action")
-            plugins.forEach {
-                listener!!.onItemDisconnected(it.plugin)
+            factories.forEach {
+                listener!!.onItemDisconnected(it.factory)
                 //if (!(it.plugin is PluginFragment)) {
                     // Only call onDestroy for plugins that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
-                    it.plugin.onDestroy()
+                    it.factory.onDestroy()
                 //}
-                manager.pluginInfoMap.remove(it.plugin)
+                //manager.pluginInfoMap.remove(it.plugin)
             }
-            plugins.clear()
+            factories.clear()
             handleQueryPlugins()
         }
 
         fun removePackage(pkg: String) {
             launch {
-                plugins.forEach {
+                factories.forEach {
                     if (it.pkg == pkg) {
                         handlePluginDisconnected(it)
-                        plugins.remove(it)
+                        factories.remove(it)
                     }
                 }
             }
@@ -190,39 +180,34 @@ class InstanceManagerImpl<T: Plugin>(
         fun queryPackage(pkg: String) {
             launch {
                 if (control.debugEnabled) Log.d(TAG, "queryPkg $pkg $action")
-                if (allowMultiple || (plugins.size == 0)) {
-                    handleQueryPlugins(pkg)
-                } else {
-                    if (control.debugEnabled) Log.d(TAG, "Too many of $action")
-                }
+                handleQueryPlugins(pkg)
             }
         }
 
-        private suspend fun handlePluginConnected(info: PluginInfo<T>) {
-            pluginPrefs.setHasPlugins()
+        private suspend fun handleFactoryConnected(info: PluginFactoryInfo) {
             withContext(Dispatchers.Main) {
                 manager.handleWtfs()
-                manager.pluginInfoMap[info.plugin] = info
+                //manager.pluginInfoMap[info.plugin] = info
 
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onCreate for plugins that aren't fragments, as fragments
                     // will get the onCreate as part of the fragment lifecycle.
-                    info.plugin.onCreate()
+                    info.factory.onCreate()
                 //}
-                listener!!.onItemConnected(info.plugin)
+                listener!!.onItemConnected(info.factory)
             }
         }
 
-        fun handlePluginDisconnected(info: PluginInfo<T>) {
+        fun handleFactoryDisconnected(info: PluginFactoryInfo) {
             launch(Dispatchers.Main) {
-                if (control.debugEnabled) Log.d(TAG, "onPluginDisconnected")
-                listener!!.onItemDisconnected(info.plugin)
+                if (control.debugEnabled) Log.d(TAG, "onPluginFactoryDisconnected")
+                listener!!.onItemDisconnected(info.factory)
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onDestroy for plugins that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
-                    info.plugin.onDestroy()
+                    info.factory.onDestroy()
                 //}
-                manager.pluginInfoMap.remove(info.plugin)
+                //manager.pluginInfoMap.remove(info.plugin)
             }
         }
 
@@ -235,11 +220,6 @@ class InstanceManagerImpl<T: Plugin>(
             }
             val result: MutableList<ResolveInfo> = pm.queryIntentServices(intent, 0)
             if (control.debugEnabled) Log.d(TAG, "Found ${result.size} plugins for $action")
-            if (result.size > 1 && !allowMultiple) {
-                // TODO: Show warning.
-                Log.w(TAG, "Multiple plugins found for $action")
-                return
-            }
 
             listener!!.onStartLoading()
 
@@ -249,9 +229,9 @@ class InstanceManagerImpl<T: Plugin>(
                         val name = ComponentName(it.serviceInfo.packageName, it.serviceInfo.name)
                         handleLoadPlugin(name)?.let { info ->
                             if (notify) {
-                                handlePluginConnected(info)
+                                handleFactoryConnected(info)
                             }
-                            plugins.add(info)
+                            factories.add(info)
                         }
                     }
                 }
@@ -260,7 +240,7 @@ class InstanceManagerImpl<T: Plugin>(
             listener.onDoneLoading()
         }
 
-        private fun handleLoadPlugin(component: ComponentName): PluginInfo<T>? {
+        private fun handleLoadFactory(component: ComponentName): PluginInfo<T>? {
             val pkg = component.packageName
             val cls = component.className
             try {

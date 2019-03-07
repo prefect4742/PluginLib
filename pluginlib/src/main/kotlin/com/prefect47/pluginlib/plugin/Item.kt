@@ -13,9 +13,14 @@
  * permissions and limitations under the License.
  */
 
+
 package com.prefect47.pluginlib.plugin
 
-/**
- * Interface for listening to plugins being connected.
- */
-interface PluginListener<T: Plugin>: ConnectionListener<T>
+interface PluginLifecycle {
+    // Called when item is loaded, either at app start or when an item is installed while app is running.
+    // pluginContext and applicationContext is available until onDestroy is called.
+    fun onCreate() {}
+
+    // Called when app shuts down, or if APK containing the item is uninstalled while app is running.
+    fun onDestroy() {}
+}

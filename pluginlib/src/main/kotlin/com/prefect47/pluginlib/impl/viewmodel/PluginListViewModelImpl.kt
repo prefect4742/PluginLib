@@ -33,11 +33,11 @@ class PluginListViewModelImpl @Inject constructor(
             control.debug("PluginLib started tracking ${cls.qualifiedName}")
         }
 
-        override fun onPluginConnected(plugin: T) {
+        override fun onItemConnected(plugin: T) {
             instanceManager?.let { im -> plugins.postValue(im.plugins.map { it.plugin }) }
         }
 
-        override fun onPluginDisconnected(plugin: T) {
+        override fun onItemDisconnected(plugin: T) {
             instanceManager?.let { im -> plugins.postValue(im.plugins.map { it.plugin }) }
         }
 

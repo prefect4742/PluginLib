@@ -35,12 +35,12 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
  * plugin.onCreate(Context appContext, Context pluginContext);
  * --- This is always called before any other calls
  *
- * pluginListener.onPluginConnected(Plugin p);
+ * pluginListener.onItemConnected(p: Plugin);
  * --- This lets the plugin hook know that a plugin is now connected.
  *
  * ** Any other calls back and forth between app/plugin **
  *
- * pluginListener.onPluginDisconnected(Plugin p);
+ * pluginListener.onItemDisconnected(p: Plugin);
  * --- Lets the plugin hook know that it should stop interacting with
  * this plugin and drop all references to it.
  *
@@ -68,7 +68,7 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
  * Manager.getInstance(this).addPluginListener(MyPlugin.COMPONENT,
  * new PluginListener&lt;MyPlugin&gt;() {
  *
- * public void onPluginConnected(MyPlugin plugin) {
+ * public void onItemConnected(plugin: MyPlugin) {
  *    ...do some stuff...
  * }
  * }, MyPlugin.VERSION, true /* Allow multiple plugins *\/);
@@ -109,7 +109,7 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 */
 */
 
-interface Plugin {
+interface Plugin: PluginLifecycle {
     companion object {
         private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
@@ -142,10 +142,6 @@ interface Plugin {
     val icon: Drawable?
         get() = ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)
 
-    // Called when plugin is loaded, either at app start or when the plugin is installed while app is running.
-    // pluginContext and applicationContext is available until onDestroy is called.
-    fun onCreate() {}
-
     // Called when app wishes to use the plugin.
     // preferenceDataStore is available until onStop is called.
     fun onStart() {}
@@ -154,9 +150,6 @@ interface Plugin {
     // preferenceDataStore may no longer be valid (for example if the app implements a PluginPreferenceDataStoreProvider
     // and has invalidated any currently used PluginPreferenceDataStore instances).
     fun onStop() {}
-
-    // Called when app shuts down, or if plugin is uninstalled while app is running.
-    fun onDestroy() {}
 
     val preferenceDataStore: PluginPreferenceDataStore
         get() = prefsManager.getPreferenceDataStore(this)

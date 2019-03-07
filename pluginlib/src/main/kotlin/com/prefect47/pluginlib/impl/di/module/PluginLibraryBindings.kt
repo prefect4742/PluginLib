@@ -28,11 +28,15 @@ abstract class PluginLibraryBindings {
 
     @Singleton
     @Binds
+    abstract fun bindFactoryManagerFactory(factory: PluginFactoryManagerImpl.Factory): PluginFactoryManager.Factory
+
+    @Singleton
+    @Binds
     abstract fun bindInstanceManagerFactory(factory: InstanceManagerImpl.Factory): InstanceManager.Factory
 
     @Singleton
     @Binds
-    abstract fun bindPluginTrackerFactory(model: PluginListViewModelImpl): PluginListViewModel
+    abstract fun bindPluginListViewModel(model: PluginListViewModelImpl): PluginListViewModel
 
     @Singleton
     @Binds

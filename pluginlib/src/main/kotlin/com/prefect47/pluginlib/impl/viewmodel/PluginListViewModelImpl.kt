@@ -57,6 +57,10 @@ class PluginListViewModelImpl @Inject constructor(
     }
     */
 
+    override fun track(factoryAction: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun track(cls: KClass<out Plugin>) {
         list[cls] = PluginListModelImpl(cls)
     }

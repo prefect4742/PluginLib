@@ -40,6 +40,12 @@ interface PluginLibraryControl {
     val factories: List<PluginFactory>
 
     var settingsHandler: PluginListCategory.SettingsHandler?
+
+    /**
+     * Set this if you wish for the library to look for PluginFactory in APK:s.
+     */
+    //var pluginFactoryName: String?
+
     var permissionName: String
     var debugEnabled: Boolean
     var debugTag: String
@@ -48,7 +54,7 @@ interface PluginLibraryControl {
 
     val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 
-    val viewModel: PluginListViewModel
+    //val viewModel: PluginListViewModel
 
     fun addStaticProviders(providers: PluginLibProviders)
 
@@ -62,6 +68,7 @@ interface PluginLibraryControl {
         action: String = Manager.getAction(cls), allowMultiple : Boolean = false)
     fun removePluginListener(listener: PluginListener<*>)
 
+    fun track(factoryAction: String)
     fun track(cls: KClass<out Plugin>)
 
     fun addStateListener(listener: StateListener)

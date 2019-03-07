@@ -26,8 +26,8 @@ class LibraryControlImpl @Inject constructor(
     override val staticRequirements = ArrayList<PluginLibRequirements>()
     override val factories = ArrayList<PluginFactory>()
 
-    override val viewModel: PluginListViewModel
-        get() = viewModelInner
+    //override val viewModel: PluginListViewModel
+    //    get() = viewModelInner
 
     private val viewModelInner: PluginListViewModelImpl by lazy {
         ViewModelProviders.of(activity, PluginListViewModelFactory(manager, this))
@@ -39,6 +39,7 @@ class LibraryControlImpl @Inject constructor(
     private val manager: Manager by lazy { managerLazy.get() }
 
     override var settingsHandler: PluginListCategory.SettingsHandler? = null
+    //override var pluginFactoryName: String? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
     override var debugEnabled: Boolean = false
     override var debugTag: String = PluginLibraryControl.DEFAULT_DEBUGTAG
@@ -80,6 +81,10 @@ class LibraryControlImpl @Inject constructor(
 
     override fun track(cls: KClass<out Plugin>) {
         viewModelInner.track(cls)
+    }
+
+    override fun track(factoryAction: String) {
+        viewModelInner.track(factoryAction)
     }
 
     override fun addStateListener(listener: PluginLibraryControl.StateListener) {

@@ -18,7 +18,7 @@ interface PluginSettings: PluginPreferenceDataStore.OnPluginPreferenceDataStoreC
     override fun onDataStorePreferenceChanged(dataStore: PluginPreferenceDataStore, key: String) {}
 
     // Called when app changes the PluginSharedPreferencesFactory. This can happen if the app uses sessions and
-    // wishes all its plugins to switch to another set of preferences.
+    // wishes all its instances to switch to another set of preferences.
     // Plugin should reload whatever preferences it has cached.
     //fun onSharedPreferenceHandlerChanged() {}
 }

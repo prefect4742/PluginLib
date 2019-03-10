@@ -15,10 +15,7 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.impl.Manager
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
-import com.prefect47.pluginlib.viewmodel.PluginListViewModel
-import java.util.ArrayList
 import java.util.EnumSet
 import kotlin.reflect.KClass
 
@@ -29,7 +26,7 @@ interface PluginLibraryControl {
     }
 
     interface StateListener {
-        fun onStarted() // All added trackers have loaded their plugins
+        fun onStarted() // All added trackers have loaded their instances
         fun onPaused()
         fun onResumed()
         fun onStopped()
@@ -85,17 +82,17 @@ interface PluginLibraryControl {
     suspend fun stopPlugin(plugin: Plugin)
 
     /**
-     * Add a [filter] to the plugin classloader that lets plugins use libraries or code where class names might
+     * Add a [filter] to the plugin classloader that lets instances use libraries or code where class names might
      * conflict with those of the app.
      */
     fun addClassFilter(filter: (String) -> Boolean)
 
-    fun getPluginList(cls: KClass<out Plugin>): List<Plugin>?
-    fun getPluginList(pluginClassName: String): List<Plugin>?
+    fun getPluginList(cls: KClass<out Plugin>): List<PluginInfo<out Plugin>>?
+    fun getPluginList(pluginClassName: String): List<PluginInfo<out Plugin>>?
 
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
 
-    fun getPlugin(className: String): Plugin?
+    fun getPlugin(className: String): PluginInfo<out Plugin>?
 
     fun debug(msg: String) {
         if (debugEnabled) Log.d(debugTag, msg)

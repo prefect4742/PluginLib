@@ -2,11 +2,12 @@ package com.prefect47.pluginlib.impl.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.prefect47.pluginlib.impl.InstanceManager
-import com.prefect47.pluginlib.impl.Manager
+import com.prefect47.pluginlib.impl.interfaces.InstanceManager
+import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginListener
+import com.prefect47.pluginlib.impl.interfaces.PluginListener
+import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.viewmodel.PluginListModel
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ class PluginListViewModelImpl @Inject constructor(
     override val list = HashMap<KClass<out Plugin>, PluginListModel<out Plugin>>()
 
     inner class PluginListModelImpl<T: Plugin>(val cls: KClass<T>) : PluginListModel<T>, PluginListener<T> {
-        override val plugins = MutableLiveData<List<T>>()
+        override val plugins = MutableLiveData<List<PluginInfo<T>>>()
 
         private var instanceManager: InstanceManager<T>? = null
 
@@ -33,17 +34,17 @@ class PluginListViewModelImpl @Inject constructor(
             control.debug("PluginLib started tracking ${cls.qualifiedName}")
         }
 
-        override fun onItemConnected(plugin: T) {
-            instanceManager?.let { im -> plugins.postValue(im.plugins.map { it.plugin }) }
+        override fun onPluginDiscovered(info: InstanceManager.InstanceInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
         }
 
-        override fun onItemDisconnected(plugin: T) {
-            instanceManager?.let { im -> plugins.postValue(im.plugins.map { it.plugin }) }
+        override fun onPluginRemoved(info: InstanceManager.InstanceInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
         }
 
         suspend fun start() {
             instanceManager = manager.addPluginListener(this, cls, allowMultiple = true)
-            instanceManager?.let { im -> plugins.postValue(im.plugins.map { it.plugin }) }
+            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
         }
 
         fun stop() {
@@ -53,7 +54,7 @@ class PluginListViewModelImpl @Inject constructor(
 
     /*
     private fun postList() {
-        instanceManager?.let { im -> list.postValue(im.plugins.map { it.plugin }) }
+        instanceManager?.let { im -> list.postValue(im.instances.map { it.plugin }) }
     }
     */
 

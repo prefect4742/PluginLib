@@ -8,6 +8,7 @@ import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
 
 /**
  * EditTextPreference.
@@ -29,11 +30,11 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
             }
     }
 
-    private lateinit var plugin: Plugin
+    private lateinit var pluginInfo: PluginInfo<out Plugin>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        plugin = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
         super.onCreate(savedInstanceState)
     }
 

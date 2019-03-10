@@ -13,36 +13,33 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl
+package com.prefect47.pluginlib.impl.interfaces
 
-import android.content.Context
+import com.prefect47.pluginlib.impl.VersionInfo
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginListener
-import kotlin.reflect.KClass
+import com.prefect47.pluginlib.plugin.PluginInfo
 
 interface InstanceManager<T: Plugin> {
 
     interface Factory {
         fun <T: Plugin> create(action: String, listener: PluginListener<T>?, allowMultiple: Boolean,
-                cls: KClass<*>): InstanceManager<T>
+                               cls: String): InstanceManager<T>
     }
 
-    data class PluginInfo<T: Plugin>(
-        val plugin: T,
-        val pkg: String,
-        val version: VersionInfo?,
-        val context: Context)
+    data class InstanceInfo<T: Plugin>(
+        val info: PluginInfo<T>,
+        val version: VersionInfo?)
 
-    //val plugins: List<PluginInfo<T>>
+    val instances: List<InstanceInfo<T>>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean
     fun destroy()
 
-    fun getPlugin(): PluginInfo<T>?
+    //fun getPlugin(): InstanceInfo<T>?
 
-    fun <P: Any> dependsOn(p: Plugin, cls: KClass<P>): Boolean
+    fun dependsOn(p: Plugin, cls: String): Boolean
 
     fun onPackageRemoved(pkg: String)
     fun onPackageChange(pkg: String)

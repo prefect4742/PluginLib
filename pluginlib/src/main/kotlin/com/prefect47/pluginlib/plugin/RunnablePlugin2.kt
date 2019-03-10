@@ -16,11 +16,6 @@
 
 package com.prefect47.pluginlib.plugin
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
-import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 /**
@@ -109,38 +104,11 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 */
 */
 
-interface Plugin {
+/*
+interface RunnablePlugin2: Plugin2 {
     companion object {
-        private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
     }
-
-    /**
-     * Behavioral flags that apply to the Plugin type.
-     * Declare these as a companion object member EnumSet called "FLAGS" in your Plugin class interface.
-     */
-    enum class Flag {
-        /**
-         * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
-         * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
-         * All instances will still be loaded and started.
-         */
-        ALLOW_SIMULTANEOUS_USE // Allow multiple instances of this type to be enabled at the same time
-    }
-
-    val className: String
-        get() = this::class.qualifiedName!!
-    val pkgName: String
-        get() = manager.instanceInfoMap[this]!!.info.component.packageName
-    val pluginContext: Context
-        get() = manager.instanceInfoMap[this]!!.info.pluginContext
-    val applicationContext: Context
-        get() = manager.getApplicationContext()
-
-    val title: String
-    val description: String
-    val icon: Drawable?
-        get() = ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)
 
     // Called when plugin is loaded, either at app start or when an plugin is installed while app is running.
     // pluginContext and applicationContext is available until onDestroy is called.
@@ -149,6 +117,7 @@ interface Plugin {
     // Called when app shuts down, or if APK containing the plugin is uninstalled while app is running.
     fun onDestroy() {}
 
+    /*
     // Called when app wishes to use the plugin.
     // preferenceDataStore is available until onStop is called.
     fun onStart() {}
@@ -157,12 +126,14 @@ interface Plugin {
     // preferenceDataStore may no longer be valid (for example if the app implements a PluginPreferenceDataStoreProvider
     // and has invalidated any currently used PluginPreferenceDataStore instances).
     fun onStop() {}
+    */
 
     val preferenceDataStore: PluginPreferenceDataStore
-        get() = prefsManager.getPreferenceDataStore(manager.instanceInfoMap[this]!!.info)
+        get() = prefsManager.getPreferenceDataStore(this)
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
     // PreferenceDataStoreProvider and wishes all its instances to switch to another set of preferences.
     // Plugin should reload whatever preferences it has cached.
     fun onPreferenceDataStoreInvalidated() {}
 }
+*/

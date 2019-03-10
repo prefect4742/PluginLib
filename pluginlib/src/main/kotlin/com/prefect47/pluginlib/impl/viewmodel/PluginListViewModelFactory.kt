@@ -2,7 +2,7 @@ package com.prefect47.pluginlib.impl.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.prefect47.pluginlib.impl.Manager
+import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 
 class PluginListViewModelFactory(

@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.ui.settings
 
 import android.os.Bundle
 import android.view.*
+import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.PluginSettings
 import com.prefect47.pluginlib.ui.PluginFragment
 
@@ -11,7 +12,7 @@ class PluginSettingsFragment : PluginFragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val layoutResId = (plugin as PluginSettings).layoutResId
+        val layoutResId = R.layout.plugin_settings_fragment //pluginInfo.metadata.getInt(plugin as PluginSettings).layoutResId
         return inflater.inflate(layoutResId, container, false)
     }
 }

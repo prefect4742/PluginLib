@@ -3,11 +3,11 @@ package com.prefect47.pluginlib.impl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
+import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginListCategory
-import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -158,12 +158,12 @@ class LibraryControlImpl @Inject constructor(
         }
     }
 
-    override fun getPluginList(cls: KClass<out Plugin>): List<Plugin>? {
+    override fun getPluginList(cls: KClass<out Plugin>): List<PluginInfo<out Plugin>>? {
         assertStarted()
         return viewModelInner.list[cls]?.plugins?.value
     }
 
-    override fun getPluginList(pluginClassName: String): List<Plugin>? =
+    override fun getPluginList(pluginClassName: String): List<PluginInfo<out Plugin>>? =
         getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
     override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
@@ -171,10 +171,10 @@ class LibraryControlImpl @Inject constructor(
         return manager.pluginClassFlagsMap[pluginClassName]
     }
 
-    override fun getPlugin(className: String): Plugin? {
+    override fun getPlugin(className: String): PluginInfo<out Plugin>? {
         assertStarted()
         viewModelInner.list.values.forEach { model ->
-            model.plugins.value?.find { plugin -> plugin::class.qualifiedName == className }?.let { return it }
+            model.plugins.value?.find { it.component.className == className }?.let { return it }
         }
         return null
     }

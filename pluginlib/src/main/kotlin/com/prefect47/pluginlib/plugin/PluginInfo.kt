@@ -16,11 +16,27 @@
 
 package com.prefect47.pluginlib.plugin
 
-interface PluginLifecycle {
-    // Called when item is loaded, either at app start or when an item is installed while app is running.
-    // pluginContext and applicationContext is available until onDestroy is called.
-    fun onCreate() {}
+import android.content.ComponentName
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.os.Bundle
 
-    // Called when app shuts down, or if APK containing the item is uninstalled while app is running.
-    fun onDestroy() {}
+interface PluginInfo<T: Plugin>: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener {
+    companion object {
+        const val TITLE = "title"
+        const val DESCRIPTION = "description"
+        const val ICON = "icon"
+        const val PREFERENCES = "preferences"
+    }
+
+    val pluginContext: Context
+    val metadata: Bundle
+    val component: ComponentName
+
+    fun start(): T
+    fun stop()
+
+    fun getString(key: String): String?
+    fun getDrawable(key: String): Drawable?
+
 }

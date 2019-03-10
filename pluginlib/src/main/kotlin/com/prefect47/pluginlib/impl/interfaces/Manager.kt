@@ -13,17 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl
+package com.prefect47.pluginlib.impl.interfaces
 
 import android.content.Context
-import android.text.TextUtils
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginListener
-import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import java.util.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
 
 interface Manager {
 
@@ -37,7 +33,7 @@ interface Manager {
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
 
-        fun <P: Plugin> getAction(cls: KClass<P>) : String {
+        fun getAction(cls: String) : String {
             // TODO: Due to KT-7186 we cannot access the members of a subclass inside a loop over the superclass (yet).
 
             // Try the static dependencies first
@@ -47,14 +43,16 @@ interface Manager {
                 }
             }
 
+            /*
             cls.findAnnotation<ProvidesInterface>()?.let { info ->
                 if (TextUtils.isEmpty(info.action)) {
                     throw RuntimeException(cls.simpleName + " doesn't provide an action")
                 }
                 return info.action
             }
+            */
 
-            throw RuntimeException(cls.simpleName + " doesn't provide an interface")
+            throw RuntimeException(cls.substringAfterLast(".") + " doesn't provide an interface")
         }
 
         private var nextNotificationIdInt = 0
@@ -63,17 +61,24 @@ interface Manager {
             get() = nextNotificationIdInt++
     }
 
-    val pluginInfoMap: MutableMap<Plugin, InstanceManager.PluginInfo<*>>
+    val instanceInfoMap: MutableMap<Plugin, InstanceManager.InstanceInfo<*>>
     val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
-    fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(cls)) : T?
+    /*
+    fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
+        cls
+    )
+    ) : T?
+    */
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-            action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
+                                              action: String = getAction(
+                                                  cls.qualifiedName!!
+                                              ), allowMultiple : Boolean = false): InstanceManager<T>
 
     fun removePluginListener(listener: PluginListener<*>)
 
-    fun <T: Any> dependsOn(p: Plugin, cls: KClass<T>) : Boolean
+    fun dependsOn(p: Plugin, cls: String) : Boolean
 
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()

@@ -26,21 +26,19 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     }
 
     private lateinit var prefs: PluginPreferenceDataStore
-    private lateinit var prefsListener: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
-    private lateinit var plugin: Plugin
+    private lateinit var pluginInfo: PluginInfo<out Plugin>
     private var activityResultHandler: ActivityResultHandler? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        plugin = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
 
-        prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(plugin)
+        prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
         preferenceManager.preferenceDataStore = prefs
 
-        val preferencesResId = (plugin as PluginSettings).preferencesResId
+        val preferencesResId = pluginInfo.metadata.getInt(PluginInfo.PREFERENCES)
+        //val preferencesResId = (plugin as PluginSettings).preferencesResId
         addPreferencesFromResource(preferencesResId)
-
-        prefsListener = plugin as PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
@@ -49,19 +47,19 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
-        prefs.registerOnPluginPreferenceDataStoreChangeListener(prefsListener)
+        prefs.registerOnPluginPreferenceDataStoreChangeListener(pluginInfo)
     }
 
     override fun onPause() {
         super.onPause()
-        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(prefsListener)
+        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(pluginInfo)
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {
         val f: DialogFragment
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
-                plugin::class.qualifiedName!!,
+                pluginInfo.component.className,
                 preference.key,
                 preference.inputType,
                 preference.digits

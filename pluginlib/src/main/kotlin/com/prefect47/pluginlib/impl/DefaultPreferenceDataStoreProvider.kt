@@ -3,6 +3,7 @@ package com.prefect47.pluginlib.impl
 import android.content.Context
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
@@ -29,7 +30,7 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
                 prefs.edit().putStringSet(key, values).apply()
     }
 
-    private class PluginDataStore(plugin: Plugin): DataStore(plugin.pluginContext, "preferences") {
+    private class PluginDataStore(pluginInfo: PluginInfo<out Plugin>): DataStore(pluginInfo.pluginContext, "preferences") {
         init {
             prefs.registerOnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
         }
@@ -39,7 +40,7 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
         return DataStore(context, "preferences")
     }
 
-    override fun getPreferenceDataStore(plugin: Plugin): PluginPreferenceDataStore {
-        return PluginDataStore(plugin)
+    override fun getPreferenceDataStore(pluginInfo: PluginInfo<out Plugin>): PluginPreferenceDataStore {
+        return PluginDataStore(pluginInfo)
     }
 }

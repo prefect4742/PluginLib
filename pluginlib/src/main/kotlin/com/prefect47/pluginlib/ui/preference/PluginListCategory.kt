@@ -8,9 +8,10 @@ import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
 
 /**
- * Preference category that automatically adds all plugins of its type and sets their common layout.
+ * Preference category that automatically adds all instances of its type and sets their common layout.
  */
 
 class PluginListCategory @JvmOverloads constructor(
@@ -22,7 +23,7 @@ class PluginListCategory @JvmOverloads constructor(
     private var layoutResId = R.layout.plugin_pref
 
     interface SettingsHandler {
-        fun openSettings(plugin: Plugin)
+        fun openSettings(pluginInfo: PluginInfo<out Plugin>)
     }
 
     init {
@@ -48,20 +49,20 @@ class PluginListCategory @JvmOverloads constructor(
 
         val control = PluginLibraryDI.component.getControl()
         val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
-        val creator: (Plugin)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
+        val creator: (PluginInfo<out Plugin>)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
         control.getPluginList(className)?.forEach {
             addPreference(creator(it))
         }
     }
 
-    private fun createPref(plugin: Plugin) =
+    private fun createPref(plugin: PluginInfo<out Plugin>) =
         PluginSingleListEntry(context, key, layoutResId, plugin).apply {
             setOnPreferenceChangeListener { preference, newValue ->
                 preferenceChanged(preference as PluginSingleListEntry, newValue as Boolean) }
         }
 
-    private fun createMultiPref(plugin: Plugin) =
+    private fun createMultiPref(plugin: PluginInfo<out Plugin>) =
         PluginMultiListEntry(context, key, layoutResId, plugin)
 
     private fun preferenceChanged(preference: PluginSingleListEntry, newValue: Boolean): Boolean {

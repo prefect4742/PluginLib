@@ -13,12 +13,14 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.impl.interfaces
+
+import com.prefect47.pluginlib.plugin.Plugin
 
 /**
- * Interface for listening to items being connected.
+ * Interface for listening to instances being connected.
  */
-interface ConnectionListener<T> {
+interface PluginListener<T: Plugin> {
     /**
      * Called when library starts looking for items of the given type. Should be used at application start.
      */
@@ -29,19 +31,27 @@ interface ConnectionListener<T> {
      */
     fun onDoneLoading()
 
+    fun onPluginDiscovered(info: InstanceManager.InstanceInfo<T>)
+
+    fun onPluginRemoved(info: InstanceManager.InstanceInfo<T>)
+
+    //fun onPluginStarted()
+
+    //fun onPluginStopped()
+
     /**
      * Called when the item has been loaded and is ready to be used.
      * This may be called multiple times if multiple items are allowed.
      * It may also be called in the future if the item package changes
      * and needs to be reloaded.
      */
-    fun onItemConnected(item: T)
+    //fun onPluginConnected(info: InstanceManager.InstanceInfo<T>)
 
     /**
      * Called when a item has been uninstalled/updated and should be removed
      * from use.
      */
-    fun onItemDisconnected(item: T) {
+    //fun onPluginDisconnected(info: InstanceManager.InstanceInfo<T>) {
         // Optional.
-    }
+    //}
 }

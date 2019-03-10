@@ -13,9 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.impl.interfaces
 
-/**
- * Interface for listening to plugins being connected.
- */
-interface PluginListener<T: Plugin>: ConnectionListener<T>
+import android.content.ComponentName
+import android.content.Context
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
+
+interface PluginInfoFactory {
+    fun <T: Plugin> create(component: ComponentName, pluginContext: Context): PluginInfo<T>
+}

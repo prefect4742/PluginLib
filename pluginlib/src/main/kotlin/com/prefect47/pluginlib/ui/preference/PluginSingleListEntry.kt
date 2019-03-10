@@ -7,6 +7,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
@@ -18,25 +19,25 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * SwitchPreference.
  */
 class PluginSingleListEntry(
-    context: Context, private val overrideKey: String, layoutResId: Int, private val plugin: Plugin
+    context: Context, private val overrideKey: String, layoutResId: Int, private val pluginInfo: PluginInfo<out Plugin>
 ): SwitchPreferenceCompat(context) {
     private val prefs: PluginPreferenceDataStore by lazy { preferenceDataStore as PluginPreferenceDataStore }
 
     init {
         layoutResource = layoutResId
         widgetLayoutResource = R.layout.plugin_radiobutton
-        title = plugin.title
-        summary = plugin.description
-        icon = plugin.icon
+        title = context.getString(pluginInfo.metadata.getInt(PluginInfo.TITLE))
+        summary = context.getString(pluginInfo.metadata.getInt(PluginInfo.DESCRIPTION))
+        icon = context.getDrawable(pluginInfo.metadata.getInt(PluginInfo.ICON))
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         holder.itemView.settings_frame?.let {
-            if (plugin is PluginSettings) {
+            if (pluginInfo.metadata.containsKey(PluginInfo.PREFERENCES)) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
-                    PluginLibraryDI.component.getControl().settingsHandler?.openSettings(plugin)
+                    PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo)
                 }
             } else {
                 it.visibility = View.INVISIBLE
@@ -46,11 +47,11 @@ class PluginSingleListEntry(
     }
 
     override fun persistBoolean(value: Boolean): Boolean {
-        if (value) prefs.putString(overrideKey, plugin.className)
+        if (value) prefs.putString(overrideKey, pluginInfo.component.className)
         return true
     }
 
 
     override fun getPersistedBoolean(defaultReturnValue: Boolean): Boolean =
-        plugin.className == prefs.getString(overrideKey, null)
+        pluginInfo.component.className == prefs.getString(overrideKey, null)
 }

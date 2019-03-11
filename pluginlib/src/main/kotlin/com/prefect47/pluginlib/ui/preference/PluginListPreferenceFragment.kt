@@ -1,5 +1,7 @@
 package com.prefect47.pluginlib.ui.preference
 
+import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
@@ -11,14 +13,17 @@ import com.prefect47.pluginlib.impl.ui.PluginPreferenceGroupAdapter
  * preference layout.
  */
 abstract class PluginListPreferenceFragment : PreferenceFragmentCompat() {
+    abstract val key: Any?
 
-    // We override this so that we can set the PreferenceDataStore as early as possible.
-    override fun setPreferencesFromResource(preferencesResId: Int, key: String?) {
-        preferenceManager.preferenceDataStore = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore()
-        super.setPreferencesFromResource(preferencesResId, key)
+    /**
+     * Call this from your subclass if you wish to use the generic data store.
+     */
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        preferenceManager.preferenceDataStore =
+                PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore()
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
-        return PluginPreferenceGroupAdapter(preferenceScreen)
+        return PluginPreferenceGroupAdapter(preferenceScreen, key)
     }
 }

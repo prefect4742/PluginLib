@@ -17,8 +17,13 @@ class PreferenceDataStoreManagerImpl @Inject constructor(context: Context): Plug
 
     override fun getPreferenceDataStore(): PluginPreferenceDataStore = provider.getPreferenceDataStore()
 
+    override fun getPreferenceDataStore(key: Any): PluginPreferenceDataStore =
+        provider.getPreferenceDataStore(key)
+
+    /*
     override fun getPreferenceDataStore(pluginInfo: PluginInfo<out Plugin>): PluginPreferenceDataStore =
         provider.getPreferenceDataStore(pluginInfo)
+        */
         /*{
         served.add(pluginInfo)
         cache[pluginInfo.component.packageName]?.let { return it }

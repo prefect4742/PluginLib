@@ -33,6 +33,7 @@ class PluginSingleListEntry(
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
+        val tag = holder.itemView.tag
         holder.itemView.settings_frame?.let {
             if (pluginInfo.metadata.containsKey(PluginSettings.PREFERENCES)) {
                 it.visibility = View.VISIBLE

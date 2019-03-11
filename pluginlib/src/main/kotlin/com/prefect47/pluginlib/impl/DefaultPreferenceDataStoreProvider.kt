@@ -7,6 +7,7 @@ import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreProvider
+import java.lang.IllegalArgumentException
 
 class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPreferenceDataStoreProvider {
 
@@ -41,10 +42,14 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
 
     override fun getPreferenceDataStore() = defaultStore
 
-    override fun getPreferenceDataStore(pluginInfo: PluginInfo<out Plugin>): PluginPreferenceDataStore {
-        cache[pluginInfo.component.packageName]?.let { return it }
-        val newStore = PluginDataStore(pluginInfo)
-        cache[pluginInfo.component.packageName] = newStore
-        return newStore
+    override fun getPreferenceDataStore(key: Any): PluginPreferenceDataStore {
+        if (key is PluginInfo<out Plugin>) {
+            cache[key.component.packageName]?.let { return it }
+            val newStore = PluginDataStore(key)
+            cache[key.component.packageName] = newStore
+            return newStore
+        } else {
+            throw IllegalArgumentException("Unrecognized session key $key")
+        }
     }
 }

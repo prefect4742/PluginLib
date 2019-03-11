@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.ui.settings
 
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.Fragment
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.plugin.PluginSettings
 import com.prefect47.pluginlib.ui.PluginFragment

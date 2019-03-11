@@ -7,8 +7,9 @@ interface PluginPreferenceDataStoreProvider {
     fun getPreferenceDataStore(): PluginPreferenceDataStore
 
     /**
-     * Get the current data store for the given plugin. Note that instances in the same package must get the same
-     * data store.
+     * Get the data store matching the given key.
+     * The library will mainly call this with the key being a PluginInfo<out Plugin>. Note that
+     * instances of plugins in the same package must get the same data store.
      */
-    fun getPreferenceDataStore(pluginInfo: PluginInfo<out Plugin>): PluginPreferenceDataStore
+    fun getPreferenceDataStore(key: Any): PluginPreferenceDataStore
 }

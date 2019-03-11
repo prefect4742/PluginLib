@@ -11,9 +11,12 @@ import kotlinx.android.synthetic.main.plugin_pref.view.*
 
 /**
  * Inserts a settings icon into a Preference if if contains a settings_frame element.
+ * The key will be passed to the itemView as a tag and can be used anywhere the PreferenceViewHolder is seen.
  */
 @SuppressLint("RestrictedApi")
-class PluginPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) : PreferenceGroupAdapter(preferenceGroup) {
+class PluginPreferenceGroupAdapter(
+    preferenceGroup: PreferenceGroup, private val key: Any?
+): PreferenceGroupAdapter(preferenceGroup) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreferenceViewHolder {
         val holder = super.onCreateViewHolder(parent, viewType)
@@ -23,6 +26,7 @@ class PluginPreferenceGroupAdapter(preferenceGroup: PreferenceGroup) : Preferenc
             inflater.inflate(R.layout.plugin_setting, it)
         }
 
+        holder.itemView.tag = key
         return holder
     }
 }

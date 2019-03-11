@@ -16,22 +16,20 @@
 package com.prefect47.pluginlib.impl
 
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.annotations.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.findAnnotation
 
 class VersionInfo(private val control: PluginLibraryControl) {
     //private val versions: MutableMap<KClass<*>, Version> = HashMap()
-    private val versions: MutableMap<String, Version> = HashMap()
+    private val versions: MutableMap<KClass<*>, Version> = HashMap()
 
     fun hasVersionInfo() = !versions.isEmpty()
 
-    fun addClass(cls: String): VersionInfo {
+    fun addClass(cls: KClass<*>): VersionInfo {
         addClass(cls, false)
         return this
     }
 
-    fun addClass(cls: String, required: Boolean) {
+    fun addClass(cls: KClass<*>, required: Boolean) {
         if (versions.containsKey(cls)) return
 
         // Use static providers data if we have it
@@ -108,7 +106,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
 
     @Throws(InvalidVersionException::class)
     fun checkVersion(plugin: VersionInfo) {
-        val versionsCopy = HashMap<String, Version>(versions)
+        val versionsCopy = HashMap<KClass<*>, Version>(versions)
         plugin.versions.forEach { aClass, version ->
             var v: Version? = versionsCopy.remove(aClass)
             if (v == null) {
@@ -116,13 +114,12 @@ class VersionInfo(private val control: PluginLibraryControl) {
             }
             if (v == null) {
                 throw InvalidVersionException(
-                    aClass.substringAfter(".")
-                            + " does not provide an interface", false
+                    "${aClass.simpleName} does not provide an interface", false
                 )
             }
             if (v.version != version.version) {
                 throw InvalidVersionException(
-                    aClass, v.version < version.version, v.version,
+                    aClass.simpleName!!, v.version < version.version, v.version,
                     version.version
                 )
             }
@@ -130,7 +127,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
         versionsCopy.forEach { aClass, version ->
             if (version.required) {
                 throw InvalidVersionException(
-                    "Missing required dependency " + aClass.substringAfter("."),
+                    "Missing required dependency ${aClass.simpleName}",
                     false
                 )
             }
@@ -170,7 +167,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
     }
     */
 
-    private fun createVersion(cls: String): Version? {
+    private fun createVersion(cls: KClass<*>): Version? {
         control.staticProviders.forEach { list ->
             if (list.providers.containsKey(cls)) {
                 list.providers[cls]?.let { return Version(it.version, true) }
@@ -190,7 +187,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
     }
     */
 
-    fun hasClass(cls: String): Boolean {
+    fun hasClass(cls: KClass<*>): Boolean {
         return versions.containsKey(cls)
     }
 

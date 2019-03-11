@@ -13,28 +13,21 @@
  * permissions and limitations under the License.
  */
 
-
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.impl.interfaces
 
 import android.content.ComponentName
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.os.Bundle
+import com.prefect47.pluginlib.impl.VersionInfo
+import com.prefect47.pluginlib.plugin.Plugin
 
-interface PluginInfo<T: Plugin>: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener {
-    companion object {
-        const val TITLE = "title"
-        const val DESCRIPTION = "description"
-        const val ICON = "icon"
+interface InstanceInfo<T: Plugin> {
+    interface Factory {
+        fun <T: Plugin> create(pluginContext: Context, component: ComponentName, version: VersionInfo?): InstanceInfo<T>
     }
 
+    val version: VersionInfo?
     val pluginContext: Context
     val metadata: Bundle
     val component: ComponentName
-
-    fun start(): T
-    fun stop()
-
-    fun getString(key: String): String?
-    fun getDrawable(key: String): Drawable?
 }

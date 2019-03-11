@@ -20,7 +20,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.GET_META_DATA
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.pm.ResolveInfo
 import android.content.res.Resources
@@ -28,33 +27,30 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.impl.interfaces.InstanceManager.InstanceInfo
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
-import com.prefect47.pluginlib.impl.interfaces.InstanceManager
-import com.prefect47.pluginlib.impl.interfaces.Manager
-import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
+import com.prefect47.pluginlib.impl.interfaces.*
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.impl.interfaces.PluginListener
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 class InstanceManagerImpl<T: Plugin>(
     private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
-    private val control: PluginLibraryControl, private val infoFactory: PluginInfoFactory,
+    private val control: PluginLibraryControl, private val infoFactory: InstanceInfo.Factory,
     private val action: String, private val listener: PluginListener<T>?,
     private val allowMultiple: Boolean, private val version: VersionInfo
 ): InstanceManager<T> {
 
     class Factory @Inject constructor(
         private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
-        private val pluginPrefs: PluginPrefs, private val infoFactory: PluginInfoFactory
+        private val pluginPrefs: PluginPrefs, private val infoFactory: InstanceInfo.Factory
     ): InstanceManager.Factory {
 
         override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
-                                        allowMultiple: Boolean, cls: String) = InstanceManagerImpl(
+                allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
             context,
             manager,
             pluginPrefs,
@@ -120,7 +116,7 @@ class InstanceManagerImpl<T: Plugin>(
     override fun checkAndDisable(className: String): Boolean {
         var disableAny = false
         ArrayList(instances).forEach {
-            if (className.startsWith(it.info.component.packageName)) {
+            if (className.startsWith(it.component.packageName)) {
                 disable(it)
                 disableAny = true
             }
@@ -142,21 +138,16 @@ class InstanceManagerImpl<T: Plugin>(
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
         // assuming one of them must be bad.
-        Log.w(TAG, "Disabling plugin ${info.info.component}")
+        Log.w(TAG, "Disabling plugin ${info.component}")
         pm.setComponentEnabledSetting(
-                info.info.component,
+                info.component,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP)
     }
 
-    override fun dependsOn(p: Plugin, cls: String): Boolean {
+    override fun dependsOn(p: Plugin, cls: KClass<*>): Boolean {
         val plugins = ArrayList<InstanceInfo<T>>(instances)
-        plugins.forEach {
-            if (it.info.component.packageName.equals(p::class.qualifiedName)) {
-                return (it.version != null && it.version.hasClass(cls))
-            }
-        }
-        return false
+        return plugins.find { it.component.packageName.equals(p::class.qualifiedName) }?.version?.hasClass(cls) ?: false
     }
 
     override fun toString(): String {
@@ -185,7 +176,7 @@ class InstanceManagerImpl<T: Plugin>(
         fun removePackage(pkg: String) {
             launch {
                 instances.forEach {
-                    if (it.info.component.packageName == pkg) {
+                    if (it.component.packageName == pkg) {
                         handlePluginRemoved(it)
                         instances.remove(it)
                     }
@@ -268,6 +259,13 @@ class InstanceManagerImpl<T: Plugin>(
             listener.onDoneLoading()
         }
 
+        private fun findPluginClass(cls: String): KClass<*> {
+            control.staticImplementations.forEach { list ->
+                list.implementations[cls]?.let { return it }
+            }
+            return Class.forName(cls).kotlin
+        }
+
         private fun handleDiscoverPlugin(component: ComponentName): InstanceInfo<T>? {
             val pkg = component.packageName
             val cls = component.className
@@ -285,15 +283,11 @@ class InstanceManagerImpl<T: Plugin>(
                     PluginContextWrapper(context, context.createPackageContext(pkg, 0), classLoader, pkg)
 
                 return try {
-                    val pluginVersion = checkVersion(cls, version)
-                    if (control.debugEnabled) Log.d(TAG, "discoverPlugin")
-
-                    val pluginInfo = infoFactory.create<T>(component, pluginContext)
-                    InstanceInfo(pluginInfo, pluginVersion)
+                    if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
+                    val pluginVersion = checkVersion(findPluginClass(cls), version)
+                    infoFactory.create<T>(pluginContext, component, pluginVersion)
                 } catch (e: InvalidVersionException) {
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
-                    // TODO: Warn user.
-                    //@Suppress("DEPRECATION")
                     Log.w(TAG, "Plugin $cls version check failed: ${e.message}")
                     null
                 }
@@ -302,59 +296,6 @@ class InstanceManagerImpl<T: Plugin>(
                 return null
             }
         }
-
-        // TODO: Move forName() calls and such to a default factory that will run if there is no other
-        // TODO: IF we have factory then we will also have all annotations static anyway and can use class name strings instead of KClass<*>
-
-        /*
-        private fun handleLoadPlugin(component: ComponentName): InstanceInfo<T>? {
-            val pkg = component.packageName
-            val cls = component.className
-            try {
-                val info = pm.getApplicationInfo(pkg, 0)
-                // TODO: This probably isn't needed given that we don't have IGNORE_SECURITY on
-                val permissionName = control.permissionName
-                if (pm.checkPermission(permissionName, pkg) != PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Plugin doesn't have permission: $pkg")
-                    return null
-                }
-                // Create our own ClassLoader so we can use our own code as the parent.
-                val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
-                val pluginContext =
-                    PluginContextWrapper(context, context.createPackageContext(pkg, 0), classLoader, pkg)
-
-                // TODO: Can we work around this without suppressing the warning?
-                @Suppress("UNCHECKED_CAST")
-                val pluginClass = Class.forName(cls, true, classLoader).kotlin as KClass<T>
-
-                // TODO: Only create the plugin before version check if we need it for legacy version check.
-
-                var pluginVersion: VersionInfo? = null
-                try {
-                    pluginVersion = checkVersion(pluginClass, version)
-                    //val pluginVersion: VersionInfo? = checkVersion(pluginClass, plugin, version)
-                    if (control.debugEnabled) Log.d(TAG, "createPlugin")
-
-                    // We support object/singleton instances as well
-                    //@Suppress("UNCHECKED_CAST")
-                    //val pluginClass = Class.forName(cls, false, classLoader).kotlin as KClass<T>
-                    val plugin: T = pluginClass.objectInstance ?: pluginClass.createInstance()
-                    //val plugin = pluginClass.createInstance()
-
-                    return InstanceInfo(plugin, pkg, pluginVersion, pluginContext)
-                } catch (e: InvalidVersionException) {
-                    notifyInvalidVersion(component, cls, e.tooNew, e.message)
-                    // TODO: Warn user.
-                    //@Suppress("DEPRECATION")
-                    Log.w(TAG, "Plugin $cls version check failed: ${e.message}")
-                    return null
-                }
-            } catch (e: Throwable) {
-                Log.w(TAG, "Couldn't load plugin: $pkg", e)
-                return null
-            }
-        }
-        */
 
         private fun notifyInvalidVersion(component: ComponentName, cls: String, tooNew: Boolean, msg: String?) {
             control.notificationChannel?.let { channel ->
@@ -394,7 +335,7 @@ class InstanceManagerImpl<T: Plugin>(
         }
 
         @Throws(InvalidVersionException::class)
-        private fun checkVersion(cls: String, version: VersionInfo): VersionInfo? {
+        private fun checkVersion(cls: KClass<*>, version: VersionInfo): VersionInfo? {
             val pv: VersionInfo = VersionInfo(control).addClass(cls)
             if (pv.hasVersionInfo()) {
                 version.checkVersion(pv)

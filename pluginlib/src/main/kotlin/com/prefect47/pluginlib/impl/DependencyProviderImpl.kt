@@ -35,7 +35,7 @@ class DependencyProviderImpl @Inject constructor(private val manager: Manager): 
     override operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {
         // TODO: Check classloader used on annotations, it should be the system one right?
         // Reload the class with our own classloader
-        if (!manager.dependsOn(p, cls.qualifiedName!!)) {
+        if (!manager.dependsOn(p, cls)) {
             throw IllegalArgumentException(p.javaClass.simpleName + " does not depend on " + cls)
         }
         val ourCls = Class.forName(cls.qualifiedName!!).kotlin

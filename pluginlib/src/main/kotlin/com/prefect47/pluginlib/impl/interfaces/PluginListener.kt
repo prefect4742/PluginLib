@@ -31,9 +31,9 @@ interface PluginListener<T: Plugin> {
      */
     fun onDoneLoading()
 
-    fun onPluginDiscovered(info: InstanceManager.InstanceInfo<T>)
+    fun onPluginDiscovered(info: InstanceInfo<T>)
 
-    fun onPluginRemoved(info: InstanceManager.InstanceInfo<T>)
+    fun onPluginRemoved(info: InstanceInfo<T>)
 
     //fun onPluginStarted()
 

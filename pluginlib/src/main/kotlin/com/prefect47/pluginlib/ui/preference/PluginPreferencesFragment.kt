@@ -36,8 +36,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
         prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
         preferenceManager.preferenceDataStore = prefs
 
-        val preferencesResId = pluginInfo.metadata.getInt(PluginInfo.PREFERENCES)
-        //val preferencesResId = (plugin as PluginSettings).preferencesResId
+        val preferencesResId = pluginInfo.metadata.getInt(PluginSettings.PREFERENCES)
         addPreferencesFromResource(preferencesResId)
     }
 

@@ -33,6 +33,7 @@ interface PluginLibraryControl {
     }
 
     val staticProviders: List<PluginLibProviders>
+    val staticImplementations: List<PluginLibImplementations>
     val staticRequirements: List<PluginLibRequirements>
     val factories: List<PluginFactory>
 
@@ -55,6 +56,8 @@ interface PluginLibraryControl {
 
     fun addStaticProviders(providers: PluginLibProviders)
 
+    fun addStaticImplementations(implementations: PluginLibImplementations)
+    fun removeStaticImplementations(implementations: PluginLibImplementations)
     fun addStaticRequirements(requirements: PluginLibRequirements)
     fun removeStaticRequirements(requirements: PluginLibRequirements)
 
@@ -87,11 +90,22 @@ interface PluginLibraryControl {
      */
     fun addClassFilter(filter: (String) -> Boolean)
 
-    fun getPluginList(cls: KClass<out Plugin>): List<PluginInfo<out Plugin>>?
-    fun getPluginList(pluginClassName: String): List<PluginInfo<out Plugin>>?
+    /**
+     * Get a list of PluginInfo containers for any plugin implementing the [pluginClass] interface.
+     * Note that each call to this will return new instances of the containers.
+     */
+    fun getPluginList(pluginClass: KClass<out Plugin>): List<PluginInfo<out Plugin>>?
+    @Suppress("UNCHECKED_CAST")
+    fun getPluginList(pluginClassName: String) =
+            getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
     fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
 
+    /**
+     * Get a PluginInfo container for the plugin [cls].
+     * Note that each call to this will return a new instance of the container.
+     */
+    fun getPlugin(cls: KClass<out Plugin>) = getPlugin(cls.qualifiedName!!)
     fun getPlugin(className: String): PluginInfo<out Plugin>?
 
     fun debug(msg: String) {

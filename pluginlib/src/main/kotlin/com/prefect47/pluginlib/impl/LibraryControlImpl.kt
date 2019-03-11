@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.impl.interfaces.Manager
+import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 
 class LibraryControlImpl @Inject constructor(
     private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
+    private val pluginInfofactory: PluginInfoFactory,
     override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
     private val isStarted = AtomicBoolean(false)
@@ -27,6 +29,7 @@ class LibraryControlImpl @Inject constructor(
     override val staticProviders = ArrayList<PluginLibProviders>().apply {
         add(PluginLibProvidersImpl)
     }
+    override val staticImplementations = ArrayList<PluginLibImplementations>()
     override val staticRequirements = ArrayList<PluginLibRequirements>()
     override val factories = ArrayList<PluginFactory>()
 
@@ -65,6 +68,14 @@ class LibraryControlImpl @Inject constructor(
 
     override fun addStaticProviders(providers: PluginLibProviders) {
         staticProviders.add(providers)
+    }
+
+    override fun addStaticImplementations(implementations: PluginLibImplementations) {
+        staticImplementations.add(implementations)
+    }
+
+    override fun removeStaticImplementations(implementations: PluginLibImplementations) {
+        staticImplementations.remove(implementations)
     }
 
     override fun addStaticRequirements(requirements: PluginLibRequirements) {
@@ -158,13 +169,10 @@ class LibraryControlImpl @Inject constructor(
         }
     }
 
-    override fun getPluginList(cls: KClass<out Plugin>): List<PluginInfo<out Plugin>>? {
+    override fun getPluginList(pluginClass: KClass<out Plugin>): List<PluginInfo<out Plugin>>? {
         assertStarted()
-        return viewModelInner.list[cls]?.plugins?.value
+        return viewModelInner.list[pluginClass]?.plugins?.value?.map { pluginInfofactory.create(it) }
     }
-
-    override fun getPluginList(pluginClassName: String): List<PluginInfo<out Plugin>>? =
-        getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
     override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
         assertStarted()
@@ -174,7 +182,9 @@ class LibraryControlImpl @Inject constructor(
     override fun getPlugin(className: String): PluginInfo<out Plugin>? {
         assertStarted()
         viewModelInner.list.values.forEach { model ->
-            model.plugins.value?.find { it.component.className == className }?.let { return it }
+            model.plugins.value?.find { it.component.className == className }?.let {
+                return pluginInfofactory.create(it)
+            }
         }
         return null
     }

@@ -33,7 +33,7 @@ interface Manager {
         const val PLUGIN_CHANGED = "com.prefect47.pluginlib.action.PLUGIN_CHANGED"
         const val DISABLE_PLUGIN = "com.prefect47.pluginlib.action.DISABLE_PLUGIN"
 
-        fun getAction(cls: String) : String {
+        fun getAction(cls: KClass<*>) : String {
             // TODO: Due to KT-7186 we cannot access the members of a subclass inside a loop over the superclass (yet).
 
             // Try the static dependencies first
@@ -52,7 +52,7 @@ interface Manager {
             }
             */
 
-            throw RuntimeException(cls.substringAfterLast(".") + " doesn't provide an interface")
+            throw RuntimeException("${cls.simpleName} doesn't provide an interface")
         }
 
         private var nextNotificationIdInt = 0
@@ -61,7 +61,7 @@ interface Manager {
             get() = nextNotificationIdInt++
     }
 
-    val instanceInfoMap: MutableMap<Plugin, InstanceManager.InstanceInfo<*>>
+    val instanceInfoMap: MutableMap<Plugin, InstanceInfo<*>>
     val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
     /*
@@ -72,13 +72,11 @@ interface Manager {
     */
 
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-                                              action: String = getAction(
-                                                  cls.qualifiedName!!
-                                              ), allowMultiple : Boolean = false): InstanceManager<T>
+        action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
 
     fun removePluginListener(listener: PluginListener<*>)
 
-    fun dependsOn(p: Plugin, cls: String) : Boolean
+    fun dependsOn(p: Plugin, cls: KClass<*>) : Boolean
 
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()

@@ -26,15 +26,15 @@ class PluginSingleListEntry(
     init {
         layoutResource = layoutResId
         widgetLayoutResource = R.layout.plugin_radiobutton
-        title = context.getString(pluginInfo.metadata.getInt(PluginInfo.TITLE))
-        summary = context.getString(pluginInfo.metadata.getInt(PluginInfo.DESCRIPTION))
-        icon = context.getDrawable(pluginInfo.metadata.getInt(PluginInfo.ICON))
+        title = pluginInfo.getString(PluginInfo.TITLE)
+        summary = pluginInfo.getString(PluginInfo.DESCRIPTION)
+        icon = pluginInfo.getDrawable(PluginInfo.ICON) ?: context.getDrawable(R.drawable.ic_no_icon)
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         holder.itemView.settings_frame?.let {
-            if (pluginInfo.metadata.containsKey(PluginInfo.PREFERENCES)) {
+            if (pluginInfo.metadata.containsKey(PluginSettings.PREFERENCES)) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
                     PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo)

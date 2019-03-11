@@ -15,11 +15,9 @@
 
 package com.prefect47.pluginlib.impl.interfaces
 
-import android.content.ComponentName
-import android.content.Context
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 
 interface PluginInfoFactory {
-    fun <T: Plugin> create(component: ComponentName, pluginContext: Context): PluginInfo<T>
+    fun <T: Plugin> create(instanceInfo: InstanceInfo<T>): PluginInfo<T>
 }

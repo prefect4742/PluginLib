@@ -15,13 +15,9 @@
 
 package com.prefect47.pluginlib.impl
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
-import android.os.Bundle
-import com.prefect47.pluginlib.impl.interfaces.InstanceManager.InstanceInfo
+import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
@@ -29,29 +25,22 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
-    override val metadata: Bundle, override val component: ComponentName, override val pluginContext: Context
+    instanceInfo: InstanceInfo<T>
 ): PluginInfo<T> {
 
     class Factory @Inject constructor(
-        context: Context
     ): PluginInfoFactory {
-
-        private val pm = context.packageManager
-
-        override fun <T : Plugin> create(component: ComponentName, pluginContext: Context): PluginInfo<T> {
-            val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
-            val metadata = serviceInfo.metaData ?: Bundle()
-            metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
-            metadata.putInt(PluginInfo.DESCRIPTION, serviceInfo.descriptionRes)
-            metadata.putInt(PluginInfo.ICON, serviceInfo.icon)
-            metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
-            return PluginInfoImpl(metadata, component, pluginContext)
-        }
+        override fun <T : Plugin> create(instanceInfo: InstanceInfo<T>): PluginInfo<T> =
+            PluginInfoImpl(instanceInfo)
     }
 
     companion object {
         private const val TAG = "PluginInfo"
     }
+
+    override val pluginContext = instanceInfo.pluginContext
+    override val component = instanceInfo.component
+    override val metadata = instanceInfo.metadata
 
     override fun getString(key: String): String? {
         return try {

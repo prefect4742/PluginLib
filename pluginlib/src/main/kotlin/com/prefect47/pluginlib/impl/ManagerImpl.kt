@@ -33,7 +33,7 @@ import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.interfaces.InstanceManager
-import com.prefect47.pluginlib.impl.interfaces.InstanceManager.InstanceInfo
+import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.interfaces.PluginListener
 import com.prefect47.pluginlib.plugin.*
@@ -142,7 +142,7 @@ class ManagerImpl(
     override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
                                                        allowMultiple: Boolean): InstanceManager<T> {
         pluginPrefs.addAction(action)
-        val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls.qualifiedName!!)
+        val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
         instancesMap[listener] = p
         startListening()
@@ -272,7 +272,7 @@ class ManagerImpl(
         return PluginContextWrapper(context, context.createPackageContext(pkg, 0), classLoader, pkg)
     }
 
-    override fun dependsOn(p: Plugin, cls: String): Boolean {
+    override fun dependsOn(p: Plugin, cls: KClass<*>): Boolean {
         instancesMap.forEach {
             if (it.value.dependsOn(p, cls)) return true
         }

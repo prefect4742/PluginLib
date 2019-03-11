@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.impl.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.InstanceManager
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.plugin.Plugin
@@ -22,7 +23,7 @@ class PluginListViewModelImpl @Inject constructor(
     override val list = HashMap<KClass<out Plugin>, PluginListModel<out Plugin>>()
 
     inner class PluginListModelImpl<T: Plugin>(val cls: KClass<T>) : PluginListModel<T>, PluginListener<T> {
-        override val plugins = MutableLiveData<List<PluginInfo<T>>>()
+        override val plugins = MutableLiveData<List<InstanceInfo<T>>>()
 
         private var instanceManager: InstanceManager<T>? = null
 
@@ -34,17 +35,17 @@ class PluginListViewModelImpl @Inject constructor(
             control.debug("PluginLib started tracking ${cls.qualifiedName}")
         }
 
-        override fun onPluginDiscovered(info: InstanceManager.InstanceInfo<T>) {
-            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
+        override fun onPluginDiscovered(info: InstanceInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.instances) }
         }
 
-        override fun onPluginRemoved(info: InstanceManager.InstanceInfo<T>) {
-            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
+        override fun onPluginRemoved(info: InstanceInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.instances) }
         }
 
         suspend fun start() {
             instanceManager = manager.addPluginListener(this, cls, allowMultiple = true)
-            instanceManager?.let { im -> plugins.postValue(im.instances.map { it.info }) }
+            instanceManager?.let { im -> plugins.postValue(im.instances) }
         }
 
         fun stop() {

@@ -30,17 +30,21 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
                 prefs.edit().putStringSet(key, values).apply()
     }
 
+    private val defaultStore: PluginPreferenceDataStore by lazy { DataStore(context, "preferences") }
+    private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
+
     private class PluginDataStore(pluginInfo: PluginInfo<out Plugin>): DataStore(pluginInfo.pluginContext, "preferences") {
         init {
             prefs.registerOnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
         }
     }
 
-    override fun getPreferenceDataStore(): PluginPreferenceDataStore {
-        return DataStore(context, "preferences")
-    }
+    override fun getPreferenceDataStore() = defaultStore
 
     override fun getPreferenceDataStore(pluginInfo: PluginInfo<out Plugin>): PluginPreferenceDataStore {
-        return PluginDataStore(pluginInfo)
+        cache[pluginInfo.component.packageName]?.let { return it }
+        val newStore = PluginDataStore(pluginInfo)
+        cache[pluginInfo.component.packageName] = newStore
+        return newStore
     }
 }

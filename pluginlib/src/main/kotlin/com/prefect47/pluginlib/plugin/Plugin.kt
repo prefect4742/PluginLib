@@ -128,19 +128,16 @@ interface Plugin {
         ALLOW_SIMULTANEOUS_USE // Allow multiple instances of this type to be enabled at the same time
     }
 
+    /*
     val className: String
         get() = this::class.qualifiedName!!
     val pkgName: String
-        get() = manager.instanceInfoMap[this]!!.info.component.packageName
+        get() = manager.instanceInfoMap[this]!!.component.packageName
+    */
     val pluginContext: Context
-        get() = manager.instanceInfoMap[this]!!.info.pluginContext
+        get() = manager.instanceInfoMap[this]!!.pluginContext
     val applicationContext: Context
         get() = manager.getApplicationContext()
-
-    val title: String
-    val description: String
-    val icon: Drawable?
-        get() = ContextCompat.getDrawable(pluginContext, R.drawable.ic_no_icon)
 
     // Called when plugin is loaded, either at app start or when an plugin is installed while app is running.
     // pluginContext and applicationContext is available until onDestroy is called.
@@ -158,8 +155,10 @@ interface Plugin {
     // and has invalidated any currently used PluginPreferenceDataStore instances).
     fun onStop() {}
 
+    /*
     val preferenceDataStore: PluginPreferenceDataStore
-        get() = prefsManager.getPreferenceDataStore(manager.instanceInfoMap[this]!!.info)
+        get() = null //prefsManager.getPreferenceDataStore(manager.instanceInfoMap[this]!!)
+        */
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
     // PreferenceDataStoreProvider and wishes all its instances to switch to another set of preferences.

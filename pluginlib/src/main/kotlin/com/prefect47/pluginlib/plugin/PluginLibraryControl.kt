@@ -15,7 +15,7 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.ui.preference.PluginListCategory
+import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import java.util.EnumSet
 import kotlin.reflect.KClass
 
@@ -37,7 +37,7 @@ interface PluginLibraryControl {
     val staticRequirements: List<PluginLibRequirements>
     val factories: List<PluginFactory>
 
-    var settingsHandler: PluginListCategory.SettingsHandler?
+    var settingsHandler: PluginSettingsEntrance.Callback?
 
     /**
      * Set this if you wish for the library to look for PluginFactory in APK:s.

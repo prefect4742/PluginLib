@@ -29,12 +29,21 @@ interface PluginInfo<T: Plugin>: PluginPreferenceDataStore.OnPluginPreferenceDat
     }
 
     val pluginContext: Context
-    val metadata: Bundle
+    val data: Bundle
     val component: ComponentName
 
     fun start(): T
     fun stop()
 
-    fun getString(key: String): String?
-    fun getDrawable(key: String): Drawable?
+    /** Check if the meta-data for the plugin type declares contains the given key **/
+    fun containsKey(key: String): Boolean
+
+    /** Get the integer value that the meta-data for the plugin type declares, if any **/
+    fun getInt(key: String, default: Int): Int?
+
+    /** Get the resource string that the meta-data for the plugin type declares, if any **/
+    fun getStringResource(key: String, default: String? = null): String?
+
+    /** Get the resource drawable that the meta-data for the plugin type declares, if any **/
+    fun getDrawableResource(key: String, default: Drawable? = null): Drawable?
 }

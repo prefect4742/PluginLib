@@ -17,6 +17,7 @@ package com.prefect47.pluginlib.impl
 
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.plugin.Plugin
@@ -25,7 +26,7 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
-    instanceInfo: InstanceInfo<T>
+    private val instanceInfo: InstanceInfo<T>
 ): PluginInfo<T> {
 
     class Factory @Inject constructor(
@@ -40,20 +41,25 @@ class PluginInfoImpl<T: Plugin> (
 
     override val pluginContext = instanceInfo.pluginContext
     override val component = instanceInfo.component
-    override val metadata = instanceInfo.metadata
+    override val data = Bundle()
 
-    override fun getString(key: String): String? {
+    override fun containsKey(key: String) = instanceInfo.metadata.containsKey(key)
+
+    override fun getInt(key: String, default: Int) = instanceInfo.metadata.getInt(key, default)
+
+    override fun getStringResource(key: String, default: String?): String? {
         return try {
-            pluginContext.getString(metadata.getInt(key))
+            pluginContext.getString(instanceInfo.metadata.getInt(key))
         } catch (e: Resources.NotFoundException) {
-            null
+            default
         }
     }
-    override fun getDrawable(key: String): Drawable? {
+
+    override fun getDrawableResource(key: String, default: Drawable?): Drawable? {
         return try {
-            pluginContext.getDrawable(metadata.getInt(key))
+            pluginContext.getDrawable(instanceInfo.metadata.getInt(key))
         } catch (e: Resources.NotFoundException) {
-            null
+            default
         }
     }
 

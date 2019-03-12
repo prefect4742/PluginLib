@@ -12,6 +12,8 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
 import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.ui.settings.PluginSettingsFragment
+import java.lang.IllegalArgumentException
 
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
@@ -32,12 +34,19 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        val parent = parentFragment
+        if (parent is PluginSettingsFragment) {
+            parent.onPluginInfoCreated(pluginInfo)
+        }
 
         prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
         preferenceManager.preferenceDataStore = prefs
 
-        val preferencesResId = pluginInfo.metadata.getInt(PluginSettings.PREFERENCES)
-        addPreferencesFromResource(preferencesResId)
+        val preferencesResId = pluginInfo.getInt(PluginSettings.PREFERENCES, 0)
+        if (preferencesResId == 0) {
+            throw IllegalArgumentException("${pluginInfo.component.className} missing preferences resource meta-data")
+        }
+        addPreferencesFromResource(preferencesResId!!)
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {

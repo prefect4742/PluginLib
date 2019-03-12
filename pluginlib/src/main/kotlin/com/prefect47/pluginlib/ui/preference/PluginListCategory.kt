@@ -1,6 +1,7 @@
 package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
+import android.os.Bundle
 import android.util.AttributeSet
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -22,10 +23,6 @@ class PluginListCategory @JvmOverloads constructor(
 ): PreferenceCategory(context, attrs, defStyleAttr, defStyleRes) {
     private var className: String = "NO_CLASSNAME"
     private var layoutResId = R.layout.plugin_pref
-
-    interface SettingsHandler {
-        fun openSettings(pluginInfo: PluginInfo<out Plugin>)
-    }
 
     init {
         if (attrs != null) {

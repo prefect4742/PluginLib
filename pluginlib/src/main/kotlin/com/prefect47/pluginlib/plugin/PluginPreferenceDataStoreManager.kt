@@ -8,10 +8,4 @@ interface PluginPreferenceDataStoreManager: PluginPreferenceDataStoreProvider {
      * keys with the instances package name(s).
      */
     var provider: PluginPreferenceDataStoreProvider
-
-    /**
-     * Call this when the provider has new PreferenceDataStore instances to serve and the instances should no longer
-     * use the ones they have.
-     */
-    //fun invalidate()
 }

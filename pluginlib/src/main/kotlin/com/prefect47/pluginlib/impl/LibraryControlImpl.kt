@@ -8,7 +8,7 @@ import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
-import com.prefect47.pluginlib.ui.preference.PluginListCategory
+import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,7 +45,7 @@ class LibraryControlImpl @Inject constructor(
     // circular call loop and exhaust the stack.
     private val manager: Manager by lazy { managerLazy.get() }
 
-    override var settingsHandler: PluginListCategory.SettingsHandler? = null
+    override var settingsHandler: PluginSettingsEntrance.Callback? = null
     //override var pluginFactoryName: String? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
     override var debugEnabled: Boolean = false

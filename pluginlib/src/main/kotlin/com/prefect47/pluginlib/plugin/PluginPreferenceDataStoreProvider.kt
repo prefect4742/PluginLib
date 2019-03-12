@@ -2,7 +2,7 @@ package com.prefect47.pluginlib.plugin
 
 interface PluginPreferenceDataStoreProvider {
     /**
-     * Get the current data store.
+     * Get the default data store.
      */
     fun getPreferenceDataStore(): PluginPreferenceDataStore
 

@@ -19,7 +19,7 @@ package com.prefect47.pluginlib.plugin
 import android.content.Context
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
+import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfo
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -58,8 +58,8 @@ import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
  * your app and create callback interfaces for anything you need to
  * pass through into the plugin.
  *
- * Then to attach to any instances simply add a plugin listener and
- * onPluginConnected will get called whenever new instances are installed,
+ * Then to attach to any discoverables simply add a plugin listener and
+ * onPluginConnected will get called whenever new discoverables are installed,
  * updated, or enabled.  Like this example:
  *
  * <pre class="prettyprint">
@@ -69,21 +69,21 @@ import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
  * public void onItemConnected(plugin: MyPlugin) {
  *    ...do some stuff...
  * }
- * }, MyPlugin.VERSION, true /* Allow multiple instances *\/);
+ * }, MyPlugin.VERSION, true /* Allow multiple discoverables *\/);
  *
 </pre> *
  * Note the VERSION included here.  Any time incompatible changes in the
- * interface are made, this version should be changed to ensure old instances
+ * interface are made, this version should be changed to ensure old discoverables
  * aren't accidentally loaded.  Default implementations can be added for
  * new methods to avoid version changes when possible.
  *
  * Implementing a Plugin:
  *
  * See the ExamplePlugin for an example Android.mk on how to compile
- * a plugin. Note that the base plugin classes is not static for instances,
+ * a plugin. Note that the base plugin classes is not static for discoverables,
  * the implementation of those classes are provided by pluginlib.
  *
- * Plugin security is based around a signature permission, so instances must
+ * Plugin security is based around a signature permission, so discoverables must
  * hold the permission you send to PlugLib.init() in their manifest. You must
  * also declare that permission in your own manifest.
  *
@@ -107,11 +107,17 @@ import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
 */
 */
 
-interface Plugin: Discoverable {
+interface Plugin {
     companion object {
         private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
     }
+
+    // TODO: Clean up this class.
+    // TODO: Much is now in Discoverable.
+    // TODO: A Plugin shall be a runnable entity, so one PluginInfo shall map to one Plugin.
+    // TODO: And one PluginDiscoverableInfo shall map to multiple PluginInfo.
+
 
     /**
      * Behavioral flags that apply to the Plugin type.
@@ -121,19 +127,18 @@ interface Plugin: Discoverable {
         /**
          * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
          * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
-         * All instances will still be loaded and started.
          */
-        ALLOW_SIMULTANEOUS_USE // Allow multiple instances of this type to be enabled at the same time
+        ALLOW_SIMULTANEOUS_USE
     }
 
     /*
     val className: String
         get() = this::class.qualifiedName!!
     val pkgName: String
-        get() = manager.instanceInfoMap[this]!!.component.packageName
+        get() = manager.discoverableInfoMap[this]!!.component.packageName
     */
     val pluginContext: Context
-        get() = (manager.instanceInfoMap[this]!! as PluginInstanceInfo).context
+        get() = (manager.discoverableInfoMap[this]!! as PluginDiscoverableInfo).context
     val applicationContext: Context
         get() = manager.getApplicationContext()
 
@@ -150,16 +155,16 @@ interface Plugin: Discoverable {
 
     // Called when app wishes to stop using the plugin.
     // preferenceDataStore may no longer be valid (for example if the app implements a PluginPreferenceDataStoreProvider
-    // and has invalidated any currently used PluginPreferenceDataStore instances).
+    // and has invalidated any currently used PluginPreferenceDataStore discoverables).
     fun onStop() {}
 
     /*
     val preferenceDataStore: PluginPreferenceDataStore
-        get() = null //prefsManager.getPreferenceDataStore(manager.instanceInfoMap[this]!!)
+        get() = null //prefsManager.getPreferenceDataStore(manager.discoverableInfoMap[this]!!)
         */
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
-    // PreferenceDataStoreProvider and wishes all its instances to switch to another set of preferences.
+    // PreferenceDataStoreProvider and wishes all its discoverables to switch to another set of preferences.
     // Plugin should reload whatever preferences it has cached.
     fun onPreferenceDataStoreInvalidated() {}
 }

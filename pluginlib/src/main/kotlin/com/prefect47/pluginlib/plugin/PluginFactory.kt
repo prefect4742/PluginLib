@@ -1,10 +1,11 @@
 package com.prefect47.pluginlib.plugin
 
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
 @ProvidesInterface(version = PluginFactory.VERSION)
-interface PluginFactory: Discoverable {
+interface PluginFactory {
     companion object {
         const val VERSION = 1
     }

@@ -1,7 +1,7 @@
 package com.prefect47.pluginlib.impl.interfaces
 
 /**
- * Keeps track of PluginFactory instances.
+ * Keeps track of PluginFactory discoverables.
  */
 interface FactoryManager {
     //val list: Map<KClass<out Plugin>, PluginListModel<out Plugin>>

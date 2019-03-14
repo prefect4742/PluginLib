@@ -1,20 +1,18 @@
 package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
-import android.os.Bundle
 import android.util.AttributeSet
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
-import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 
 /**
- * Preference category that automatically adds all instances of its type and sets their common layout.
+ * Preference category that automatically adds all discoverables of its type and sets their common layout.
  */
 
 class PluginListCategory @JvmOverloads constructor(

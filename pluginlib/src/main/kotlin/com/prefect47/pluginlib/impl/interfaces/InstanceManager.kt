@@ -15,24 +15,23 @@
 
 package com.prefect47.pluginlib.impl.interfaces
 
-import com.prefect47.pluginlib.plugin.Discoverable
 import kotlin.reflect.KClass
 
 interface InstanceManager<T: Discoverable> {
 
     interface Factory {
         fun <T: Discoverable> create(action: String, listener: Discoverable.Listener<T>?, allowMultiple: Boolean,
-                                                                    cls: KClass<*>): InstanceManager<T>
+                                                                             cls: KClass<*>): InstanceManager<T>
     }
 
-    val instances: List<InstanceInfo<T>>
+    val discoverables: List<DiscoverableInfo<T>>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean
     fun destroy()
 
-    //fun getPlugin(): InstanceInfo<T>?
+    //fun getPlugin(): DiscoverableInfo<T>?
 
     fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean
 

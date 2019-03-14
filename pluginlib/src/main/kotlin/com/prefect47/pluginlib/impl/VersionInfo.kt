@@ -51,7 +51,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
             }
         }
 
-        // Most instances will only implement one interface and have one Requires
+        // Most discoverables will only implement one interface and have one Requires
         // Otherwise they might have more than one Requirements
         // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
         // DependsOn/Dependencies.
@@ -90,7 +90,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
             }
         }
 
-        // Most instances will only implement one interface and have one Requires
+        // Most discoverables will only implement one interface and have one Requires
         // Otherwise they might have more than one Requirements
         // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
         // DependsOn/Dependencies.

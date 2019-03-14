@@ -19,5 +19,5 @@ import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 
 interface PluginInfoFactory {
-    fun <T: Plugin> create(instanceInfo: InstanceInfo<T>): PluginInfo<T>
+    fun <T: Plugin> create(discoverableInfo: DiscoverableInfo<T>): PluginInfo<T>
 }

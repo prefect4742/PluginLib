@@ -16,7 +16,7 @@ interface PluginSettings: PluginPreferenceDataStore.OnPluginPreferenceDataStoreC
     }
 
     // Called when app invalidates the data store(s). This can happen if the app uses sessions and
-    // wishes all its instances to switch to another set of preferences.
+    // wishes all its discoverables to switch to another set of preferences.
     // Plugin should reload whatever preferences it has cached.
     override fun onDataStorePreferenceChanged(dataStore: PluginPreferenceDataStore, key: String) {}
 }

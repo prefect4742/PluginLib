@@ -18,13 +18,12 @@ package com.prefect47.pluginlib.impl.interfaces
 import android.content.ComponentName
 import android.content.Context
 import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.plugin.Discoverable
 
-interface InstanceInfo<T: Discoverable> {
+interface DiscoverableInfo<T: Discoverable> {
     interface Factory {
         fun <T: Discoverable> create(
             discoverableContext: Context, component: ComponentName, version: VersionInfo?
-        ): InstanceInfo<T>
+        ): DiscoverableInfo<T>
     }
 
     val version: VersionInfo?

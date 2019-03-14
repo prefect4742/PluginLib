@@ -33,10 +33,10 @@ import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.interfaces.InstanceManager
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
 import com.prefect47.pluginlib.impl.interfaces.Manager
-import com.prefect47.pluginlib.plugin.Discoverable
-import com.prefect47.pluginlib.plugin.Discoverable.Listener
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.Discoverable.Listener
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import dagger.Lazy
 import dalvik.system.PathClassLoader
@@ -71,7 +71,7 @@ class ManagerImpl(
         )
     }
 
-    override val instanceInfoMap: MutableMap<Discoverable, InstanceInfo<out Discoverable>> = Collections.synchronizedMap(HashMap())
+    override val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo<out Discoverable>> = Collections.synchronizedMap(HashMap())
     override val discoverableClassFlagsMap: MutableMap<String, EnumSet<Discoverable.Flag>> = Collections.synchronizedMap(HashMap())
 
     private val instancesMap: MutableMap<Listener<*>, InstanceManager<out Discoverable>> =
@@ -79,7 +79,7 @@ class ManagerImpl(
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
 
-    // Lazily load this so it doesn't have any effect on devices without instances.
+    // Lazily load this so it doesn't have any effect on devices without discoverables.
     private val parentClassLoader: ClassLoaderFilterInternal by lazy {
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
         filter.filters.add { name ->
@@ -129,7 +129,7 @@ class ManagerImpl(
         }
         val p: InstanceManager<T> = factory.create(action, null, false, cls)
         pluginPrefs.addAction(action)
-        val info: InstanceInfo<T>? = p.getPlugin()
+        val info: DiscoverableInfo<T>? = p.getPlugin()
         if (info != null) {
             oneShotPackages.add(info.pkg)
             hasOneShot = true
@@ -141,7 +141,7 @@ class ManagerImpl(
     */
 
     override suspend fun <T: Discoverable> addListener(listener: Discoverable.Listener<T>, cls: KClass<T>, action: String,
-            allowMultiple: Boolean): InstanceManager<T> {
+                                                                                               allowMultiple: Boolean): InstanceManager<T> {
         pluginPrefs.addAction(action)
         val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
@@ -297,7 +297,7 @@ class ManagerImpl(
         parentClassLoader.filters.add(filter)
     }
 
-        // This allows instances to include any libraries or copied code they want by only including
+        // This allows discoverables to include any libraries or copied code they want by only including
     // classes from the plugin library.
     private class ClassLoaderFilterInternal(val base: ClassLoader) : ClassLoader(getSystemClassLoader()) {
         val filters = ArrayList<(String) -> Boolean>()
@@ -325,11 +325,11 @@ class ManagerImpl(
                 return
             }
 
-            // Search for and disable instances that may have been involved in this crash.
+            // Search for and disable discoverables that may have been involved in this crash.
             var disabledAny: Boolean = checkStack(throwable)
             if (!disabledAny) {
-                // We couldn't find any instances involved in this crash, just to be safe
-                // disable all the instances, so we can be sure that the app is running as
+                // We couldn't find any discoverables involved in this crash, just to be safe
+                // disable all the discoverables, so we can be sure that the app is running as
                 // best as possible.
                 instancesMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
             }

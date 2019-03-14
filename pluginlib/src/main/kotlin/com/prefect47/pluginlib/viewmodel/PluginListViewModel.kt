@@ -4,7 +4,7 @@ import com.prefect47.pluginlib.plugin.Plugin
 import kotlin.reflect.KClass
 
 /**
- * Viewmodel that will maintain lists of available instances of the classes it's told to track.
+ * Viewmodel that will maintain lists of available discoverables of the classes it's told to track.
  * The lists will be populated automatically and can be used in databindings.
  */
 interface PluginListViewModel {

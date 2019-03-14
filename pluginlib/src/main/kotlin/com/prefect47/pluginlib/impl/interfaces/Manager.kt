@@ -17,7 +17,6 @@ package com.prefect47.pluginlib.impl.interfaces
 
 import android.content.Context
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Discoverable
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -61,7 +60,7 @@ interface Manager {
             get() = nextNotificationIdInt++
     }
 
-    val instanceInfoMap: MutableMap<Discoverable, InstanceInfo<*>>
+    val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo<*>>
     val discoverableClassFlagsMap: MutableMap<String, EnumSet<Discoverable.Flag>>
 
     /*
@@ -72,7 +71,7 @@ interface Manager {
     */
 
     suspend fun <T: Discoverable> addListener(listener: Discoverable.Listener<T>, cls: KClass<T>,
-           action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
+                                                                                      action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
 
     fun <T: Discoverable> removeListener(listener: Discoverable.Listener<T>)
 

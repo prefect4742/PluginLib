@@ -18,19 +18,19 @@ package com.prefect47.pluginlib.impl.instances
 import android.content.ComponentName
 import android.content.Context
 import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 
-class FactoryInstanceInfoImpl (
+class FactoryDiscoverableInfoImpl (
     override val component: ComponentName, override val version: VersionInfo?
-): FactoryInstanceInfo {
+): FactoryDiscoverableInfo {
 
-    class Factory: InstanceInfo.Factory {
+    class Factory: DiscoverableInfo.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T: Discoverable> create(discoverableContext: Context, component: ComponentName,
-                version: VersionInfo?): InstanceInfo<T> {
-            return FactoryInstanceInfoImpl(component, version) as InstanceInfo<T>
+                                                                                      version: VersionInfo?): DiscoverableInfo<T> {
+            return FactoryDiscoverableInfoImpl(component, version) as DiscoverableInfo<T>
         }
     }
 }

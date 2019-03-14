@@ -14,11 +14,14 @@
  */
 
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.impl.interfaces
 
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
+import android.content.ComponentName
+import android.content.Context
+import com.prefect47.pluginlib.impl.VersionInfo
 
 interface Discoverable {
+    /*
     /**
      * Behavioral flags that apply to the Discoverable type.
      * Declare these as a companion object member EnumSet called "FLAGS" in your Discoverable class interface.
@@ -29,6 +32,7 @@ interface Discoverable {
          */
         ALLOW_SIMULTANEOUS_USE
     }
+    */
 
     interface Listener<T: Discoverable> {
         /**
@@ -41,8 +45,17 @@ interface Discoverable {
          */
         fun onDoneDiscovering()
 
-        fun onDiscovered(info: InstanceInfo<T>)
+        fun onDiscovered(info: DiscoverableInfo<T>)
 
-        fun onRemoved(info: InstanceInfo<T>)
+        fun onRemoved(info: DiscoverableInfo<T>)
     }
+
+    interface Factory {
+        fun <T: Discoverable> create(
+            discoverableContext: Context, component: ComponentName, version: VersionInfo?
+        ): T
+    }
+
+    val version: VersionInfo?
+    val component: ComponentName
 }

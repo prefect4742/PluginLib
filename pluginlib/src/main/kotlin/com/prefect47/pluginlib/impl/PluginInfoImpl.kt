@@ -19,8 +19,8 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
+import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfo
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
@@ -28,30 +28,30 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
-    private val instanceInfo: PluginInstanceInfo
+    private val discoverableInfo: PluginDiscoverableInfo
 ): PluginInfo<T> {
 
     class Factory @Inject constructor(
     ): PluginInfoFactory {
-        override fun <T : Plugin> create(instanceInfo: InstanceInfo<T>): PluginInfo<T> =
-            PluginInfoImpl(instanceInfo as PluginInstanceInfo)
+        override fun <T : Plugin> create(discoverableInfo: DiscoverableInfo<T>): PluginInfo<T> =
+            PluginInfoImpl(discoverableInfo as PluginDiscoverableInfo)
     }
 
     companion object {
         private const val TAG = "PluginInfo"
     }
 
-    override val pluginContext = instanceInfo.context
-    override val component = instanceInfo.component
+    override val pluginContext = discoverableInfo.context
+    override val component = discoverableInfo.component
     override val data = Bundle()
 
-    override fun containsKey(key: String) = instanceInfo.metadata.containsKey(key)
+    override fun containsKey(key: String) = discoverableInfo.metadata.containsKey(key)
 
-    override fun getInt(key: String, default: Int) = instanceInfo.metadata.getInt(key, default)
+    override fun getInt(key: String, default: Int) = discoverableInfo.metadata.getInt(key, default)
 
     override fun getStringResource(key: String, default: String?): String? {
         return try {
-            pluginContext.getString(instanceInfo.metadata.getInt(key))
+            pluginContext.getString(discoverableInfo.metadata.getInt(key))
         } catch (e: Resources.NotFoundException) {
             default
         }
@@ -59,7 +59,7 @@ class PluginInfoImpl<T: Plugin> (
 
     override fun getDrawableResource(key: String, default: Drawable?): Drawable? {
         return try {
-            pluginContext.getDrawable(instanceInfo.metadata.getInt(key))
+            pluginContext.getDrawable(discoverableInfo.metadata.getInt(key))
         } catch (e: Resources.NotFoundException) {
             default
         }

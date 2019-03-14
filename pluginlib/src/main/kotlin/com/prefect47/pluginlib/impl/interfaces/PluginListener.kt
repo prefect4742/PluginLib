@@ -15,7 +15,6 @@
 
 package com.prefect47.pluginlib.impl.interfaces
 
-import com.prefect47.pluginlib.plugin.Discoverable
 import com.prefect47.pluginlib.plugin.Plugin
 
 /**
@@ -32,13 +31,13 @@ interface PluginListener<T: Plugin>: Discoverable.Listener<T> {
      * It may also be called in the future if the item package changes
      * and needs to be reloaded.
      */
-    //fun onPluginConnected(info: InstanceManager.InstanceInfo<T>)
+    //fun onPluginConnected(info: InstanceManager.DiscoverableInfo<T>)
 
     /**
      * Called when a item has been uninstalled/updated and should be removed
      * from use.
      */
-    //fun onPluginDisconnected(info: InstanceManager.InstanceInfo<T>) {
+    //fun onPluginDisconnected(info: InstanceManager.DiscoverableInfo<T>) {
         // Optional.
     //}
 }

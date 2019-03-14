@@ -2,11 +2,10 @@ package com.prefect47.pluginlib.impl
 
 import android.util.Log
 import com.prefect47.pluginlib.impl.interfaces.*
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.plugin.PluginFactory
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -26,11 +25,11 @@ class FactoryManagerImpl @Inject constructor(
             control.debug("PluginLib started tracking factories with ${action}")
         }
 
-        override fun onDiscovered(info: InstanceInfo<PluginFactory>) {
+        override fun onDiscovered(info: DiscoverableInfo<PluginFactory>) {
             if (control.debugEnabled) Log.d(TAG, "Found factory ${info.component.className}")
         }
 
-        override fun onRemoved(info: InstanceInfo<PluginFactory>) {
+        override fun onRemoved(info: DiscoverableInfo<PluginFactory>) {
             if (control.debugEnabled) Log.d(TAG, "Factory ${info.component.className} was removed")
         }
     }

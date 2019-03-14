@@ -3,7 +3,7 @@ package com.prefect47.pluginlib.impl.viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
 import com.prefect47.pluginlib.impl.interfaces.InstanceManager
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.plugin.Plugin
@@ -27,7 +27,7 @@ class PluginListViewModelImpl @Inject constructor(
     override val list = HashMap<KClass<out Plugin>, PluginListModel<out Plugin>>()
 
     inner class PluginListModelImpl<T: Plugin>(val cls: KClass<T>) : PluginListModel<T>, PluginListener<T> {
-        override val plugins = MutableLiveData<List<InstanceInfo<T>>>()
+        override val plugins = MutableLiveData<List<DiscoverableInfo<T>>>()
 
         private var instanceManager: InstanceManager<T>? = null
 
@@ -39,17 +39,17 @@ class PluginListViewModelImpl @Inject constructor(
             control.debug("PluginLib started tracking ${cls.qualifiedName}")
         }
 
-        override fun onDiscovered(info: InstanceInfo<T>) {
-            instanceManager?.let { im -> plugins.postValue(im.instances) }
+        override fun onDiscovered(info: DiscoverableInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.discoverables) }
         }
 
-        override fun onRemoved(info: InstanceInfo<T>) {
-            instanceManager?.let { im -> plugins.postValue(im.instances) }
+        override fun onRemoved(info: DiscoverableInfo<T>) {
+            instanceManager?.let { im -> plugins.postValue(im.discoverables) }
         }
 
         suspend fun start() {
             instanceManager = manager.addListener(this, cls, allowMultiple = true)
-            instanceManager?.let { im -> plugins.postValue(im.instances) }
+            instanceManager?.let { im -> plugins.postValue(im.discoverables) }
         }
 
         fun stop() {
@@ -59,7 +59,7 @@ class PluginListViewModelImpl @Inject constructor(
 
     /*
     private fun postList() {
-        instanceManager?.let { im -> list.postValue(im.instances.map { it.plugin }) }
+        instanceManager?.let { im -> list.postValue(im.discoverables.map { it.plugin }) }
     }
     */
 

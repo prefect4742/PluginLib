@@ -29,8 +29,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.impl.interfaces.*
-import com.prefect47.pluginlib.plugin.Discoverable
-import com.prefect47.pluginlib.plugin.Discoverable.Listener
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.Discoverable.Listener
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import kotlinx.coroutines.*
 import java.util.*
@@ -40,18 +40,18 @@ import kotlin.reflect.KClass
 
 class InstanceManagerImpl<T: Discoverable>(
     private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
-    private val control: PluginLibraryControl, private val infoFactory: InstanceInfo.Factory,
+    private val control: PluginLibraryControl, private val infoFactory: DiscoverableInfo.Factory,
     private val action: String, private val listener: Listener<T>?,
     private val allowMultiple: Boolean, private val version: VersionInfo
 ): InstanceManager<T> {
 
     class Factory @Inject constructor(
         private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
-        private val pluginPrefs: PluginPrefs, private val infoFactory: InstanceInfo.Factory
+        private val pluginPrefs: PluginPrefs, private val infoFactory: DiscoverableInfo.Factory
     ): InstanceManager.Factory {
 
         override fun <T: Discoverable> create(action: String, listener: Listener<T>?,
-                allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
+                                                                                      allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
             context,
             manager,
             pluginPrefs,
@@ -68,7 +68,7 @@ class InstanceManagerImpl<T: Discoverable>(
         private const val TAG = "InstanceManager"
     }
 
-    override val instances: MutableList<InstanceInfo<T>> = Collections.synchronizedList(ArrayList())
+    override val discoverables: MutableList<DiscoverableInfo<T>> = Collections.synchronizedList(ArrayList())
 
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
@@ -76,15 +76,15 @@ class InstanceManagerImpl<T: Discoverable>(
     private val notificationId = Manager.nextNotificationId
 
     /*
-    override fun getPlugin(): InstanceInfo<T>? {
+    override fun getPlugin(): DiscoverableInfo<T>? {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             throw RuntimeException("Must be called from UI thread")
         }
         runBlocking {
             pluginHandler.handleQueryPlugins( notify = false ) // Don't call listeners
         }
-        if (instances.size > 0) {
-            val info = instances[0]
+        if (discoverables.size > 0) {
+            val info = discoverables[0]
             pluginPrefs.setHasPlugins()
             info.plugin.onCreate()
             return info
@@ -100,7 +100,7 @@ class InstanceManagerImpl<T: Discoverable>(
 
     override fun destroy() {
         if (control.debugEnabled) Log.d(TAG, "destroy")
-        ArrayList(instances).forEach {
+        ArrayList(discoverables).forEach {
             pluginHandler.handlePluginRemoved(it)
         }
     }
@@ -116,7 +116,7 @@ class InstanceManagerImpl<T: Discoverable>(
 
     override fun checkAndDisable(className: String): Boolean {
         var disableAny = false
-        ArrayList(instances).forEach {
+        ArrayList(discoverables).forEach {
             if (className.startsWith(it.component.packageName)) {
                 disable(it)
                 disableAny = true
@@ -126,15 +126,15 @@ class InstanceManagerImpl<T: Discoverable>(
     }
 
     override fun disableAll(): Boolean {
-        ArrayList(instances).forEach {
+        ArrayList(discoverables).forEach {
             disable(it)
         }
-        return instances.size != 0
+        return discoverables.size != 0
     }
 
-    private fun disable(info: InstanceInfo<*>) {
+    private fun disable(info: DiscoverableInfo<*>) {
         // Live by the sword, die by the sword.
-        // Misbehaving instances get disabled and won't come back until uninstall/reinstall.
+        // Misbehaving discoverables get disabled and won't come back until uninstall/reinstall.
 
         // If a plugin is detected in the stack of a crash then this will be called for that
         // plugin, if the plugin causing a crash cannot be identified, they are all disabled
@@ -147,7 +147,7 @@ class InstanceManagerImpl<T: Discoverable>(
     }
 
     override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
-        val plugins = ArrayList<InstanceInfo<T>>(instances)
+        val plugins = ArrayList<DiscoverableInfo<T>>(discoverables)
         return plugins.find { it.component.packageName.equals(p::class.qualifiedName) }?.version?.hasClass(cls) ?: false
     }
 
@@ -160,26 +160,26 @@ class InstanceManagerImpl<T: Discoverable>(
 
         suspend fun queryAll() {
             if (control.debugEnabled) Log.d(TAG, "queryAll $action")
-            instances.forEach {
+            discoverables.forEach {
                 listener!!.onRemoved(it)
                 //if (!(it.plugin is PluginFragment)) {
-                    // Only call onDestroy for instances that aren't fragments, as fragments
+                    // Only call onDestroy for discoverables that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
                     //it.plugin.onDestroy()
                     //TODO("Do this in onPluginRemoved")
                 //}
-                //manager.instanceInfoMap.remove(it.plugin)
+                //manager.discoverableInfoMap.remove(it.plugin)
             }
-            instances.clear()
+            discoverables.clear()
             handleQueryPlugins()
         }
 
         fun removePackage(pkg: String) {
             launch {
-                instances.forEach {
+                discoverables.forEach {
                     if (it.component.packageName == pkg) {
                         handlePluginRemoved(it)
-                        instances.remove(it)
+                        discoverables.remove(it)
                     }
                 }
             }
@@ -188,7 +188,7 @@ class InstanceManagerImpl<T: Discoverable>(
         fun queryPackage(pkg: String) {
             launch {
                 if (control.debugEnabled) Log.d(TAG, "queryPkg $pkg $action")
-                if (allowMultiple || (instances.size == 0)) {
+                if (allowMultiple || (discoverables.size == 0)) {
                     handleQueryPlugins(pkg)
                 } else {
                     if (control.debugEnabled) Log.d(TAG, "Too many of $action")
@@ -196,14 +196,14 @@ class InstanceManagerImpl<T: Discoverable>(
             }
         }
 
-        private suspend fun handlePluginDiscovered(info: InstanceInfo<T>) {
+        private suspend fun handlePluginDiscovered(info: DiscoverableInfo<T>) {
             pluginPrefs.setHasPlugins()
             withContext(Dispatchers.Main) {
                 manager.handleWtfs()
-                //manager.instanceInfoMap[info.plugin] = info
+                //manager.discoverableInfoMap[info.plugin] = info
 
                 //if (!(msg.obj is PluginFragment)) {
-                    // Only call onCreate for instances that aren't fragments, as fragments
+                    // Only call onCreate for discoverables that aren't fragments, as fragments
                     // will get the onCreate as part of the fragment lifecycle.
                     //info.plugin.onCreate()
                     //TODO("Do this in onPluginDiscovered()")
@@ -212,32 +212,32 @@ class InstanceManagerImpl<T: Discoverable>(
             }
         }
 
-        fun handlePluginRemoved(info: InstanceInfo<T>) {
+        fun handlePluginRemoved(info: DiscoverableInfo<T>) {
             launch(Dispatchers.Main) {
                 if (control.debugEnabled) Log.d(TAG, "onPluginDisconnected")
                 listener!!.onRemoved(info)
                 //if (!(msg.obj is PluginFragment)) {
-                    // Only call onDestroy for instances that aren't fragments, as fragments
+                    // Only call onDestroy for discoverables that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
                     //info.plugin.onDestroy()
                     TODO("Do this in onPluginRemoved()")
                 //}
-                //manager.instanceInfoMap.remove(info.plugin)
+                //manager.discoverableInfoMap.remove(info.plugin)
             }
         }
 
         private suspend fun handleQueryPlugins(pkgName: String? = null, notify: Boolean = true) {
             // This isn't actually a service and shouldn't ever be started, but is
-            // a convenient PM based way to manage our instances.
+            // a convenient PM based way to manage our discoverables.
             val intent = Intent(action)
             if (pkgName != null) {
                 intent.setPackage(pkgName)
             }
             val result: MutableList<ResolveInfo> = pm.queryIntentServices(intent, 0)
-            if (control.debugEnabled) Log.d(TAG, "Found ${result.size} instances for $action")
+            if (control.debugEnabled) Log.d(TAG, "Found ${result.size} discoverables for $action")
             if (result.size > 1 && !allowMultiple) {
                 // TODO: Show warning.
-                Log.w(TAG, "Multiple instances found for $action")
+                Log.w(TAG, "Multiple discoverables found for $action")
                 return
             }
 
@@ -251,7 +251,7 @@ class InstanceManagerImpl<T: Discoverable>(
                             if (notify) {
                                 handlePluginDiscovered(info)
                             }
-                            instances.add(info)
+                            discoverables.add(info)
                         }
                     }
                 }
@@ -267,7 +267,7 @@ class InstanceManagerImpl<T: Discoverable>(
             return Class.forName(cls).kotlin
         }
 
-        private fun handleDiscoverPlugin(component: ComponentName): InstanceInfo<T>? {
+        private fun handleDiscoverPlugin(component: ComponentName): DiscoverableInfo<T>? {
             val pkg = component.packageName
             val cls = component.className
             try {
@@ -287,7 +287,7 @@ class InstanceManagerImpl<T: Discoverable>(
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
                     val pluginVersion = checkVersion(findPluginClass(cls), version)
 
-                    // TODO("Pick the appropriate InstanceInfo factory depending on the class")
+                    // TODO("Pick the appropriate DiscoverableInfo factory depending on the class")
                     infoFactory.create<T>(pluginContext, component, pluginVersion)
                 } catch (e: InvalidVersionException) {
 

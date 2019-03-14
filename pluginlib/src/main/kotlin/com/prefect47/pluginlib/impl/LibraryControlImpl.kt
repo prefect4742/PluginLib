@@ -3,6 +3,7 @@ package com.prefect47.pluginlib.impl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.impl.interfaces.FactoryManager
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
@@ -12,7 +13,6 @@ import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean

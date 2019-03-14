@@ -48,7 +48,7 @@ class PluginContextWrapper(private val appContext: Context, base: Context, priva
 
         // If there is no handler set, use common sense.
 
-        // Prevent instances from reading anything outside or their own settings
+        // Prevent discoverables from reading anything outside or their own settings
         return super.getSharedPreferences("${pkg}_$name", mode)
     }
 }

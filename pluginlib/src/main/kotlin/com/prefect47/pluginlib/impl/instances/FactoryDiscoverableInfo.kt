@@ -15,12 +15,7 @@
 
 package com.prefect47.pluginlib.impl.instances
 
-import android.content.Context
-import android.os.Bundle
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
+import com.prefect47.pluginlib.plugin.PluginFactory
 
-interface PluginInstanceInfo: InstanceInfo<Plugin> {
-    val context: Context
-    val metadata: Bundle
-}
+interface FactoryDiscoverableInfo: DiscoverableInfo<PluginFactory>

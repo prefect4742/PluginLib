@@ -20,36 +20,36 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.plugin.PluginInfo
 import javax.inject.Inject
 
-class PluginInstanceInfoImpl (
+class PluginDiscoverableInfoImpl (
     override val context: Context, override val component: ComponentName, override val metadata: Bundle,
     override val version: VersionInfo?
-): PluginInstanceInfo {
+): PluginDiscoverableInfo {
 
     class Factory @Inject constructor(
         context: Context
-    ): InstanceInfo.Factory {
+    ): DiscoverableInfo.Factory {
 
         private val pm = context.packageManager
 
         override fun <T : Discoverable> create(discoverableContext: Context, component: ComponentName,
-                version: VersionInfo?): InstanceInfo<T> {
+                                                                                       version: VersionInfo?): DiscoverableInfo<T> {
             val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
             val metadata = serviceInfo.metaData ?: Bundle()
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
             metadata.putInt(PluginInfo.DESCRIPTION, serviceInfo.descriptionRes)
             metadata.putInt(PluginInfo.ICON, serviceInfo.icon)
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
-            return PluginInstanceInfoImpl(
+            return PluginDiscoverableInfoImpl(
                 discoverableContext,
                 component,
                 metadata,
                 version
-            ) as InstanceInfo<T>
+            ) as DiscoverableInfo<T>
         }
     }
 }

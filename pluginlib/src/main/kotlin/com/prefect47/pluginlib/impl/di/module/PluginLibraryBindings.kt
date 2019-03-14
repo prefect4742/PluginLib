@@ -3,7 +3,7 @@ package com.prefect47.pluginlib.impl.di.module
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.*
-import com.prefect47.pluginlib.impl.instances.PluginInstanceInfoImpl
+import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfoImpl
 import com.prefect47.pluginlib.impl.interfaces.*
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.PluginDependency
@@ -34,7 +34,7 @@ abstract class PluginLibraryBindings {
 
     @Singleton
     @Binds
-    abstract fun bindInstanceInfoFactory(factory: PluginInstanceInfoImpl.Factory): InstanceInfo.Factory
+    abstract fun bindInstanceInfoFactory(factory: PluginDiscoverableInfoImpl.Factory): DiscoverableInfo.Factory
 
     @Singleton
     @Binds

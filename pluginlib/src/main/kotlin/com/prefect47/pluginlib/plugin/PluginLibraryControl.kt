@@ -15,6 +15,7 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
+import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import java.util.EnumSet
 import kotlin.reflect.KClass
@@ -26,7 +27,7 @@ interface PluginLibraryControl {
     }
 
     interface StateListener {
-        fun onStarted() // All added trackers have loaded their instances
+        fun onStarted() // All added trackers have loaded their discoverables
         fun onPaused()
         fun onResumed()
         fun onStopped()
@@ -77,14 +78,14 @@ interface PluginLibraryControl {
     suspend fun stopPlugin(plugin: Plugin)
 
     /**
-     * Add a [filter] to the plugin classloader that lets instances use libraries or code where class names might
+     * Add a [filter] to the plugin classloader that lets discoverables use libraries or code where class names might
      * conflict with those of the app.
      */
     fun addClassFilter(filter: (String) -> Boolean)
 
     /**
      * Get a list of PluginInfo containers for any plugin implementing the [pluginClass] interface.
-     * Note that each call to this will return new instances of the containers.
+     * Note that each call to this will return new discoverables of the containers.
      */
     fun getPluginList(pluginClass: KClass<out Plugin>): List<PluginInfo<out Plugin>>?
     @Suppress("UNCHECKED_CAST")

@@ -57,8 +57,8 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
  * your app and create callback interfaces for anything you need to
  * pass through into the plugin.
  *
- * Then to attach to any instances simply add a plugin listener and
- * onPluginConnected will get called whenever new instances are installed,
+ * Then to attach to any discoverables simply add a plugin listener and
+ * onPluginConnected will get called whenever new discoverables are installed,
  * updated, or enabled.  Like this example:
  *
  * <pre class="prettyprint">
@@ -68,21 +68,21 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
  * public void onItemConnected(plugin: MyPlugin) {
  *    ...do some stuff...
  * }
- * }, MyPlugin.VERSION, true /* Allow multiple instances *\/);
+ * }, MyPlugin.VERSION, true /* Allow multiple discoverables *\/);
  *
 </pre> *
  * Note the VERSION included here.  Any time incompatible changes in the
- * interface are made, this version should be changed to ensure old instances
+ * interface are made, this version should be changed to ensure old discoverables
  * aren't accidentally loaded.  Default implementations can be added for
  * new methods to avoid version changes when possible.
  *
  * Implementing a Plugin:
  *
  * See the ExamplePlugin for an example Android.mk on how to compile
- * a plugin. Note that the base plugin classes is not static for instances,
+ * a plugin. Note that the base plugin classes is not static for discoverables,
  * the implementation of those classes are provided by pluginlib.
  *
- * Plugin security is based around a signature permission, so instances must
+ * Plugin security is based around a signature permission, so discoverables must
  * hold the permission you send to PlugLib.init() in their manifest. You must
  * also declare that permission in your own manifest.
  *
@@ -120,13 +120,13 @@ interface Plugin2 {
         /**
          * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
          * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
-         * All instances will still be loaded and started.
+         * All discoverables will still be loaded and started.
          */
-        ALLOW_SIMULTANEOUS_USE // Allow multiple instances of this type to be enabled at the same time
+        ALLOW_SIMULTANEOUS_USE // Allow multiple discoverables of this type to be enabled at the same time
     }
 
     val pluginContext: Context
-        get() = manager.instanceInfoMap[this]!!.context
+        get() = manager.discoverableInfoMap[this]!!.context
     val applicationContext: Context
         get() = manager.getApplicationContext()
 }

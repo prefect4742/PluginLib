@@ -13,21 +13,22 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl
+package com.prefect47.pluginlib.impl.instances
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import com.prefect47.pluginlib.impl.VersionInfo
 import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.Discoverable
 import com.prefect47.pluginlib.plugin.PluginInfo
 import javax.inject.Inject
 
-class InstanceInfoImpl<T: Plugin> (
-    override val pluginContext: Context, override val component: ComponentName, override val metadata: Bundle,
+class PluginInstanceInfoImpl (
+    override val context: Context, override val component: ComponentName, override val metadata: Bundle,
     override val version: VersionInfo?
-): InstanceInfo<T> {
+): PluginInstanceInfo {
 
     class Factory @Inject constructor(
         context: Context
@@ -35,7 +36,7 @@ class InstanceInfoImpl<T: Plugin> (
 
         private val pm = context.packageManager
 
-        override fun <T : Plugin> create(pluginContext: Context, component: ComponentName,
+        override fun <T : Discoverable> create(discoverableContext: Context, component: ComponentName,
                 version: VersionInfo?): InstanceInfo<T> {
             val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
             val metadata = serviceInfo.metaData ?: Bundle()
@@ -43,11 +44,12 @@ class InstanceInfoImpl<T: Plugin> (
             metadata.putInt(PluginInfo.DESCRIPTION, serviceInfo.descriptionRes)
             metadata.putInt(PluginInfo.ICON, serviceInfo.icon)
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
-            return InstanceInfoImpl(pluginContext, component, metadata, version)
+            return PluginInstanceInfoImpl(
+                discoverableContext,
+                component,
+                metadata,
+                version
+            ) as InstanceInfo<T>
         }
-    }
-
-    companion object {
-        private const val TAG = "InstanceInfo"
     }
 }

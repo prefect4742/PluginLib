@@ -35,8 +35,9 @@ import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.interfaces.InstanceManager
 import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.Manager
-import com.prefect47.pluginlib.impl.interfaces.PluginListener
-import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.plugin.Discoverable.Listener
+import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import dagger.Lazy
 import dalvik.system.PathClassLoader
 import kotlinx.coroutines.*
@@ -70,10 +71,10 @@ class ManagerImpl(
         )
     }
 
-    override val instanceInfoMap: MutableMap<Plugin, InstanceInfo<*>> = Collections.synchronizedMap(HashMap())
-    override val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = Collections.synchronizedMap(HashMap())
+    override val instanceInfoMap: MutableMap<Discoverable, InstanceInfo<out Discoverable>> = Collections.synchronizedMap(HashMap())
+    override val discoverableClassFlagsMap: MutableMap<String, EnumSet<Discoverable.Flag>> = Collections.synchronizedMap(HashMap())
 
-    private val instancesMap: MutableMap<PluginListener<*>, InstanceManager<out Plugin>> =
+    private val instancesMap: MutableMap<Listener<*>, InstanceManager<out Discoverable>> =
             Collections.synchronizedMap(HashMap())
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
@@ -139,26 +140,26 @@ class ManagerImpl(
     }
     */
 
-    override suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>, action: String,
-                                                       allowMultiple: Boolean): InstanceManager<T> {
+    override suspend fun <T: Discoverable> addListener(listener: Discoverable.Listener<T>, cls: KClass<T>, action: String,
+            allowMultiple: Boolean): InstanceManager<T> {
         pluginPrefs.addAction(action)
         val p: InstanceManager<T> = factory.create(action, listener, allowMultiple, cls)
         p.loadAll()
         instancesMap[listener] = p
         startListening()
 
-        var flags = EnumSet.noneOf(Plugin.Flag::class.java)
+        var flags = EnumSet.noneOf(Discoverable.Flag::class.java)
         val result = cls.companionObject?.declaredMemberProperties?.find { it.name == "FLAGS" }
         if (result is KProperty1) {
-            result as KProperty1<Any?, EnumSet<Plugin.Flag>>
+            result as KProperty1<Any?, EnumSet<Discoverable.Flag>>
             flags = result.get(cls.companionObjectInstance)
         }
-        pluginClassFlagsMap[cls.qualifiedName!!] = flags ?: EnumSet.noneOf(Plugin.Flag::class.java)
+        discoverableClassFlagsMap[cls.qualifiedName!!] = flags ?: EnumSet.noneOf(Discoverable.Flag::class.java)
 
         return p
     }
 
-    override fun removePluginListener(listener: PluginListener<*>) {
+    override fun <T: Discoverable> removeListener(listener: Discoverable.Listener<T>) {
         if (!instancesMap.containsKey(listener)) return
         instancesMap.remove(listener)?.destroy()
         if (instancesMap.isEmpty()) {
@@ -272,7 +273,7 @@ class ManagerImpl(
         return PluginContextWrapper(context, context.createPackageContext(pkg, 0), classLoader, pkg)
     }
 
-    override fun dependsOn(p: Plugin, cls: KClass<*>): Boolean {
+    override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
         instancesMap.forEach {
             if (it.value.dependsOn(p, cls)) return true
         }

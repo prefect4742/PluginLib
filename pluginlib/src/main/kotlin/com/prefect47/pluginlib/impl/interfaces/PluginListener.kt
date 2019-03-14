@@ -15,26 +15,13 @@
 
 package com.prefect47.pluginlib.impl.interfaces
 
+import com.prefect47.pluginlib.plugin.Discoverable
 import com.prefect47.pluginlib.plugin.Plugin
 
 /**
- * Interface for listening to instances being connected.
+ * Interface for listening to plugins being connected.
  */
-interface PluginListener<T: Plugin> {
-    /**
-     * Called when library starts looking for items of the given type. Should be used at application start.
-     */
-    fun onStartLoading()
-
-    /**
-     * Called when library has finished loading items of the given type. Should be used at application start.
-     */
-    fun onDoneLoading()
-
-    fun onPluginDiscovered(info: InstanceInfo<T>)
-
-    fun onPluginRemoved(info: InstanceInfo<T>)
-
+interface PluginListener<T: Plugin>: Discoverable.Listener<T> {
     //fun onPluginStarted()
 
     //fun onPluginStopped()

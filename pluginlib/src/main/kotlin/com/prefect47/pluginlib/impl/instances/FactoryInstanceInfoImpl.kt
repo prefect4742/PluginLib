@@ -13,20 +13,24 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl.interfaces
+package com.prefect47.pluginlib.impl.instances
 
 import android.content.ComponentName
 import android.content.Context
 import com.prefect47.pluginlib.impl.VersionInfo
+import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.plugin.Discoverable
 
-interface InstanceInfo<T: Discoverable> {
-    interface Factory {
-        fun <T: Discoverable> create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?
-        ): InstanceInfo<T>
-    }
+class FactoryInstanceInfoImpl (
+    override val component: ComponentName, override val version: VersionInfo?
+): FactoryInstanceInfo {
 
-    val version: VersionInfo?
-    val component: ComponentName
+    class Factory: InstanceInfo.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T: Discoverable> create(discoverableContext: Context, component: ComponentName,
+                version: VersionInfo?): InstanceInfo<T> {
+            return FactoryInstanceInfoImpl(component, version) as InstanceInfo<T>
+        }
+    }
 }

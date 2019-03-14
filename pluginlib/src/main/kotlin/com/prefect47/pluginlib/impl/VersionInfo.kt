@@ -16,7 +16,9 @@
 package com.prefect47.pluginlib.impl
 
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
+import com.prefect47.pluginlib.plugin.annotations.*
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
 
 class VersionInfo(private val control: PluginLibraryControl) {
     //private val versions: MutableMap<KClass<*>, Version> = HashMap()
@@ -42,7 +44,7 @@ class VersionInfo(private val control: PluginLibraryControl) {
         }
 
         // Use static requirements data if we have it
-        control.staticRequirements.forEach {
+        control.factories.forEach {
             it.requirements[cls]?.let { list ->
                 list.forEach { versions[it.target] = Version(it.version, required) }
                 return
@@ -53,7 +55,6 @@ class VersionInfo(private val control: PluginLibraryControl) {
         // Otherwise they might have more than one Requirements
         // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
         // DependsOn/Dependencies.
-        /*
         cls.findAnnotation<Requires>()?.let { a -> versions[a.target] = Version(a.version, required) }
             ?: cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] = Version(it.version, required) }
             ?: cls.findAnnotation<ProvidesInterface>()?.let { a ->
@@ -61,7 +62,6 @@ class VersionInfo(private val control: PluginLibraryControl) {
                 cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
                     ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
             }
-        */
     }
 
     /*

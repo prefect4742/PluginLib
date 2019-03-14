@@ -15,14 +15,14 @@
 
 package com.prefect47.pluginlib.impl.interfaces
 
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.Discoverable
 import kotlin.reflect.KClass
 
-interface InstanceManager<T: Plugin> {
+interface InstanceManager<T: Discoverable> {
 
     interface Factory {
-        fun <T: Plugin> create(action: String, listener: PluginListener<T>?, allowMultiple: Boolean,
-                cls: KClass<*>): InstanceManager<T>
+        fun <T: Discoverable> create(action: String, listener: Discoverable.Listener<T>?, allowMultiple: Boolean,
+                                                                    cls: KClass<*>): InstanceManager<T>
     }
 
     val instances: List<InstanceInfo<T>>
@@ -34,7 +34,7 @@ interface InstanceManager<T: Plugin> {
 
     //fun getPlugin(): InstanceInfo<T>?
 
-    fun dependsOn(p: Plugin, cls: KClass<*>): Boolean
+    fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean
 
     fun onPackageRemoved(pkg: String)
     fun onPackageChange(pkg: String)

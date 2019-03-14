@@ -29,7 +29,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.impl.interfaces.*
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.plugin.Discoverable.Listener
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import kotlinx.coroutines.*
 import java.util.*
@@ -37,10 +38,10 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class InstanceManagerImpl<T: Plugin>(
+class InstanceManagerImpl<T: Discoverable>(
     private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
     private val control: PluginLibraryControl, private val infoFactory: InstanceInfo.Factory,
-    private val action: String, private val listener: PluginListener<T>?,
+    private val action: String, private val listener: Listener<T>?,
     private val allowMultiple: Boolean, private val version: VersionInfo
 ): InstanceManager<T> {
 
@@ -49,7 +50,7 @@ class InstanceManagerImpl<T: Plugin>(
         private val pluginPrefs: PluginPrefs, private val infoFactory: InstanceInfo.Factory
     ): InstanceManager.Factory {
 
-        override fun <T: Plugin> create(action: String, listener: PluginListener<T>?,
+        override fun <T: Discoverable> create(action: String, listener: Listener<T>?,
                 allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
             context,
             manager,
@@ -145,7 +146,7 @@ class InstanceManagerImpl<T: Plugin>(
                 PackageManager.DONT_KILL_APP)
     }
 
-    override fun dependsOn(p: Plugin, cls: KClass<*>): Boolean {
+    override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
         val plugins = ArrayList<InstanceInfo<T>>(instances)
         return plugins.find { it.component.packageName.equals(p::class.qualifiedName) }?.version?.hasClass(cls) ?: false
     }
@@ -160,7 +161,7 @@ class InstanceManagerImpl<T: Plugin>(
         suspend fun queryAll() {
             if (control.debugEnabled) Log.d(TAG, "queryAll $action")
             instances.forEach {
-                listener!!.onPluginRemoved(it)
+                listener!!.onRemoved(it)
                 //if (!(it.plugin is PluginFragment)) {
                     // Only call onDestroy for instances that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
@@ -207,14 +208,14 @@ class InstanceManagerImpl<T: Plugin>(
                     //info.plugin.onCreate()
                     //TODO("Do this in onPluginDiscovered()")
                 //}
-                listener!!.onPluginDiscovered(info)
+                listener!!.onDiscovered(info)
             }
         }
 
         fun handlePluginRemoved(info: InstanceInfo<T>) {
             launch(Dispatchers.Main) {
                 if (control.debugEnabled) Log.d(TAG, "onPluginDisconnected")
-                listener!!.onPluginRemoved(info)
+                listener!!.onRemoved(info)
                 //if (!(msg.obj is PluginFragment)) {
                     // Only call onDestroy for instances that aren't fragments, as fragments
                     // will get the onDestroy as part of the fragment lifecycle.
@@ -240,7 +241,7 @@ class InstanceManagerImpl<T: Plugin>(
                 return
             }
 
-            listener!!.onStartLoading()
+            listener!!.onStartDiscovering()
 
             withContext(Dispatchers.Default) {
                 result.forEach {
@@ -256,11 +257,11 @@ class InstanceManagerImpl<T: Plugin>(
                 }
             }
 
-            listener.onDoneLoading()
+            listener.onDoneDiscovering()
         }
 
         private fun findPluginClass(cls: String): KClass<*> {
-            control.staticImplementations.forEach { list ->
+            control.factories.forEach { list ->
                 list.implementations[cls]?.let { return it }
             }
             return Class.forName(cls).kotlin
@@ -285,9 +286,13 @@ class InstanceManagerImpl<T: Plugin>(
                 return try {
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
                     val pluginVersion = checkVersion(findPluginClass(cls), version)
+
+                    // TODO("Pick the appropriate InstanceInfo factory depending on the class")
                     infoFactory.create<T>(pluginContext, component, pluginVersion)
                 } catch (e: InvalidVersionException) {
+
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
+
                     Log.w(TAG, "Plugin $cls version check failed: ${e.message}")
                     null
                 }

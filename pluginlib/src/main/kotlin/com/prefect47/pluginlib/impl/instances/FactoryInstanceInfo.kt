@@ -13,20 +13,9 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl.interfaces
+package com.prefect47.pluginlib.impl.instances
 
-import android.content.ComponentName
-import android.content.Context
-import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
+import com.prefect47.pluginlib.plugin.PluginFactory
 
-interface InstanceInfo<T: Discoverable> {
-    interface Factory {
-        fun <T: Discoverable> create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?
-        ): InstanceInfo<T>
-    }
-
-    val version: VersionInfo?
-    val component: ComponentName
-}
+interface FactoryInstanceInfo: InstanceInfo<PluginFactory>

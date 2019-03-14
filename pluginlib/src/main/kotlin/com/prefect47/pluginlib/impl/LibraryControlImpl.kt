@@ -3,6 +3,7 @@ package com.prefect47.pluginlib.impl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
+import com.prefect47.pluginlib.impl.interfaces.FactoryManager
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
@@ -20,7 +21,7 @@ import kotlin.reflect.KClass
 
 class LibraryControlImpl @Inject constructor(
     private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
-    private val pluginInfofactory: PluginInfoFactory,
+    private val pluginInfofactory: PluginInfoFactory, private val factoryManagerLazy: Lazy<FactoryManager>,
     override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
     private val isStarted = AtomicBoolean(false)
@@ -29,8 +30,6 @@ class LibraryControlImpl @Inject constructor(
     override val staticProviders = ArrayList<PluginLibProviders>().apply {
         add(PluginLibProvidersImpl)
     }
-    override val staticImplementations = ArrayList<PluginLibImplementations>()
-    override val staticRequirements = ArrayList<PluginLibRequirements>()
     override val factories = ArrayList<PluginFactory>()
 
     //override val viewModel: PluginListViewModel
@@ -44,9 +43,9 @@ class LibraryControlImpl @Inject constructor(
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.
     private val manager: Manager by lazy { managerLazy.get() }
+    private val factoryManager: FactoryManager by lazy { factoryManagerLazy.get() }
 
     override var settingsHandler: PluginSettingsEntrance.Callback? = null
-    //override var pluginFactoryName: String? = null
     override var permissionName: String = PluginLibraryControl.DEFAULT_PERMISSIONNAME
     override var debugEnabled: Boolean = false
     override var debugTag: String = PluginLibraryControl.DEFAULT_DEBUGTAG
@@ -68,22 +67,6 @@ class LibraryControlImpl @Inject constructor(
 
     override fun addStaticProviders(providers: PluginLibProviders) {
         staticProviders.add(providers)
-    }
-
-    override fun addStaticImplementations(implementations: PluginLibImplementations) {
-        staticImplementations.add(implementations)
-    }
-
-    override fun removeStaticImplementations(implementations: PluginLibImplementations) {
-        staticImplementations.remove(implementations)
-    }
-
-    override fun addStaticRequirements(requirements: PluginLibRequirements) {
-        staticRequirements.add(requirements)
-    }
-
-    override fun removeStaticRequirements(requirements: PluginLibRequirements) {
-        staticRequirements.remove(requirements)
     }
 
     override fun addFactory(factory: PluginFactory) {
@@ -112,7 +95,7 @@ class LibraryControlImpl @Inject constructor(
 
     override fun track(factoryAction: String) {
         assertNotStarted()
-        factoryActions.add(factoryAction)
+        factoryManager.track(factoryAction)
     }
 
     override fun addStateListener(listener: PluginLibraryControl.StateListener) {
@@ -126,17 +109,7 @@ class LibraryControlImpl @Inject constructor(
     override suspend fun start() {
         assertNotStarted()
         debug("PluginLib starting")
-
-        withContext(Dispatchers.Default) {
-            factoryActions.forEach {
-                launch {
-                    // TODO: manager.addPluginFactoryListener()
-                    // TODO: Also remember to check the factories in the instance Manager when one is told to start
-                    // TODO: tracking a class.
-                }
-            }
-        }
-
+        factoryManager.start()
         viewModelInner.start()
         isStarted.set(true)
         debug("PluginLib started")
@@ -174,9 +147,9 @@ class LibraryControlImpl @Inject constructor(
         return viewModelInner.list[pluginClass]?.plugins?.value?.map { pluginInfofactory.create(it) }
     }
 
-    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
+    override fun getFlags(pluginClassName: String): EnumSet<Discoverable.Flag>? {
         assertStarted()
-        return manager.pluginClassFlagsMap[pluginClassName]
+        return manager.discoverableClassFlagsMap[pluginClassName]
     }
 
     override fun getPlugin(className: String): PluginInfo<out Plugin>? {

@@ -18,6 +18,8 @@ package com.prefect47.pluginlib.impl
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
+import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.InstanceInfo
 import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
 import com.prefect47.pluginlib.plugin.Plugin
@@ -26,20 +28,20 @@ import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
-    private val instanceInfo: InstanceInfo<T>
+    private val instanceInfo: PluginInstanceInfo
 ): PluginInfo<T> {
 
     class Factory @Inject constructor(
     ): PluginInfoFactory {
         override fun <T : Plugin> create(instanceInfo: InstanceInfo<T>): PluginInfo<T> =
-            PluginInfoImpl(instanceInfo)
+            PluginInfoImpl(instanceInfo as PluginInstanceInfo)
     }
 
     companion object {
         private const val TAG = "PluginInfo"
     }
 
-    override val pluginContext = instanceInfo.pluginContext
+    override val pluginContext = instanceInfo.context
     override val component = instanceInfo.component
     override val data = Bundle()
 
@@ -64,8 +66,7 @@ class PluginInfoImpl<T: Plugin> (
     }
 
     override fun onDataStorePreferenceChanged(dataStore: PluginPreferenceDataStore, key: String) {
-        // TODO: Call plugin instance on the same interface if it is currently running
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Log.w(TAG, "pluginInfo.onDataStorePreferenceChanged NOT IMPLEMENTED")
     }
 
     override fun start(): T {

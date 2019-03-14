@@ -33,8 +33,6 @@ interface PluginLibraryControl {
     }
 
     val staticProviders: List<PluginLibProviders>
-    val staticImplementations: List<PluginLibImplementations>
-    val staticRequirements: List<PluginLibRequirements>
     val factories: List<PluginFactory>
 
     var settingsHandler: PluginSettingsEntrance.Callback?
@@ -55,12 +53,6 @@ interface PluginLibraryControl {
     //val viewModel: PluginListViewModel
 
     fun addStaticProviders(providers: PluginLibProviders)
-
-    fun addStaticImplementations(implementations: PluginLibImplementations)
-    fun removeStaticImplementations(implementations: PluginLibImplementations)
-    fun addStaticRequirements(requirements: PluginLibRequirements)
-    fun removeStaticRequirements(requirements: PluginLibRequirements)
-
     fun addFactory(factory: PluginFactory)
     fun removeFactory(factory: PluginFactory)
 
@@ -99,7 +91,7 @@ interface PluginLibraryControl {
     fun getPluginList(pluginClassName: String) =
             getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
-    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
+    fun getFlags(pluginClassName: String): EnumSet<Discoverable.Flag>?
 
     /**
      * Get a PluginInfo container for the plugin [cls].

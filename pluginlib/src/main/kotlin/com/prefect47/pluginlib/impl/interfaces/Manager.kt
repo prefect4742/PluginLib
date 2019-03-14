@@ -17,7 +17,7 @@ package com.prefect47.pluginlib.impl.interfaces
 
 import android.content.Context
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.Discoverable
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -61,8 +61,8 @@ interface Manager {
             get() = nextNotificationIdInt++
     }
 
-    val instanceInfoMap: MutableMap<Plugin, InstanceInfo<*>>
-    val pluginClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
+    val instanceInfoMap: MutableMap<Discoverable, InstanceInfo<*>>
+    val discoverableClassFlagsMap: MutableMap<String, EnumSet<Discoverable.Flag>>
 
     /*
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
@@ -71,12 +71,12 @@ interface Manager {
     ) : T?
     */
 
-    suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-        action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
+    suspend fun <T: Discoverable> addListener(listener: Discoverable.Listener<T>, cls: KClass<T>,
+           action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
 
-    fun removePluginListener(listener: PluginListener<*>)
+    fun <T: Discoverable> removeListener(listener: Discoverable.Listener<T>)
 
-    fun dependsOn(p: Plugin, cls: KClass<*>) : Boolean
+    fun dependsOn(p: Discoverable, cls: KClass<*>) : Boolean
 
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()

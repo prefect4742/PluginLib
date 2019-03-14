@@ -17,11 +17,9 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
-import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
-import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
+import com.prefect47.pluginlib.impl.instances.PluginInstanceInfo
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -109,7 +107,7 @@ import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 */
 */
 
-interface Plugin {
+interface Plugin: Discoverable {
     companion object {
         private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
@@ -135,7 +133,7 @@ interface Plugin {
         get() = manager.instanceInfoMap[this]!!.component.packageName
     */
     val pluginContext: Context
-        get() = manager.instanceInfoMap[this]!!.pluginContext
+        get() = (manager.instanceInfoMap[this]!! as PluginInstanceInfo).context
     val applicationContext: Context
         get() = manager.getApplicationContext()
 

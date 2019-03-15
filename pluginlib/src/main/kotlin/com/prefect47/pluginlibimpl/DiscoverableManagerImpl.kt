@@ -27,11 +27,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.prefect47.pluginlib.*
 import com.prefect47.pluginlibimpl.VersionInfo.InvalidVersionException
-import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
-import com.prefect47.pluginlib.Control
+import com.prefect47.pluginlib.factory.FactoryManager
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executors
@@ -41,25 +40,27 @@ import kotlin.reflect.KClass
 class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
     private val context: Context, private val manager: Manager, private val discoverablePrefs: DiscoverablePrefs,
     private val control: Control, private val discoverableInfoFactory: DiscoverableInfo.Factory<I>,
-    override val cls: KClass<*>, private val action: String, private val listener: Listener<I>?,
+    private val factoryManager: FactoryManager,
+    override val cls: KClass<out T>, private val action: String, private val listener: Listener<I>?,
     private val allowMultiple: Boolean
-): DiscoverableManager<T> {
+): DiscoverableManager<T, I> {
 
     class Factory @Inject constructor(
         private val context: Context, private val manager: Manager, private val control: Control,
-        private val discoverablePrefs: DiscoverablePrefs
+        private val factoryManager: FactoryManager, private val discoverablePrefs: DiscoverablePrefs
     ): DiscoverableManager.Factory {
 
         override fun <T: Discoverable, I: DiscoverableInfo> create(
-            action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<*>,
+            action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<out T>,
             discoverableInfoFactory: DiscoverableInfo.Factory<I>
-        ): DiscoverableManager<T> {
+        ): DiscoverableManager<T, I> {
             return DiscoverableManagerImpl(
                 context,
                 manager,
                 discoverablePrefs,
                 control,
                 discoverableInfoFactory,
+                factoryManager,
                 cls,
                 action,
                 listener,
@@ -72,7 +73,7 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
         private const val TAG = "DiscoverableManager"
     }
 
-    private val version = VersionInfo(control).addClass(cls)
+    private val version = VersionInfo(control, factoryManager).addClass(cls)
     override val flags = findFlags(cls)
     override val discoverables: MutableList<I> = Collections.synchronizedList(ArrayList())
 
@@ -154,7 +155,7 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
 
     override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
         val plugins = ArrayList<DiscoverableInfo>(discoverables)
-        return plugins.find { it.component.packageName.equals(p::class.qualifiedName) }?.version?.hasClass(cls) ?: false
+        return plugins.find { it.component.packageName == p::class.qualifiedName }?.version?.hasClass(cls) ?: false
     }
 
     override fun toString(): String {
@@ -275,13 +276,6 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
             listener.onDoneDiscovering()
         }
 
-        private fun findClass(cls: String): KClass<*> {
-            control.factories.forEach {  list ->
-                list.implementations[cls]?.let { return it }
-            }
-            return Class.forName(cls).kotlin
-        }
-
         private fun handleDiscoverPlugin(component: ComponentName): I? {
             val pkg = component.packageName
             val cls = component.className
@@ -296,7 +290,10 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
 
                 return try {
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
-                    val dClass = findClass(cls)
+
+                    @Suppress("UNCHECKED_CAST")
+                    val dClass = factoryManager.findClass(cls) as KClass<out Discoverable>
+
                     val dVersion = checkVersion(dClass, version)
 
                     // Create our own ClassLoader so we can use our own code as the parent.
@@ -311,7 +308,9 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
 
                     val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
 
-                    discoverableInfoFactory.create(discoverableContext, component, dVersion, serviceInfo)
+                    discoverableInfoFactory.create(
+                        this@DiscoverableManagerImpl,
+                        discoverableContext, dClass, component, dVersion, serviceInfo)
                 } catch (e: InvalidVersionException) {
 
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)
@@ -364,7 +363,7 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
 
         @Throws(InvalidVersionException::class)
         private fun checkVersion(cls: KClass<*>, version: VersionInfo): VersionInfo? {
-            val pv: VersionInfo = VersionInfo(control).addClass(cls)
+            val pv: VersionInfo = VersionInfo(control, factoryManager).addClass(cls)
             if (pv.hasVersionInfo()) {
                 version.checkVersion(pv)
             } else {

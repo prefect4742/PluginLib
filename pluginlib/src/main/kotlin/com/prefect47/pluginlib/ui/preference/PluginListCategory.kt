@@ -43,11 +43,11 @@ class PluginListCategory @JvmOverloads constructor(
     override fun onAttachedToHierarchy(preferenceManager: PreferenceManager?) {
         super.onAttachedToHierarchy(preferenceManager)
 
-        val control = PluginLibraryDI.component.getControl()
-        val allowMulti = control.getFlags(className).contains(Plugin.FLAG_ALLOW_SIMULTANEOUS_USE)
+        val pluginManager = PluginLibraryDI.component.getControl().pluginManager
+        val allowMulti = pluginManager.getFlags(className).contains(Plugin.FLAG_ALLOW_SIMULTANEOUS_USE)
         val creator: (PluginInfo<out Plugin>)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
-        control.getPluginList(className)?.forEach {
+        pluginManager.getList(className)?.forEach {
             addPreference(creator(it))
         }
     }

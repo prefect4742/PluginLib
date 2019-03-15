@@ -34,7 +34,7 @@ class PluginEditTextPreferenceDialogFragment : EditTextPreferenceDialogFragmentC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
         super.onCreate(savedInstanceState)
     }
 

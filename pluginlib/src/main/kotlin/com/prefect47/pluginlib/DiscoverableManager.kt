@@ -13,32 +13,28 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlibimpl
+package com.prefect47.pluginlib
 
-import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import kotlin.reflect.KClass
 
-interface DiscoverableManager<T: Discoverable> {
+interface DiscoverableManager<T: Discoverable, I: DiscoverableInfo> {
 
     interface Factory {
         fun <T: Discoverable, I: DiscoverableInfo> create(
-            action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<*>,
+            action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<out T>,
             discoverableInfoFactory: DiscoverableInfo.Factory<I>
-        ): DiscoverableManager<T>
+        ): DiscoverableManager<T, I>
     }
 
-    val cls: KClass<*>
-    val discoverables: List<DiscoverableInfo>
+    val cls: KClass<out T>
+    val discoverables: List<I>
     val flags: Set<String>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean
     fun disableAll(): Boolean
     fun destroy()
-
-    //fun getPlugin(): DiscoverableInfo<T>?
 
     fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean
 

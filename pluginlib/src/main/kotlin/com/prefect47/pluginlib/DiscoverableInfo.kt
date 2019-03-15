@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlibimpl.VersionInfo
+import kotlin.reflect.KClass
 
 interface DiscoverableInfo {
 
@@ -41,11 +42,15 @@ interface DiscoverableInfo {
 
     interface Factory<I: DiscoverableInfo> {
         fun create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+            manager: DiscoverableManager<out Discoverable, I>, discoverableContext: Context,
+            cls: KClass<out Discoverable>, component: ComponentName,
+            version: VersionInfo?, serviceInfo: ServiceInfo
         ): I
     }
 
+    val manager: DiscoverableManager<out Discoverable, out DiscoverableInfo>
     val version: VersionInfo?
+    val cls: KClass<out Discoverable>
     val component: ComponentName
     val metadata: Bundle
 }

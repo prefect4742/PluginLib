@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlibimpl.discoverables.plugin
+package com.prefect47.pluginlib.plugin
 
 import android.content.Context
 import com.prefect47.pluginlib.DiscoverableInfo
@@ -22,4 +22,6 @@ interface PluginDiscoverableInfo: DiscoverableInfo {
     interface Factory: DiscoverableInfo.Factory<PluginDiscoverableInfo>
     interface Listener: DiscoverableInfo.Listener<PluginDiscoverableInfo>
     val context: Context
+
+    fun <T: Plugin> makePluginInfo(): PluginInfo<T>
 }

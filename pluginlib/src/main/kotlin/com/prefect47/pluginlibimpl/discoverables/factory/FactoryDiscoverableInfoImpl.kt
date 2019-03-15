@@ -19,28 +19,37 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Bundle
-import com.prefect47.pluginlib.factory.DiscoverableFactory
+import com.prefect47.pluginlib.Discoverable
+import com.prefect47.pluginlib.DiscoverableManager
+import com.prefect47.pluginlib.factory.FactoryDiscoverable
+import com.prefect47.pluginlib.factory.FactoryDiscoverableInfo
 import com.prefect47.pluginlibimpl.VersionInfo
+import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 class FactoryDiscoverableInfoImpl (
-    override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
+    override val manager: DiscoverableManager<out Discoverable, FactoryDiscoverableInfo>,
+    override val cls: KClass<FactoryDiscoverable>, override val component: ComponentName,
+    override val version: VersionInfo?, override val metadata: Bundle
 ): FactoryDiscoverableInfo {
 
-    override val factory: DiscoverableFactory by lazy {
+    override val factory: FactoryDiscoverable by lazy {
         val factoryClass = Class.forName(component.className).kotlin
         val factory = factoryClass.objectInstance ?: factoryClass.createInstance()
-        factory as DiscoverableFactory
+        factory as FactoryDiscoverable
     }
 
     class Factory: FactoryDiscoverableInfo.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+            manager: DiscoverableManager<out Discoverable, FactoryDiscoverableInfo>, discoverableContext: Context,
+            cls: KClass<out Discoverable>, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
         ): FactoryDiscoverableInfo {
             val metadata = serviceInfo.metaData ?: Bundle()
             return FactoryDiscoverableInfoImpl(
+                manager,
+                cls as KClass<FactoryDiscoverable>,
                 component,
                 version,
                 metadata

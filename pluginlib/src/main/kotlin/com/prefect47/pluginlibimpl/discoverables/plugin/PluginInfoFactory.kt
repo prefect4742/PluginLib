@@ -15,10 +15,10 @@
 
 package com.prefect47.pluginlibimpl.discoverables.plugin
 
-import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlib.plugin.PluginInfo
 
 interface PluginInfoFactory {
-    fun <T: Plugin> create(discoverableInfo: DiscoverableInfo): PluginInfo<T>
+    fun <T: Plugin> create(discoverableInfo: PluginDiscoverableInfo): PluginInfo<T>
 }

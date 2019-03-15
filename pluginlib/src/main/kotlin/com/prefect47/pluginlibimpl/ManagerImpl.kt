@@ -22,7 +22,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.content.res.Resources
@@ -32,11 +31,9 @@ import androidx.core.app.NotificationCompat.Action
 import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.DiscoverableInfo
-import com.prefect47.pluginlib.Discoverable
+import com.prefect47.pluginlib.*
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.Control
 import dagger.Lazy
 import dalvik.system.PathClassLoader
 import kotlinx.coroutines.*
@@ -67,10 +64,8 @@ class ManagerImpl(
     }
 
     override val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo> = Collections.synchronizedMap(HashMap())
-    override val classManagerMap: MutableMap<String, DiscoverableManager<out Discoverable>> =
-            Collections.synchronizedMap(HashMap())
 
-    private val discoverableManagerMap: MutableMap<Listener<*>, DiscoverableManager<out Discoverable>> =
+    private val discoverableManagerMap: MutableMap<Listener<*>, DiscoverableManager<out Discoverable, out DiscoverableInfo>> =
             Collections.synchronizedMap(HashMap())
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
@@ -139,12 +134,12 @@ class ManagerImpl(
     override suspend fun <T: Discoverable, I: DiscoverableInfo> addListener(
         listener: Listener<I>, cls: KClass<T>, action: String, allowMultiple: Boolean,
         discoverableInfoFactory: DiscoverableInfo.Factory<I>
-    ): DiscoverableManager<T> {
+    ): DiscoverableManager<T, I> {
         discoverablePrefs.addAction(action)
-        val p: DiscoverableManager<T> = factory.create(action, listener, allowMultiple, cls, discoverableInfoFactory)
+        val p: DiscoverableManager<T, I> = factory.create(action, listener, allowMultiple, cls, discoverableInfoFactory)
         p.loadAll()
         discoverableManagerMap[listener] = p
-        classManagerMap.put(cls.qualifiedName!!, p)
+        //classManagerMap[cls.qualifiedName!!] = p
         startListening()
         return p
     }
@@ -152,7 +147,7 @@ class ManagerImpl(
     override fun <I: DiscoverableInfo> removeListener(listener: Listener<I>) {
         if (!discoverableManagerMap.containsKey(listener)) return
         discoverableManagerMap.remove(listener)?.also {
-            classManagerMap.remove(it.cls.qualifiedName)
+            //classManagerMap.remove(it.cls.qualifiedName)
             it.destroy()
         }
         if (discoverableManagerMap.isEmpty()) {
@@ -258,17 +253,6 @@ class ManagerImpl(
 
     private fun clearClassLoader(pkg: String): Boolean {
         return classLoaders.remove(pkg) != null
-    }
-
-    @Throws(NameNotFoundException::class)
-    fun getContext(info: ApplicationInfo, pkg: String): Context {
-        val classLoader: ClassLoader = getClassLoader(info.sourceDir, pkg)
-        return DiscoverableContextWrapper(
-            context,
-            context.createPackageContext(pkg, 0),
-            classLoader,
-            pkg
-        )
     }
 
     override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {

@@ -19,10 +19,10 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
+import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
@@ -31,8 +31,8 @@ class PluginInfoImpl<T: Plugin> (
 
     class Factory @Inject constructor(
     ): PluginInfoFactory {
-        override fun <T : Plugin> create(discoverableInfo: DiscoverableInfo): PluginInfo<T> =
-            PluginInfoImpl(discoverableInfo as PluginDiscoverableInfo)
+        override fun <T : Plugin> create(discoverableInfo: PluginDiscoverableInfo): PluginInfo<T> =
+            PluginInfoImpl(discoverableInfo)
     }
 
     companion object {

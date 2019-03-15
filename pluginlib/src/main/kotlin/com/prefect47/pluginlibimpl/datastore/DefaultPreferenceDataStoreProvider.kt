@@ -1,6 +1,7 @@
 package com.prefect47.pluginlibimpl.datastore
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
@@ -12,7 +13,7 @@ class DefaultPreferenceDataStoreProvider(private val context: Context):
     PluginPreferenceDataStoreProvider {
 
     private open class DataStore(context: Context, name: String): PluginPreferenceDataStore() {
-        protected val prefs = context.getSharedPreferences(name, Context.MODE_PRIVATE)
+        protected val prefs: SharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE)
 
         override fun getBoolean(key: String?, defValue: Boolean) = prefs.getBoolean(key, defValue)
         override fun getFloat(key: String?, defValue: Float) = prefs.getFloat(key, defValue)

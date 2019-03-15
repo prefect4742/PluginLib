@@ -19,18 +19,29 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Bundle
+import com.prefect47.pluginlib.Discoverable
+import com.prefect47.pluginlib.DiscoverableManager
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlibimpl.VersionInfo
 import com.prefect47.pluginlib.plugin.PluginInfo
+import javax.inject.Inject
+import kotlin.reflect.KClass
 
 class PluginDiscoverableInfoImpl (
-    override val context: Context, override val component: ComponentName, override val metadata: Bundle,
-    override val version: VersionInfo?
+    override val manager: DiscoverableManager<out Discoverable, PluginDiscoverableInfo>, override val context: Context,
+    override val cls: KClass<out Plugin>, override val component: ComponentName, override val metadata: Bundle,
+    override val version: VersionInfo?, private val pluginInfoFactory: PluginInfoFactory
 ): PluginDiscoverableInfo {
 
-    class Factory: PluginDiscoverableInfo.Factory {
+    class Factory @Inject constructor(
+        private val pluginInfoFactory: PluginInfoFactory
+    ): PluginDiscoverableInfo.Factory {
 
+        @Suppress("UNCHECKED_CAST")
         override fun create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+            manager: DiscoverableManager<out Discoverable, PluginDiscoverableInfo>, discoverableContext: Context,
+            cls: KClass<out Discoverable>, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
         ): PluginDiscoverableInfo {
             val metadata = serviceInfo.metaData ?: Bundle()
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
@@ -38,11 +49,18 @@ class PluginDiscoverableInfoImpl (
             metadata.putInt(PluginInfo.ICON, serviceInfo.icon)
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
             return PluginDiscoverableInfoImpl(
+                manager,
                 discoverableContext,
+                cls as KClass<out Plugin>,
                 component,
                 metadata,
-                version
+                version,
+                pluginInfoFactory
             )
         }
+    }
+
+    override fun <T : Plugin> makePluginInfo(): PluginInfo<T> {
+        return pluginInfoFactory.create(this)
     }
 }

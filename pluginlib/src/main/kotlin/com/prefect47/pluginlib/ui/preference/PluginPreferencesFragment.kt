@@ -34,7 +34,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
         val parent = parentFragment
         if (parent is PluginSettingsFragment) {
             parent.onPluginInfoCreated(pluginInfo)

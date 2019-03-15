@@ -5,7 +5,8 @@ import com.prefect47.pluginlibimpl.DependencyProviderImpl
 import com.prefect47.pluginlibimpl.DiscoverablePrefs
 import com.prefect47.pluginlibimpl.discoverables.factory.FactoryDiscoverableInfoImpl
 import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfoImpl
-import com.prefect47.pluginlibimpl.Manager
+import com.prefect47.pluginlib.Manager
+import com.prefect47.pluginlibimpl.discoverables.plugin.PluginInfoFactory
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -27,7 +28,8 @@ class PluginLibraryModule {
 
     @Singleton
     @Provides
-    fun providePluginDiscoverableInfoFactory() = PluginDiscoverableInfoImpl.Factory()
+    fun providePluginDiscoverableInfoFactory(pluginInfoFactory: PluginInfoFactory) =
+        PluginDiscoverableInfoImpl.Factory(pluginInfoFactory)
 
     @Singleton
     @Provides

@@ -5,23 +5,18 @@ import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlibimpl.datastore.PreferenceDataStoreManagerImpl
-import com.prefect47.pluginlibimpl.discoverables.factory.FactoryDiscoverableInfo
+import com.prefect47.pluginlib.factory.FactoryDiscoverableInfo
 import com.prefect47.pluginlibimpl.discoverables.factory.FactoryDiscoverableInfoImpl
-import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfo
-import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfoImpl
-import com.prefect47.pluginlibimpl.discoverables.plugin.PluginInfoFactory
-import com.prefect47.pluginlibimpl.discoverables.plugin.PluginInfoImpl
 import com.prefect47.pluginlibimpl.discoverables.factory.FactoryManagerImpl
-import com.prefect47.pluginlibimpl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
-import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import com.prefect47.pluginlibimpl.DependencyProviderImpl
 import com.prefect47.pluginlibimpl.DiscoverableManagerImpl
 import com.prefect47.pluginlibimpl.ControlImpl
 import com.prefect47.pluginlibimpl.ManagerImpl
-import com.prefect47.pluginlibimpl.discoverables.factory.FactoryManager
-import com.prefect47.pluginlibimpl.DiscoverableManager
-import com.prefect47.pluginlibimpl.Manager
+import com.prefect47.pluginlib.factory.FactoryManager
+import com.prefect47.pluginlib.DiscoverableManager
+import com.prefect47.pluginlib.Manager
+import com.prefect47.pluginlibimpl.discoverables.plugin.*
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton
@@ -60,15 +55,21 @@ abstract class PluginLibraryBindings {
 
     @Singleton
     @Binds
-    abstract fun bindFactoryManager(factory: FactoryManagerImpl): FactoryManager
+    abstract fun bindFactoryManager(manager: FactoryManagerImpl): FactoryManager
+
+    @Singleton
+    @Binds
+    abstract fun bindPluginManager(manager: PluginManagerImpl): PluginManager
 
     @Singleton
     @Binds
     abstract fun bindInstanceManagerFactory(factory: DiscoverableManagerImpl.Factory): DiscoverableManager.Factory
 
+    /*
     @Singleton
     @Binds
     abstract fun bindPluginListViewModel(model: PluginListViewModelImpl): PluginListViewModel
+    */
 
     @Singleton
     @Binds

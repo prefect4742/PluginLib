@@ -16,10 +16,9 @@ package com.prefect47.pluginlib
 
 import android.util.Log
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
-import com.prefect47.pluginlib.factory.DiscoverableFactory
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
-import kotlin.reflect.KClass
+import com.prefect47.pluginlib.factory.FactoryManager
 
 interface Control {
     companion object {
@@ -35,14 +34,8 @@ interface Control {
     }
 
     val staticProviders: List<Providers>
-    val factories: List<DiscoverableFactory>
 
     var settingsHandler: PluginSettingsEntrance.Callback?
-
-    /**
-     * Set this if you wish for the library to look for DiscoverableFactory in APK:s.
-     */
-    //var pluginFactoryName: String?
 
     var permissionName: String
     var debugEnabled: Boolean
@@ -50,22 +43,12 @@ interface Control {
     var notificationChannel: String?
     var notificationIconResId: Int
 
+    val manager: Manager
+    val factoryManager: FactoryManager
+    val pluginManager: PluginManager
     val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 
-    //val viewModel: PluginListViewModel
-
     fun addStaticProviders(providers: Providers)
-    fun addFactory(factory: DiscoverableFactory)
-    fun removeFactory(factory: DiscoverableFactory)
-
-    /*
-    suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,
-        action: String = Manager.getAction(cls), allowMultiple : Boolean = false)
-    fun removePluginListener(listener: PluginListener<*>)
-    */
-
-    fun track(factoryAction: String)
-    fun track(cls: KClass<out Plugin>)
 
     fun addStateListener(listener: StateListener)
     fun removeStateListener(listener: StateListener)
@@ -75,32 +58,14 @@ interface Control {
     fun resume()
     fun stop()
 
-    suspend fun startPlugin(plugin: Plugin)
-    suspend fun stopPlugin(plugin: Plugin)
+    //suspend fun startPlugin(plugin: Plugin)
+    //suspend fun stopPlugin(plugin: Plugin)
 
     /**
      * Add a [filter] to the plugin classloader that lets discoverables use libraries or code where class names might
      * conflict with those of the app.
      */
     fun addClassFilter(filter: (String) -> Boolean)
-
-    /**
-     * Get a list of PluginInfo containers for any plugin implementing the [pluginClass] interface.
-     * Note that each call to this will return new discoverables of the containers.
-     */
-    fun <T: Plugin> getPluginList(pluginClass: KClass<T>): List<PluginInfo<T>>?
-    @Suppress("UNCHECKED_CAST")
-    fun getPluginList(pluginClassName: String) =
-            getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
-
-    fun getFlags(pluginClassName: String): Set<String>
-
-    /**
-     * Get a PluginInfo container for the plugin [cls].
-     * Note that each call to this will return a new instance of the container.
-     */
-    fun getPlugin(cls: KClass<out Plugin>) = getPlugin(cls.qualifiedName!!)
-    fun getPlugin(className: String): PluginInfo<out Plugin>?
 
     fun debug(msg: String) {
         if (debugEnabled) Log.d(debugTag, msg)

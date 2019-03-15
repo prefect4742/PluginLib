@@ -13,12 +13,10 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlibimpl
+package com.prefect47.pluginlib
 
 import android.content.Context
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
-import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import kotlin.reflect.KClass
 
@@ -39,8 +37,8 @@ interface Manager {
 
             // Try the static dependencies first
             PluginLibraryDI.component.getControl().staticProviders.forEach {
-                it.providers[cls]?.let {
-                    return it.action
+                it.providers[cls]?.let { provider ->
+                    return provider.action
                 }
             }
 
@@ -63,7 +61,6 @@ interface Manager {
     }
 
     val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo>
-    val classManagerMap: MutableMap<String, DiscoverableManager<out Discoverable>>
 
     /*
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
@@ -77,7 +74,7 @@ interface Manager {
             cls
         ), allowMultiple : Boolean = false,
         discoverableInfoFactory: DiscoverableInfo.Factory<I>
-    ): DiscoverableManager<T>
+    ): DiscoverableManager<T, I>
 
     fun <I: DiscoverableInfo> removeListener(listener: Listener<I>)
 

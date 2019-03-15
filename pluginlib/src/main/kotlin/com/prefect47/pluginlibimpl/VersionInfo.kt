@@ -17,10 +17,11 @@ package com.prefect47.pluginlibimpl
 
 import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.annotations.*
+import com.prefect47.pluginlib.factory.FactoryManager
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-class VersionInfo(private val control: Control) {
+class VersionInfo(private val control: Control, private val factoryManager: FactoryManager) {
     private val versions: MutableMap<KClass<*>, Version> = HashMap()
 
     fun hasVersionInfo() = !versions.isEmpty()
@@ -45,12 +46,9 @@ class VersionInfo(private val control: Control) {
         }
 
         // Use static requirements data if we have it
-        control.factories.forEach {
-            it.requirements[cls]?.let { list ->
-                list.forEach { versions[it.target] =
-                    Version(it.version, required)
-                }
-                return
+        factoryManager.findRequirements(cls)?.let { list ->
+            list.forEach {
+                versions[it.target] = Version(it.version, required)
             }
         }
 

@@ -16,6 +16,7 @@
 package com.prefect47.pluginlibimpl
 
 import android.util.ArrayMap
+import com.prefect47.pluginlib.Manager
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginDependency.DependencyProvider
 import javax.inject.Inject

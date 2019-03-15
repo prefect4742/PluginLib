@@ -14,7 +14,7 @@ open class PluginFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        pluginInfo = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
     }
 
     override fun onAttachFragment(childFragment: Fragment) {

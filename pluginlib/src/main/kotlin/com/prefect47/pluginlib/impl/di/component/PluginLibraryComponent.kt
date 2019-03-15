@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryBindings
 import com.prefect47.pluginlib.impl.di.module.PluginLibraryModule
 import com.prefect47.pluginlib.impl.interfaces.Manager
+import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.PluginDependency
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager

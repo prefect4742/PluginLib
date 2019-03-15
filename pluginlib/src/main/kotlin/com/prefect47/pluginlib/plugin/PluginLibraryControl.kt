@@ -15,7 +15,6 @@
 package com.prefect47.pluginlib.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import java.util.EnumSet
 import kotlin.reflect.KClass
@@ -87,12 +86,12 @@ interface PluginLibraryControl {
      * Get a list of PluginInfo containers for any plugin implementing the [pluginClass] interface.
      * Note that each call to this will return new discoverables of the containers.
      */
-    fun getPluginList(pluginClass: KClass<out Plugin>): List<PluginInfo<out Plugin>>?
+    fun <T: Plugin> getPluginList(pluginClass: KClass<T>): List<PluginInfo<T>>?
     @Suppress("UNCHECKED_CAST")
     fun getPluginList(pluginClassName: String) =
             getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
-    fun getFlags(pluginClassName: String): EnumSet<Discoverable.Flag>?
+    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
 
     /**
      * Get a PluginInfo container for the plugin [cls].

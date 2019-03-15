@@ -7,7 +7,7 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
+import com.prefect47.pluginlib.plugin.Discoverable
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 
@@ -45,7 +45,7 @@ class PluginListCategory @JvmOverloads constructor(
         super.onAttachedToHierarchy(preferenceManager)
 
         val control = PluginLibraryDI.component.getControl()
-        val allowMulti = control.getFlags(className)?.contains(Discoverable.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
+        val allowMulti = control.getFlags(className)?.contains(Plugin.Flag.ALLOW_SIMULTANEOUS_USE) ?: false
         val creator: (PluginInfo<out Plugin>)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
         control.getPluginList(className)?.forEach {

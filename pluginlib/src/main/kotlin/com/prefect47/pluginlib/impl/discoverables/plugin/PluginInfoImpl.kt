@@ -13,15 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl
+package com.prefect47.pluginlib.impl.discoverables.plugin
 
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfo
-import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
-import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
+import com.prefect47.pluginlib.plugin.DiscoverableInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
@@ -33,7 +31,7 @@ class PluginInfoImpl<T: Plugin> (
 
     class Factory @Inject constructor(
     ): PluginInfoFactory {
-        override fun <T : Plugin> create(discoverableInfo: DiscoverableInfo<T>): PluginInfo<T> =
+        override fun <T : Plugin> create(discoverableInfo: DiscoverableInfo): PluginInfo<T> =
             PluginInfoImpl(discoverableInfo as PluginDiscoverableInfo)
     }
 

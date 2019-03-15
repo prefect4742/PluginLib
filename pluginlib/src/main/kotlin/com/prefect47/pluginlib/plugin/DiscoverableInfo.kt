@@ -13,28 +13,17 @@
  * permissions and limitations under the License.
  */
 
-
-package com.prefect47.pluginlib.impl.interfaces
+package com.prefect47.pluginlib.plugin
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Bundle
 import com.prefect47.pluginlib.impl.VersionInfo
 
-interface Discoverable {
-    /*
-    /**
-     * Behavioral flags that apply to the Discoverable type.
-     * Declare these as a companion object member EnumSet called "FLAGS" in your Discoverable class interface.
-     */
-    enum class Flag {
-        /**
-         * Allow multiple implementations of this discoverable to be used at the same time.
-         */
-        ALLOW_SIMULTANEOUS_USE
-    }
-    */
+interface DiscoverableInfo {
 
-    interface Listener<T: Discoverable> {
+    interface Listener<I: DiscoverableInfo> {
         /**
          * Called when library starts looking for items of the given type. Should be used at application start.
          */
@@ -45,17 +34,18 @@ interface Discoverable {
          */
         fun onDoneDiscovering()
 
-        fun onDiscovered(info: DiscoverableInfo<T>)
+        fun onDiscovered(info: I)
 
-        fun onRemoved(info: DiscoverableInfo<T>)
+        fun onRemoved(info: I)
     }
 
-    interface Factory {
-        fun <T: Discoverable> create(
-            discoverableContext: Context, component: ComponentName, version: VersionInfo?
-        ): T
+    interface Factory<I: DiscoverableInfo> {
+        fun create(
+            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+        ): I
     }
 
     val version: VersionInfo?
     val component: ComponentName
+    val metadata: Bundle
 }

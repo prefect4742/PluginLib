@@ -29,8 +29,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.impl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.impl.interfaces.*
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
-import com.prefect47.pluginlib.impl.interfaces.Discoverable.Listener
+import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
 import com.prefect47.pluginlib.plugin.PluginLibraryControl
 import kotlinx.coroutines.*
 import java.util.*
@@ -38,25 +39,27 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class InstanceManagerImpl<T: Discoverable>(
+class InstanceManagerImpl<T: Discoverable, I: DiscoverableInfo>(
     private val context: Context, private val manager: Manager, private val pluginPrefs: PluginPrefs,
-    private val control: PluginLibraryControl, private val infoFactory: DiscoverableInfo.Factory,
-    private val action: String, private val listener: Listener<T>?,
+    private val control: PluginLibraryControl, private val discoverableInfoFactory: DiscoverableInfo.Factory<I>,
+    private val action: String, private val listener: Listener<I>?,
     private val allowMultiple: Boolean, private val version: VersionInfo
 ): InstanceManager<T> {
 
     class Factory @Inject constructor(
         private val context: Context, private val manager: Manager, private val control: PluginLibraryControl,
-        private val pluginPrefs: PluginPrefs, private val infoFactory: DiscoverableInfo.Factory
+        private val pluginPrefs: PluginPrefs
     ): InstanceManager.Factory {
 
-        override fun <T: Discoverable> create(action: String, listener: Listener<T>?,
-                                                                                      allowMultiple: Boolean, cls: KClass<*>) = InstanceManagerImpl(
+        override fun <T: Discoverable, I: DiscoverableInfo> create(
+            action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<*>,
+            discoverableInfoFactory: DiscoverableInfo.Factory<I>
+        ) = InstanceManagerImpl<T, I>(
             context,
             manager,
             pluginPrefs,
             control,
-            infoFactory,
+            discoverableInfoFactory,
             action,
             listener,
             allowMultiple,
@@ -68,7 +71,7 @@ class InstanceManagerImpl<T: Discoverable>(
         private const val TAG = "InstanceManager"
     }
 
-    override val discoverables: MutableList<DiscoverableInfo<T>> = Collections.synchronizedList(ArrayList())
+    override val discoverables: MutableList<I> = Collections.synchronizedList(ArrayList())
 
     private val pluginHandler = PluginHandler()
     private val pm = context.packageManager
@@ -132,7 +135,7 @@ class InstanceManagerImpl<T: Discoverable>(
         return discoverables.size != 0
     }
 
-    private fun disable(info: DiscoverableInfo<*>) {
+    private fun disable(info: DiscoverableInfo) {
         // Live by the sword, die by the sword.
         // Misbehaving discoverables get disabled and won't come back until uninstall/reinstall.
 
@@ -147,7 +150,7 @@ class InstanceManagerImpl<T: Discoverable>(
     }
 
     override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
-        val plugins = ArrayList<DiscoverableInfo<T>>(discoverables)
+        val plugins = ArrayList<DiscoverableInfo>(discoverables)
         return plugins.find { it.component.packageName.equals(p::class.qualifiedName) }?.version?.hasClass(cls) ?: false
     }
 
@@ -196,7 +199,7 @@ class InstanceManagerImpl<T: Discoverable>(
             }
         }
 
-        private suspend fun handlePluginDiscovered(info: DiscoverableInfo<T>) {
+        private suspend fun handlePluginDiscovered(info: I) {
             pluginPrefs.setHasPlugins()
             withContext(Dispatchers.Main) {
                 manager.handleWtfs()
@@ -212,7 +215,7 @@ class InstanceManagerImpl<T: Discoverable>(
             }
         }
 
-        fun handlePluginRemoved(info: DiscoverableInfo<T>) {
+        fun handlePluginRemoved(info: I) {
             launch(Dispatchers.Main) {
                 if (control.debugEnabled) Log.d(TAG, "onPluginDisconnected")
                 listener!!.onRemoved(info)
@@ -267,7 +270,7 @@ class InstanceManagerImpl<T: Discoverable>(
             return Class.forName(cls).kotlin
         }
 
-        private fun handleDiscoverPlugin(component: ComponentName): DiscoverableInfo<T>? {
+        private fun handleDiscoverPlugin(component: ComponentName): I? {
             val pkg = component.packageName
             val cls = component.className
             try {
@@ -287,8 +290,9 @@ class InstanceManagerImpl<T: Discoverable>(
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
                     val pluginVersion = checkVersion(findPluginClass(cls), version)
 
-                    // TODO("Pick the appropriate DiscoverableInfo factory depending on the class")
-                    infoFactory.create<T>(pluginContext, component, pluginVersion)
+                    val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
+
+                    discoverableInfoFactory.create(pluginContext, component, pluginVersion, serviceInfo)
                 } catch (e: InvalidVersionException) {
 
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)

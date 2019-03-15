@@ -13,24 +13,30 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl.instances
+package com.prefect47.pluginlib.impl.discoverables.pluginfactory
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Bundle
 import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
 
 class FactoryDiscoverableInfoImpl (
-    override val component: ComponentName, override val version: VersionInfo?
-): FactoryDiscoverableInfo {
+    override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
+    ): FactoryDiscoverableInfo {
 
-    class Factory: DiscoverableInfo.Factory {
+    class Factory: FactoryDiscoverableInfo.Factory {
 
         @Suppress("UNCHECKED_CAST")
-        override fun <T: Discoverable> create(discoverableContext: Context, component: ComponentName,
-                                                                                      version: VersionInfo?): DiscoverableInfo<T> {
-            return FactoryDiscoverableInfoImpl(component, version) as DiscoverableInfo<T>
+        override fun create(
+            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+        ): FactoryDiscoverableInfo {
+            val metadata = serviceInfo.metaData ?: Bundle()
+            return FactoryDiscoverableInfoImpl(
+                component,
+                version,
+                metadata
+            )
         }
     }
 }

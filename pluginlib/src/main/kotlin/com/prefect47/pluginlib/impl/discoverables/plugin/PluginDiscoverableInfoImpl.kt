@@ -13,32 +13,25 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl.instances
+package com.prefect47.pluginlib.impl.discoverables.plugin
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlib.impl.VersionInfo
-import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
 import com.prefect47.pluginlib.plugin.PluginInfo
-import javax.inject.Inject
 
 class PluginDiscoverableInfoImpl (
     override val context: Context, override val component: ComponentName, override val metadata: Bundle,
     override val version: VersionInfo?
 ): PluginDiscoverableInfo {
 
-    class Factory @Inject constructor(
-        context: Context
-    ): DiscoverableInfo.Factory {
+    class Factory: PluginDiscoverableInfo.Factory {
 
-        private val pm = context.packageManager
-
-        override fun <T : Discoverable> create(discoverableContext: Context, component: ComponentName,
-                                                                                       version: VersionInfo?): DiscoverableInfo<T> {
-            val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
+        override fun create(
+            discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
+        ): PluginDiscoverableInfo {
             val metadata = serviceInfo.metaData ?: Bundle()
             metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
             metadata.putInt(PluginInfo.DESCRIPTION, serviceInfo.descriptionRes)
@@ -49,7 +42,7 @@ class PluginDiscoverableInfoImpl (
                 component,
                 metadata,
                 version
-            ) as DiscoverableInfo<T>
+            )
         }
     }
 }

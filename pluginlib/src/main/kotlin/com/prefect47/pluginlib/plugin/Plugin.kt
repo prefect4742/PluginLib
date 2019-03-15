@@ -19,7 +19,7 @@ package com.prefect47.pluginlib.plugin
 import android.content.Context
 import com.prefect47.pluginlib.impl.interfaces.Manager
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfo
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginDiscoverableInfo
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -107,7 +107,7 @@ import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfo
 */
 */
 
-interface Plugin {
+interface Plugin: Discoverable {
     companion object {
         private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }

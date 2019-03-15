@@ -13,9 +13,12 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.impl.instances
+package com.prefect47.pluginlib.impl.discoverables.plugin
 
-import com.prefect47.pluginlib.impl.interfaces.DiscoverableInfo
-import com.prefect47.pluginlib.plugin.PluginFactory
+import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.plugin.PluginInfo
 
-interface FactoryDiscoverableInfo: DiscoverableInfo<PluginFactory>
+interface PluginInfoFactory {
+    fun <T: Plugin> create(discoverableInfo: DiscoverableInfo): PluginInfo<T>
+}

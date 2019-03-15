@@ -17,6 +17,10 @@ package com.prefect47.pluginlib.impl.interfaces
 
 import android.content.Context
 import com.prefect47.pluginlib.impl.di.PluginLibraryDI
+import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
+import com.prefect47.pluginlib.plugin.Plugin
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -60,8 +64,8 @@ interface Manager {
             get() = nextNotificationIdInt++
     }
 
-    val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo<*>>
-    val discoverableClassFlagsMap: MutableMap<String, EnumSet<Discoverable.Flag>>
+    val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo>
+    val discoverableClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
 
     /*
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(
@@ -70,10 +74,12 @@ interface Manager {
     ) : T?
     */
 
-    suspend fun <T: Discoverable> addListener(listener: Discoverable.Listener<T>, cls: KClass<T>,
-                                                                                      action: String = getAction(cls), allowMultiple : Boolean = false): InstanceManager<T>
+    suspend fun <T: Discoverable, I: DiscoverableInfo> addListener(
+        listener: Listener<I>, cls: KClass<T>, action: String = getAction(cls), allowMultiple : Boolean = false,
+        discoverableInfoFactory: DiscoverableInfo.Factory<I>
+    ): InstanceManager<T>
 
-    fun <T: Discoverable> removeListener(listener: Discoverable.Listener<T>)
+    fun <I: DiscoverableInfo> removeListener(listener: Listener<I>)
 
     fun dependsOn(p: Discoverable, cls: KClass<*>) : Boolean
 

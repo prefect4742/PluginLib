@@ -3,12 +3,17 @@ package com.prefect47.pluginlib.impl.di.module
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlib.impl.*
-import com.prefect47.pluginlib.impl.instances.PluginDiscoverableInfoImpl
+import com.prefect47.pluginlib.impl.datastore.PreferenceDataStoreManagerImpl
+import com.prefect47.pluginlib.impl.discoverables.pluginfactory.FactoryDiscoverableInfo
+import com.prefect47.pluginlib.impl.discoverables.pluginfactory.FactoryDiscoverableInfoImpl
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginDiscoverableInfoImpl
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginInfoFactory
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginInfoImpl
+import com.prefect47.pluginlib.impl.discoverables.pluginfactory.FactoryManagerImpl
 import com.prefect47.pluginlib.impl.interfaces.*
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
-import com.prefect47.pluginlib.plugin.PluginDependency
-import com.prefect47.pluginlib.plugin.PluginLibraryControl
-import com.prefect47.pluginlib.plugin.PluginPreferenceDataStoreManager
+import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import dagger.Binds
 import dagger.Module
@@ -32,9 +37,19 @@ abstract class PluginLibraryBindings {
     @Binds
     abstract fun bindPluginInfoFactory(factory: PluginInfoImpl.Factory): PluginInfoFactory
 
+    /*
     @Singleton
     @Binds
-    abstract fun bindInstanceInfoFactory(factory: PluginDiscoverableInfoImpl.Factory): DiscoverableInfo.Factory
+    abstract fun <T: Plugin> bindInstanceInfoFactory(factory: PluginDiscoverableInfoImpl.Factory<T>): DiscoverableInfo.Factory<T>
+    */
+
+    @Singleton
+    @Binds
+    abstract fun bindPluginDiscoverableInfoFactory(factory: PluginDiscoverableInfoImpl.Factory): PluginDiscoverableInfo.Factory
+
+    @Singleton
+    @Binds
+    abstract fun bindFactoryDiscoverableInfoFactory(factory: FactoryDiscoverableInfoImpl.Factory): FactoryDiscoverableInfo.Factory
 
     @Singleton
     @Binds

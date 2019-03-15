@@ -3,10 +3,10 @@ package com.prefect47.pluginlib.impl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
-import com.prefect47.pluginlib.impl.interfaces.Discoverable
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlib.impl.interfaces.FactoryManager
 import com.prefect47.pluginlib.impl.interfaces.Manager
-import com.prefect47.pluginlib.impl.interfaces.PluginInfoFactory
+import com.prefect47.pluginlib.impl.discoverables.plugin.PluginInfoFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelFactory
 import com.prefect47.pluginlib.impl.viewmodel.PluginListViewModelImpl
 import com.prefect47.pluginlib.plugin.*
@@ -22,6 +22,7 @@ import kotlin.reflect.KClass
 class LibraryControlImpl @Inject constructor(
     private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
     private val pluginInfofactory: PluginInfoFactory, private val factoryManagerLazy: Lazy<FactoryManager>,
+    private val discoverableInfoFactory: PluginDiscoverableInfo.Factory,
     override val preferenceDataStoreManager: PluginPreferenceDataStoreManager
 ): PluginLibraryControl {
     private val isStarted = AtomicBoolean(false)
@@ -36,7 +37,7 @@ class LibraryControlImpl @Inject constructor(
     //    get() = viewModelInner
 
     private val viewModelInner: PluginListViewModelImpl by lazy {
-        ViewModelProviders.of(activity, PluginListViewModelFactory(manager, this))
+        ViewModelProviders.of(activity, PluginListViewModelFactory(manager, this, discoverableInfoFactory))
             .get(PluginListViewModelImpl::class.java)
     }
 
@@ -142,12 +143,12 @@ class LibraryControlImpl @Inject constructor(
         }
     }
 
-    override fun getPluginList(pluginClass: KClass<out Plugin>): List<PluginInfo<out Plugin>>? {
+    override fun <T: Plugin> getPluginList(pluginClass: KClass<T>): List<PluginInfo<T>>? {
         assertStarted()
-        return viewModelInner.list[pluginClass]?.plugins?.value?.map { pluginInfofactory.create(it) }
+        return viewModelInner.list[pluginClass]?.plugins?.value?.map { pluginInfofactory.create<T>(it) }
     }
 
-    override fun getFlags(pluginClassName: String): EnumSet<Discoverable.Flag>? {
+    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
         assertStarted()
         return manager.discoverableClassFlagsMap[pluginClassName]
     }

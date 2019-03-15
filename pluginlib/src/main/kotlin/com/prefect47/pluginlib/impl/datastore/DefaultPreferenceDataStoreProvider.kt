@@ -1,7 +1,6 @@
-package com.prefect47.pluginlib.impl
+package com.prefect47.pluginlib.impl.datastore
 
 import android.content.Context
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.plugin.PluginPreferenceDataStore
@@ -31,7 +30,12 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
                 prefs.edit().putStringSet(key, values).apply()
     }
 
-    private val defaultStore: PluginPreferenceDataStore by lazy { DataStore(context, "preferences") }
+    private val defaultStore: PluginPreferenceDataStore by lazy {
+        DataStore(
+            context,
+            "preferences"
+        )
+    }
     private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
 
     private class PluginDataStore(pluginInfo: PluginInfo<out Plugin>): DataStore(pluginInfo.pluginContext, "preferences") {
@@ -45,7 +49,8 @@ class DefaultPreferenceDataStoreProvider(private val context: Context): PluginPr
     override fun getPreferenceDataStore(key: Any): PluginPreferenceDataStore {
         if (key is PluginInfo<out Plugin>) {
             cache[key.component.packageName]?.let { return it }
-            val newStore = PluginDataStore(key)
+            val newStore =
+                PluginDataStore(key)
             cache[key.component.packageName] = newStore
             return newStore
         } else {

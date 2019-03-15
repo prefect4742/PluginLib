@@ -3,7 +3,7 @@ package com.prefect47.pluginlib.ui
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
+import com.prefect47.pluginlibimpl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 

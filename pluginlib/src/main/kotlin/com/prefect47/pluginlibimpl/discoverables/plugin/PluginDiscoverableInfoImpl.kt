@@ -13,39 +13,36 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlibimpl.discoverables.plugin
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlibimpl.VersionInfo
+import com.prefect47.pluginlib.plugin.PluginInfo
 
-interface DiscoverableInfo {
+class PluginDiscoverableInfoImpl (
+    override val context: Context, override val component: ComponentName, override val metadata: Bundle,
+    override val version: VersionInfo?
+): PluginDiscoverableInfo {
 
-    interface Listener<I: DiscoverableInfo> {
-        /**
-         * Called when library starts looking for items of the given type. Should be used at application start.
-         */
-        fun onStartDiscovering()
+    class Factory: PluginDiscoverableInfo.Factory {
 
-        /**
-         * Called when library has finished loading items of the given type. Should be used at application start.
-         */
-        fun onDoneDiscovering()
-
-        fun onDiscovered(info: I)
-
-        fun onRemoved(info: I)
-    }
-
-    interface Factory<I: DiscoverableInfo> {
-        fun create(
+        override fun create(
             discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
-        ): I
+        ): PluginDiscoverableInfo {
+            val metadata = serviceInfo.metaData ?: Bundle()
+            metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
+            metadata.putInt(PluginInfo.DESCRIPTION, serviceInfo.descriptionRes)
+            metadata.putInt(PluginInfo.ICON, serviceInfo.icon)
+            metadata.putInt(PluginInfo.TITLE, serviceInfo.labelRes)
+            return PluginDiscoverableInfoImpl(
+                discoverableContext,
+                component,
+                metadata,
+                version
+            )
+        }
     }
-
-    val version: VersionInfo?
-    val component: ComponentName
-    val metadata: Bundle
 }

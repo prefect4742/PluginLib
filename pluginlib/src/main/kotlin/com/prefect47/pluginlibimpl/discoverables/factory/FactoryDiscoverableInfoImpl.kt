@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlibimpl.discoverables.factory
 
 import android.content.ComponentName
 import android.content.Context
@@ -21,31 +21,22 @@ import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlibimpl.VersionInfo
 
-interface DiscoverableInfo {
+class FactoryDiscoverableInfoImpl (
+    override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
+    ): FactoryDiscoverableInfo {
 
-    interface Listener<I: DiscoverableInfo> {
-        /**
-         * Called when library starts looking for items of the given type. Should be used at application start.
-         */
-        fun onStartDiscovering()
+    class Factory: FactoryDiscoverableInfo.Factory {
 
-        /**
-         * Called when library has finished loading items of the given type. Should be used at application start.
-         */
-        fun onDoneDiscovering()
-
-        fun onDiscovered(info: I)
-
-        fun onRemoved(info: I)
-    }
-
-    interface Factory<I: DiscoverableInfo> {
-        fun create(
+        @Suppress("UNCHECKED_CAST")
+        override fun create(
             discoverableContext: Context, component: ComponentName, version: VersionInfo?, serviceInfo: ServiceInfo
-        ): I
+        ): FactoryDiscoverableInfo {
+            val metadata = serviceInfo.metaData ?: Bundle()
+            return FactoryDiscoverableInfoImpl(
+                component,
+                version,
+                metadata
+            )
+        }
     }
-
-    val version: VersionInfo?
-    val component: ComponentName
-    val metadata: Bundle
 }

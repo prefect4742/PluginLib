@@ -8,9 +8,10 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
-import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
+import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlibimpl.ui.PluginEditTextPreferenceDialogFragment
+import com.prefect47.pluginlibimpl.ui.PluginPreferenceAdapter
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.settings.PluginSettingsFragment
 import java.lang.IllegalArgumentException

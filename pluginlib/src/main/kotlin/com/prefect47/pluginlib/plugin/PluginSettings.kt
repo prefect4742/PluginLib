@@ -1,5 +1,6 @@
 package com.prefect47.pluginlib.plugin
 
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
 
 @ProvidesInterface(version = PluginSettings.VERSION)

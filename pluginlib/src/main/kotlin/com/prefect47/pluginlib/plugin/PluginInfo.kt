@@ -20,6 +20,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 
 interface PluginInfo<T: Plugin>: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener {
     companion object {

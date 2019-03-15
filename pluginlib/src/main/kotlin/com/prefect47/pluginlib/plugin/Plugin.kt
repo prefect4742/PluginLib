@@ -17,9 +17,11 @@
 package com.prefect47.pluginlib.plugin
 
 import android.content.Context
-import com.prefect47.pluginlib.impl.interfaces.Manager
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.discoverables.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.Discoverable
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
+import com.prefect47.pluginlibimpl.Manager
+import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfo
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces

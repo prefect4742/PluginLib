@@ -6,8 +6,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceManager
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Discoverable
+import com.prefect47.pluginlibimpl.di.PluginLibraryDI
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 

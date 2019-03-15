@@ -1,7 +1,7 @@
 package com.prefect47.pluginlib.plugin
 
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
-import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
+import com.prefect47.pluginlib.annotations.ProvidesInterface
 
 @ProvidesInterface(version = PluginSettings.VERSION)
 interface PluginSettings: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener {

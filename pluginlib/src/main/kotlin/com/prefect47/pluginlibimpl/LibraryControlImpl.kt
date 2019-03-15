@@ -3,6 +3,7 @@ package com.prefect47.pluginlibimpl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.Control
+import com.prefect47.pluginlib.PluginLibProviders
 import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.factory.Factory

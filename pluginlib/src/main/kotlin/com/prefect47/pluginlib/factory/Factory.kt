@@ -2,7 +2,7 @@ package com.prefect47.pluginlib.factory
 
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.annotations.ProvidesInterface
+import com.prefect47.pluginlib.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
 @ProvidesInterface(version = Factory.VERSION)

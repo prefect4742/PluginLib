@@ -19,11 +19,19 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Bundle
+import com.prefect47.pluginlib.factory.DiscoverableFactory
 import com.prefect47.pluginlibimpl.VersionInfo
+import kotlin.reflect.full.createInstance
 
 class FactoryDiscoverableInfoImpl (
     override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
 ): FactoryDiscoverableInfo {
+
+    override val factory: DiscoverableFactory by lazy {
+        val factoryClass = Class.forName(component.className).kotlin
+        val factory = factoryClass.objectInstance ?: factoryClass.createInstance()
+        factory as DiscoverableFactory
+    }
 
     class Factory: FactoryDiscoverableInfo.Factory {
 

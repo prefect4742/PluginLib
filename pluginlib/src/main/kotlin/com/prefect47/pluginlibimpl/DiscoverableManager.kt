@@ -15,7 +15,6 @@
 
 package com.prefect47.pluginlibimpl
 
-import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.DiscoverableInfo.Listener

@@ -16,8 +16,11 @@
 package com.prefect47.pluginlibimpl.discoverables.factory
 
 import com.prefect47.pluginlib.DiscoverableInfo
+import com.prefect47.pluginlib.factory.DiscoverableFactory
 
 interface FactoryDiscoverableInfo: DiscoverableInfo {
     interface Factory: DiscoverableInfo.Factory<FactoryDiscoverableInfo>
     interface Listener: DiscoverableInfo.Listener<FactoryDiscoverableInfo>
+
+    val factory: DiscoverableFactory
 }

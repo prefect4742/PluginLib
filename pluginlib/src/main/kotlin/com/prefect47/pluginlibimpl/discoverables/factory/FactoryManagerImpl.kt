@@ -1,8 +1,8 @@
 package com.prefect47.pluginlibimpl.discoverables.factory
 
 import android.util.Log
-import com.prefect47.pluginlib.factory.Factory
 import com.prefect47.pluginlib.Control
+import com.prefect47.pluginlib.factory.DiscoverableFactory
 import com.prefect47.pluginlibimpl.DiscoverableManager
 import com.prefect47.pluginlibimpl.Manager
 import kotlinx.coroutines.Dispatchers
@@ -29,10 +29,12 @@ class FactoryManagerImpl @Inject constructor(
 
         override fun onDiscovered(info: FactoryDiscoverableInfo) {
             if (control.debugEnabled) Log.d(TAG, "Found factory ${info.component.className}")
+            control.addFactory(info.factory)
         }
 
         override fun onRemoved(info: FactoryDiscoverableInfo) {
             if (control.debugEnabled) Log.d(TAG, "Factory ${info.component.className} was removed")
+            control.removeFactory(info.factory)
         }
     }
 
@@ -47,8 +49,8 @@ class FactoryManagerImpl @Inject constructor(
 
         withContext(Dispatchers.Default) {
             factoryActions.forEach {
-                it.discoverableManager = manager.addListener(it, Factory::class, it.action, true,
-                    discoverableInfoFactory)
+                it.discoverableManager = manager.addListener(it, DiscoverableFactory::class, it.action,
+                    true, discoverableInfoFactory)
             }
         }
 

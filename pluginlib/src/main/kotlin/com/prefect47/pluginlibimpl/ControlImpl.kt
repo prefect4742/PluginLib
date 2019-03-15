@@ -6,7 +6,7 @@ import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.Providers
 import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
-import com.prefect47.pluginlib.factory.Factory
+import com.prefect47.pluginlib.factory.DiscoverableFactory
 import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlibimpl.discoverables.factory.FactoryManager
 import com.prefect47.pluginlibimpl.discoverables.plugin.PluginInfoFactory
@@ -34,7 +34,7 @@ class ControlImpl @Inject constructor(
     override val staticProviders = ArrayList<Providers>().apply {
         add(PluginLibProvidersImpl)
     }
-    override val factories = ArrayList<Factory>()
+    override val factories = ArrayList<DiscoverableFactory>()
 
     //override val viewModel: PluginListViewModel
     //    get() = viewModelInner
@@ -75,11 +75,11 @@ class ControlImpl @Inject constructor(
         staticProviders.add(providers)
     }
 
-    override fun addFactory(factory: Factory) {
+    override fun addFactory(factory: DiscoverableFactory) {
         factories.add(factory)
     }
 
-    override fun removeFactory(factory: Factory) {
+    override fun removeFactory(factory: DiscoverableFactory) {
         factories.remove(factory)
     }
 

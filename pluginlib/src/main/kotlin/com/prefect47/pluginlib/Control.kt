@@ -16,7 +16,7 @@ package com.prefect47.pluginlib
 
 import android.util.Log
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
-import com.prefect47.pluginlib.factory.Factory
+import com.prefect47.pluginlib.factory.DiscoverableFactory
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import kotlin.reflect.KClass
@@ -35,12 +35,12 @@ interface Control {
     }
 
     val staticProviders: List<Providers>
-    val factories: List<Factory>
+    val factories: List<DiscoverableFactory>
 
     var settingsHandler: PluginSettingsEntrance.Callback?
 
     /**
-     * Set this if you wish for the library to look for Factory in APK:s.
+     * Set this if you wish for the library to look for DiscoverableFactory in APK:s.
      */
     //var pluginFactoryName: String?
 
@@ -55,8 +55,8 @@ interface Control {
     //val viewModel: PluginListViewModel
 
     fun addStaticProviders(providers: Providers)
-    fun addFactory(factory: Factory)
-    fun removeFactory(factory: Factory)
+    fun addFactory(factory: DiscoverableFactory)
+    fun removeFactory(factory: DiscoverableFactory)
 
     /*
     suspend fun <T: Plugin> addPluginListener(listener: PluginListener<T>, cls: KClass<T>,

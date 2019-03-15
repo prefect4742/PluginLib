@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib
 
 import android.content.ComponentName
 import android.content.Context

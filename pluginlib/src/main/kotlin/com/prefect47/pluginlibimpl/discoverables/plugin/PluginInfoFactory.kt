@@ -15,7 +15,7 @@
 
 package com.prefect47.pluginlibimpl.discoverables.plugin
 
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 

@@ -19,7 +19,7 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore

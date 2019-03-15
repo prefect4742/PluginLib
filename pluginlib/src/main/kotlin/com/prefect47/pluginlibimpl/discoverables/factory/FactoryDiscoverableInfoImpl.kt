@@ -23,7 +23,7 @@ import com.prefect47.pluginlibimpl.VersionInfo
 
 class FactoryDiscoverableInfoImpl (
     override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
-    ): FactoryDiscoverableInfo {
+): FactoryDiscoverableInfo {
 
     class Factory: FactoryDiscoverableInfo.Factory {
 

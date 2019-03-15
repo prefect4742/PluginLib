@@ -113,6 +113,12 @@ interface Plugin: Discoverable {
     companion object {
         private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
         private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
+
+        /**
+         * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
+         * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
+         */
+        const val FLAG_ALLOW_SIMULTANEOUS_USE = "allowSimultaneousUse"
     }
 
     // TODO: Clean up this class.
@@ -121,6 +127,7 @@ interface Plugin: Discoverable {
     // TODO: And one PluginDiscoverableInfo shall map to multiple PluginInfo.
 
 
+    /*
     /**
      * Behavioral flags that apply to the Plugin type.
      * Declare these as a companion object member EnumSet called "FLAGS" in your Plugin class interface.
@@ -132,6 +139,7 @@ interface Plugin: Discoverable {
          */
         ALLOW_SIMULTANEOUS_USE
     }
+    */
 
     /*
     val className: String

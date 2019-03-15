@@ -115,27 +115,27 @@ class VersionInfo(private val control: Control) {
     @Throws(InvalidVersionException::class)
     fun checkVersion(plugin: VersionInfo) {
         val versionsCopy = HashMap<KClass<*>, Version>(versions)
-        plugin.versions.forEach { aClass, version ->
-            var v: Version? = versionsCopy.remove(aClass)
+        plugin.versions.forEach {
+            var v: Version? = versionsCopy.remove(it.key)
             if (v == null) {
-                v = createVersion(aClass)
+                v = createVersion(it.key)
             }
             if (v == null) {
                 throw InvalidVersionException(
-                    "${aClass.simpleName} does not provide an interface", false
+                    "${it.key.simpleName} does not provide an interface", false
                 )
             }
-            if (v.version != version.version) {
+            if (v.version != it.value.version) {
                 throw InvalidVersionException(
-                    aClass.simpleName!!, v.version < version.version, v.version,
-                    version.version
+                    it.key.simpleName!!, v.version < it.value.version, v.version,
+                    it.value.version
                 )
             }
         }
-        versionsCopy.forEach { aClass, version ->
-            if (version.required) {
+        versionsCopy.forEach {
+            if (it.value.required) {
                 throw InvalidVersionException(
-                    "Missing required dependency ${aClass.simpleName}",
+                    "Missing required dependency ${it.key.simpleName}",
                     false
                 )
             }

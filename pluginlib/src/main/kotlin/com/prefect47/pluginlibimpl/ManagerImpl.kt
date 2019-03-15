@@ -32,9 +32,9 @@ import androidx.core.app.NotificationCompat.Action
 import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
+import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import com.prefect47.pluginlib.plugin.Plugin
 import com.prefect47.pluginlib.Control
 import dagger.Lazy
@@ -44,10 +44,6 @@ import java.lang.Thread.UncaughtExceptionHandler
 import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.companionObject
-import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * @see Plugin
@@ -71,9 +67,10 @@ class ManagerImpl(
     }
 
     override val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo> = Collections.synchronizedMap(HashMap())
-    override val discoverableClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>> = Collections.synchronizedMap(HashMap())
+    override val classManagerMap: MutableMap<String, DiscoverableManager<out Discoverable>> =
+            Collections.synchronizedMap(HashMap())
 
-    private val instancesMap: MutableMap<Listener<*>, DiscoverableManager<out Discoverable>> =
+    private val discoverableManagerMap: MutableMap<Listener<*>, DiscoverableManager<out Discoverable>> =
             Collections.synchronizedMap(HashMap())
     private val classLoaders: MutableMap<String, ClassLoader> = Collections.synchronizedMap(HashMap())
     private val oneShotPackages: MutableSet<String> = Collections.synchronizedSet(ArraySet())
@@ -82,9 +79,9 @@ class ManagerImpl(
     private val parentClassLoader: ClassLoaderFilterInternal by lazy {
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
         filter.filters.add { name ->
-            name.startsWith("com.prefect47.pluginlib") &&
+            name.startsWith("com.prefect47.pluginlib")/* &&
                     !name.startsWith("com.prefect47.pluginlib.plugin") &&
-                    !name.startsWith("com.prefect47.pluginlib.ui")
+                    !name.startsWith("com.prefect47.pluginlib.ui")*/
         }
         filter
     }
@@ -146,24 +143,19 @@ class ManagerImpl(
         discoverablePrefs.addAction(action)
         val p: DiscoverableManager<T> = factory.create(action, listener, allowMultiple, cls, discoverableInfoFactory)
         p.loadAll()
-        instancesMap[listener] = p
+        discoverableManagerMap[listener] = p
+        classManagerMap.put(cls.qualifiedName!!, p)
         startListening()
-
-        var flags = EnumSet.noneOf(Plugin.Flag::class.java)
-        val result = cls.companionObject?.declaredMemberProperties?.find { it.name == "FLAGS" }
-        if (result is KProperty1) {
-            result as KProperty1<Any?, EnumSet<Plugin.Flag>>
-            flags = result.get(cls.companionObjectInstance)
-        }
-        discoverableClassFlagsMap[cls.qualifiedName!!] = flags ?: EnumSet.noneOf(Plugin.Flag::class.java)
-
         return p
     }
 
     override fun <I: DiscoverableInfo> removeListener(listener: Listener<I>) {
-        if (!instancesMap.containsKey(listener)) return
-        instancesMap.remove(listener)?.destroy()
-        if (instancesMap.isEmpty()) {
+        if (!discoverableManagerMap.containsKey(listener)) return
+        discoverableManagerMap.remove(listener)?.also {
+            classManagerMap.remove(it.cls.qualifiedName)
+            it.destroy()
+        }
+        if (discoverableManagerMap.isEmpty()) {
             stopListening()
         }
     }
@@ -195,7 +187,7 @@ class ManagerImpl(
         when (intent.action) {
             Intent.ACTION_USER_UNLOCKED -> {
                 GlobalScope.launch(Dispatchers.Default) {
-                    instancesMap.values.forEach { it.loadAll() }
+                    discoverableManagerMap.values.forEach { it.loadAll() }
                 }
             }
             Manager.DISABLE_PLUGIN -> {
@@ -247,9 +239,9 @@ class ManagerImpl(
                     Toast.makeText(context, "Reloading $pkg", Toast.LENGTH_LONG).show()
                 }
                 if (Intent.ACTION_PACKAGE_REMOVED != intent.action) {
-                    instancesMap.values.forEach { it.onPackageChange(pkg) }
+                    discoverableManagerMap.values.forEach { it.onPackageChange(pkg) }
                 } else {
-                    instancesMap.values.forEach { it.onPackageRemoved(pkg) }
+                    discoverableManagerMap.values.forEach { it.onPackageRemoved(pkg) }
                 }
             }
         }
@@ -280,7 +272,7 @@ class ManagerImpl(
     }
 
     override fun dependsOn(p: Discoverable, cls: KClass<*>): Boolean {
-        instancesMap.forEach {
+        discoverableManagerMap.forEach {
             if (it.value.dependsOn(p, cls)) return true
         }
         return false
@@ -337,7 +329,7 @@ class ManagerImpl(
                 // We couldn't find any discoverables involved in this crash, just to be safe
                 // disable all the discoverables, so we can be sure that the app is running as
                 // best as possible.
-                instancesMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
+                discoverableManagerMap.values.forEach { disabledAny = disabledAny || it.disableAll() }
             }
 
             if (disabledAny) {
@@ -352,7 +344,7 @@ class ManagerImpl(
             if (throwable == null) return false
             var disabledAny = false
             throwable.stackTrace.forEach { element ->
-                instancesMap.values.forEach {
+                discoverableManagerMap.values.forEach {
                     disabledAny = disabledAny || it.checkAndDisable(element.className)
                 }
             }

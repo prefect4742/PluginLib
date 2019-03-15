@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlibimpl.discoverables.plugin.PluginDiscoverableInfo.Listener
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 import com.prefect47.pluginlibimpl.DiscoverableManager
 import com.prefect47.pluginlibimpl.Manager
 import com.prefect47.pluginlib.plugin.Plugin

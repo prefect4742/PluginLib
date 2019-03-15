@@ -17,7 +17,7 @@ import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.viewmodel.PluginListViewModel
 import com.prefect47.pluginlibimpl.DependencyProviderImpl
 import com.prefect47.pluginlibimpl.DiscoverableManagerImpl
-import com.prefect47.pluginlibimpl.LibraryControlImpl
+import com.prefect47.pluginlibimpl.ControlImpl
 import com.prefect47.pluginlibimpl.ManagerImpl
 import com.prefect47.pluginlibimpl.discoverables.factory.FactoryManager
 import com.prefect47.pluginlibimpl.DiscoverableManager
@@ -34,7 +34,7 @@ abstract class PluginLibraryBindings {
 
     @Singleton
     @Binds
-    abstract fun bindControl(control: LibraryControlImpl): Control
+    abstract fun bindControl(control: ControlImpl): Control
 
     @Singleton
     @Binds

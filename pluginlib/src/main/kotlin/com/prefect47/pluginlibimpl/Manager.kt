@@ -18,10 +18,8 @@ package com.prefect47.pluginlibimpl
 import android.content.Context
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
-import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
-import com.prefect47.pluginlib.plugin.Plugin
-import java.util.*
+import com.prefect47.pluginlib.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import kotlin.reflect.KClass
 
 interface Manager {
@@ -65,7 +63,7 @@ interface Manager {
     }
 
     val discoverableInfoMap: MutableMap<Discoverable, DiscoverableInfo>
-    val discoverableClassFlagsMap: MutableMap<String, EnumSet<Plugin.Flag>>
+    val classManagerMap: MutableMap<String, DiscoverableManager<out Discoverable>>
 
     /*
     fun <T: Plugin> getOneShotPlugin(cls: KClass<T>, action: String = getAction(

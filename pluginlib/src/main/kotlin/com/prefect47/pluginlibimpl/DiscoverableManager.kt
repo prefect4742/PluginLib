@@ -15,9 +15,10 @@
 
 package com.prefect47.pluginlibimpl
 
+import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
-import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
+import com.prefect47.pluginlib.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import kotlin.reflect.KClass
 
 interface DiscoverableManager<T: Discoverable> {
@@ -29,7 +30,9 @@ interface DiscoverableManager<T: Discoverable> {
         ): DiscoverableManager<T>
     }
 
+    val cls: KClass<*>
     val discoverables: List<DiscoverableInfo>
+    val flags: Set<String>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean

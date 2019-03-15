@@ -29,8 +29,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlibimpl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
-import com.prefect47.pluginlib.plugin.DiscoverableInfo.Listener
+import com.prefect47.pluginlib.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo.Listener
 import com.prefect47.pluginlib.Control
 import kotlinx.coroutines.*
 import java.util.*
@@ -41,8 +41,8 @@ import kotlin.reflect.KClass
 class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
     private val context: Context, private val manager: Manager, private val discoverablePrefs: DiscoverablePrefs,
     private val control: Control, private val discoverableInfoFactory: DiscoverableInfo.Factory<I>,
-    private val action: String, private val listener: Listener<I>?,
-    private val allowMultiple: Boolean, private val version: VersionInfo
+    override val cls: KClass<*>, private val action: String, private val listener: Listener<I>?,
+    private val allowMultiple: Boolean
 ): DiscoverableManager<T> {
 
     class Factory @Inject constructor(
@@ -53,23 +53,27 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
         override fun <T: Discoverable, I: DiscoverableInfo> create(
             action: String, listener: Listener<I>?, allowMultiple: Boolean, cls: KClass<*>,
             discoverableInfoFactory: DiscoverableInfo.Factory<I>
-        ) = DiscoverableManagerImpl<T, I>(
-            context,
-            manager,
-            discoverablePrefs,
-            control,
-            discoverableInfoFactory,
-            action,
-            listener,
-            allowMultiple,
-            VersionInfo(control).addClass(cls)
-        )
+        ): DiscoverableManager<T> {
+            return DiscoverableManagerImpl(
+                context,
+                manager,
+                discoverablePrefs,
+                control,
+                discoverableInfoFactory,
+                cls,
+                action,
+                listener,
+                allowMultiple
+            )
+        }
     }
 
     companion object {
         private const val TAG = "DiscoverableManager"
     }
 
+    private val version = VersionInfo(control).addClass(cls)
+    override val flags = findFlags(cls)
     override val discoverables: MutableList<I> = Collections.synchronizedList(ArrayList())
 
     private val pluginHandler = PluginHandler()
@@ -155,6 +159,15 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
 
     override fun toString(): String {
         return String.format("%s@%s (action=%s)", this::class.simpleName, hashCode(), action)
+    }
+
+    fun findFlags(cls: KClass<*>): Set<String> {
+        control.staticProviders.forEach { list ->
+            list.flags[cls]?.let {
+                return it
+            }
+        }
+        return emptySet()
     }
 
     inner class PluginHandler: CoroutineScope {
@@ -262,8 +275,8 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
             listener.onDoneDiscovering()
         }
 
-        private fun findPluginClass(cls: String): KClass<*> {
-            control.factories.forEach { list ->
+        private fun findClass(cls: String): KClass<*> {
+            control.factories.forEach {  list ->
                 list.implementations[cls]?.let { return it }
             }
             return Class.forName(cls).kotlin
@@ -280,23 +293,25 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
                     Log.d(TAG, "Plugin doesn't have permission: $pkg")
                     return null
                 }
-                // Create our own ClassLoader so we can use our own code as the parent.
-                val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
-                val pluginContext =
-                    DiscoverableContextWrapper(
-                        context,
-                        context.createPackageContext(pkg, 0),
-                        classLoader,
-                        pkg
-                    )
 
                 return try {
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
-                    val pluginVersion = checkVersion(findPluginClass(cls), version)
+                    val dClass = findClass(cls)
+                    val dVersion = checkVersion(dClass, version)
+
+                    // Create our own ClassLoader so we can use our own code as the parent.
+                    val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
+                    val discoverableContext =
+                        DiscoverableContextWrapper(
+                            context,
+                            context.createPackageContext(pkg, 0),
+                            classLoader,
+                            pkg
+                        )
 
                     val serviceInfo = pm.getServiceInfo(component, PackageManager.GET_META_DATA)
 
-                    discoverableInfoFactory.create(pluginContext, component, pluginVersion, serviceInfo)
+                    discoverableInfoFactory.create(discoverableContext, component, dVersion, serviceInfo)
                 } catch (e: InvalidVersionException) {
 
                     notifyInvalidVersion(component, cls, e.tooNew, e.message)

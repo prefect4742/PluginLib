@@ -16,7 +16,7 @@
 package com.prefect47.pluginlibimpl.discoverables.plugin
 
 import android.content.Context
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 
 interface PluginDiscoverableInfo: DiscoverableInfo {
     interface Factory: DiscoverableInfo.Factory<PluginDiscoverableInfo>

@@ -19,7 +19,6 @@ import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.factory.Factory
 import com.prefect47.pluginlib.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
-import java.util.EnumSet
 import kotlin.reflect.KClass
 
 interface Control {
@@ -35,7 +34,7 @@ interface Control {
         fun onStopped()
     }
 
-    val staticProviders: List<PluginLibProviders>
+    val staticProviders: List<Providers>
     val factories: List<Factory>
 
     var settingsHandler: PluginSettingsEntrance.Callback?
@@ -55,7 +54,7 @@ interface Control {
 
     //val viewModel: PluginListViewModel
 
-    fun addStaticProviders(providers: PluginLibProviders)
+    fun addStaticProviders(providers: Providers)
     fun addFactory(factory: Factory)
     fun removeFactory(factory: Factory)
 
@@ -94,7 +93,7 @@ interface Control {
     fun getPluginList(pluginClassName: String) =
             getPluginList(Class.forName(pluginClassName).kotlin as KClass<out Plugin>)
 
-    fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>?
+    fun getFlags(pluginClassName: String): Set<String>
 
     /**
      * Get a PluginInfo container for the plugin [cls].

@@ -15,7 +15,7 @@
 
 package com.prefect47.pluginlibimpl.discoverables.factory
 
-import com.prefect47.pluginlib.plugin.DiscoverableInfo
+import com.prefect47.pluginlib.DiscoverableInfo
 
 interface FactoryDiscoverableInfo: DiscoverableInfo {
     interface Factory: DiscoverableInfo.Factory<FactoryDiscoverableInfo>

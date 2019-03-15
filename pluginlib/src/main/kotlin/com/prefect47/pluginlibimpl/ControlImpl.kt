@@ -3,7 +3,7 @@ package com.prefect47.pluginlibimpl
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prefect47.pluginlib.Control
-import com.prefect47.pluginlib.PluginLibProviders
+import com.prefect47.pluginlib.Providers
 import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.factory.Factory
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class LibraryControlImpl @Inject constructor(
+class ControlImpl @Inject constructor(
     private val activity: FragmentActivity, private val managerLazy: Lazy<Manager>,
     private val pluginInfofactory: PluginInfoFactory, private val factoryManagerLazy: Lazy<FactoryManager>,
     private val discoverableInfoFactory: PluginDiscoverableInfo.Factory,
@@ -31,7 +31,7 @@ class LibraryControlImpl @Inject constructor(
     private val isStarted = AtomicBoolean(false)
     private val factoryActions = ArrayList<String>()
     private val listeners = ArrayList<Control.StateListener>()
-    override val staticProviders = ArrayList<PluginLibProviders>().apply {
+    override val staticProviders = ArrayList<Providers>().apply {
         add(PluginLibProvidersImpl)
     }
     override val factories = ArrayList<Factory>()
@@ -71,7 +71,7 @@ class LibraryControlImpl @Inject constructor(
         manager.addClassFilter(filter)
     }
 
-    override fun addStaticProviders(providers: PluginLibProviders) {
+    override fun addStaticProviders(providers: Providers) {
         staticProviders.add(providers)
     }
 
@@ -153,9 +153,9 @@ class LibraryControlImpl @Inject constructor(
         return viewModelInner.list[pluginClass]?.plugins?.value?.map { pluginInfofactory.create<T>(it) }
     }
 
-    override fun getFlags(pluginClassName: String): EnumSet<Plugin.Flag>? {
+    override fun getFlags(pluginClassName: String): Set<String> {
         assertStarted()
-        return manager.discoverableClassFlagsMap[pluginClassName]
+        return manager.classManagerMap[pluginClassName]?.flags ?: emptySet()
     }
 
     override fun getPlugin(className: String): PluginInfo<out Plugin>? {

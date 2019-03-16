@@ -14,7 +14,7 @@
  */
 
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.discoverables.plugin
 
 import android.content.Context
 import com.prefect47.pluginlib.Discoverable

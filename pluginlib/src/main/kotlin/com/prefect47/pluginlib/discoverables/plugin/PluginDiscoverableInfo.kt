@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.discoverables.plugin
 
 import android.content.Context
 import com.prefect47.pluginlib.DiscoverableInfo

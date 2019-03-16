@@ -17,7 +17,7 @@ package com.prefect47.pluginlibimpl
 
 import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.annotations.*
-import com.prefect47.pluginlib.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 

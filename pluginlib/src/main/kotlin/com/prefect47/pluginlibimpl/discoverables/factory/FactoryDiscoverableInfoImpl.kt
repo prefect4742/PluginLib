@@ -21,8 +21,8 @@ import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.DiscoverableManager
-import com.prefect47.pluginlib.factory.FactoryDiscoverable
-import com.prefect47.pluginlib.factory.FactoryDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverable
+import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverableInfo
 import com.prefect47.pluginlibimpl.VersionInfo
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance

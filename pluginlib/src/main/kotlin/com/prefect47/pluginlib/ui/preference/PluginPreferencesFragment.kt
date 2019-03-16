@@ -12,8 +12,7 @@ import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
 import com.prefect47.pluginlibimpl.ui.PluginEditTextPreferenceDialogFragment
 import com.prefect47.pluginlibimpl.ui.PluginPreferenceAdapter
-import com.prefect47.pluginlib.plugin.*
-import com.prefect47.pluginlib.ui.settings.PluginSettingsFragment
+import com.prefect47.pluginlib.discoverables.plugin.*
 import java.lang.IllegalArgumentException
 
 /**
@@ -35,10 +34,6 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
         pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
-        val parent = parentFragment
-        if (parent is PluginSettingsFragment) {
-            parent.onPluginInfoCreated(pluginInfo)
-        }
 
         prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
         preferenceManager.preferenceDataStore = prefs

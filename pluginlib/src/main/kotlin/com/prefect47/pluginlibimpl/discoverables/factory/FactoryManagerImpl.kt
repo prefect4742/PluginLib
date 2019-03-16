@@ -2,11 +2,11 @@ package com.prefect47.pluginlibimpl.discoverables.factory
 
 import android.util.Log
 import com.prefect47.pluginlib.Control
-import com.prefect47.pluginlib.factory.FactoryDiscoverable
+import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverable
 import com.prefect47.pluginlib.DiscoverableManager
 import com.prefect47.pluginlib.Manager
-import com.prefect47.pluginlib.factory.FactoryDiscoverableInfo
-import com.prefect47.pluginlib.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

@@ -1,7 +1,7 @@
-package com.prefect47.pluginlib.factory
+package com.prefect47.pluginlib.discoverables.factory
 
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 

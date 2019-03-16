@@ -17,8 +17,8 @@ package com.prefect47.pluginlibimpl
 
 import android.util.ArrayMap
 import com.prefect47.pluginlib.Manager
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginDependency.DependencyProvider
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginDependency.DependencyProvider
 import javax.inject.Inject
 import kotlin.reflect.KClass
 

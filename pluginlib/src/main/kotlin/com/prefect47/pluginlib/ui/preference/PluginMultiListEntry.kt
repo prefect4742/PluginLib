@@ -6,10 +6,10 @@ import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
 import com.prefect47.pluginlib.R
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
-import com.prefect47.pluginlib.plugin.PluginSettings
+import com.prefect47.pluginlib.discoverables.plugin.PluginSettings
 import kotlinx.android.synthetic.main.plugin_pref.view.*
 import kotlinx.android.synthetic.main.plugin_setting.view.*
 
@@ -19,9 +19,8 @@ import kotlinx.android.synthetic.main.plugin_setting.view.*
  * CheckBoxPreference.
  */
 class PluginMultiListEntry(
-    context: Context, private val overrideKey: String, layoutResId: Int,
-    override val pluginInfo: PluginInfo<out Plugin>
-): CheckBoxPreference(context), PluginSettingsEntrance {
+    context: Context, private val overrideKey: String, layoutResId: Int, val pluginInfo: PluginInfo<out Plugin>
+): CheckBoxPreference(context) {
     private val prefs: PluginPreferenceDataStore by lazy { preferenceDataStore as PluginPreferenceDataStore }
 
     init {

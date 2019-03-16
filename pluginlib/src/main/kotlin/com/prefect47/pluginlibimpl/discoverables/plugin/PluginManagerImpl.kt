@@ -1,16 +1,17 @@
 package com.prefect47.pluginlibimpl.discoverables.plugin
 
 import android.util.Log
-import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo.Listener
+import com.prefect47.pluginlib.discoverables.plugin.PluginDiscoverableInfo.Listener
 import com.prefect47.pluginlib.DiscoverableManager
 import com.prefect47.pluginlib.Manager
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.Control
-import com.prefect47.pluginlib.factory.FactoryManager
-import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
-import com.prefect47.pluginlib.plugin.PluginInfo
-import com.prefect47.pluginlib.plugin.PluginManager
-import com.prefect47.pluginlib.plugin.PluginManager.PluginList
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.PluginManager
+import com.prefect47.pluginlib.discoverables.plugin.PluginManager.PluginInfoHook
+import com.prefect47.pluginlib.discoverables.plugin.PluginManager.PluginList
 import com.prefect47.pluginlibimpl.util.StartedTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,6 +27,8 @@ class PluginManagerImpl @Inject constructor(
     companion object {
         const val TAG = "PluginManager"
     }
+
+    override val hooks = ArrayList<PluginInfoHook>()
 
     override val list = HashMap<KClass<out Plugin>, PluginList<out Plugin>>()
     private val started = StartedTracker()
@@ -75,6 +78,7 @@ class PluginManagerImpl @Inject constructor(
         return list[pluginClass]?.plugins?.map { it.makePluginInfo<T>() }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun getList(pluginClassName: String): List<PluginInfo<out Plugin>>? {
         started.assertStarted()
         return getList(factoryManager.findClass(pluginClassName) as KClass<out Plugin>)
@@ -90,6 +94,7 @@ class PluginManagerImpl @Inject constructor(
         return null
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun get(clsName: String): PluginInfo<out Plugin>? {
         started.assertStarted()
         return get(factoryManager.findClass(clsName) as KClass<out Plugin>)

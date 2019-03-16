@@ -21,10 +21,10 @@ import android.content.pm.ServiceInfo
 import android.os.Bundle
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.DiscoverableManager
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlibimpl.VersionInfo
-import com.prefect47.pluginlib.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import javax.inject.Inject
 import kotlin.reflect.KClass
 

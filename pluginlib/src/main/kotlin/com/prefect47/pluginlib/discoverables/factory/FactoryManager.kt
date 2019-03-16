@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.factory
+package com.prefect47.pluginlib.discoverables.factory
 
 import kotlin.reflect.KClass
 

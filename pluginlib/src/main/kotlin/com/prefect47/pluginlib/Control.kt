@@ -16,9 +16,9 @@ package com.prefect47.pluginlib
 
 import android.util.Log
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
-import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.discoverables.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
-import com.prefect47.pluginlib.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 
 interface Control {
     companion object {

@@ -13,7 +13,7 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib.factory
+package com.prefect47.pluginlib.discoverables.factory
 
 import com.prefect47.pluginlib.DiscoverableInfo
 

@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.discoverables.plugin
 
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlib.annotations.ProvidesInterface

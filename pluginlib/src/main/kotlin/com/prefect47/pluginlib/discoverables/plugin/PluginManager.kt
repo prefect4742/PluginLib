@@ -1,4 +1,4 @@
-package com.prefect47.pluginlib.plugin
+package com.prefect47.pluginlib.discoverables.plugin
 
 import com.prefect47.pluginlib.DiscoverableManager
 import kotlin.reflect.KClass
@@ -12,7 +12,17 @@ interface PluginManager {
         val discoverableManager: DiscoverableManager<T, PluginDiscoverableInfo>
     }
 
+    interface PluginInfoHook {
+        fun onPluginInfoCreated(pluginInfo: PluginInfo<out Plugin>)
+    }
+
     val list: Map<KClass<out Plugin>, PluginList<out Plugin>>
+
+    /**
+     * You can add hooks to PluginInfo creation that will be called at certain points of the PluginInfo
+     * lifecycle.
+     */
+    val hooks: MutableList<PluginInfoHook>
 
     fun track(cls: KClass<out Plugin>)
     suspend fun start()

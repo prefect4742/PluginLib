@@ -2,8 +2,8 @@ package com.prefect47.pluginlibimpl.datastore
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager as Manager
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreProvider

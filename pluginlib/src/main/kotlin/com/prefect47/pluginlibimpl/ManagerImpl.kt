@@ -33,7 +33,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.*
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
-import com.prefect47.pluginlib.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import dagger.Lazy
 import dalvik.system.PathClassLoader
 import kotlinx.coroutines.*
@@ -75,7 +75,7 @@ class ManagerImpl(
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
         filter.filters.add { name ->
             name.startsWith("com.prefect47.pluginlib")/* &&
-                    !name.startsWith("com.prefect47.pluginlib.plugin") &&
+                    !name.startsWith("com.prefect47.pluginlib.discoverables.plugin") &&
                     !name.startsWith("com.prefect47.pluginlib.ui")*/
         }
         filter

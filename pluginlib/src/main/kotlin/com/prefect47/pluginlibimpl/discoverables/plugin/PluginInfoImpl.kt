@@ -19,20 +19,26 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
-import com.prefect47.pluginlib.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.plugin.PluginDiscoverableInfo
+import com.prefect47.pluginlib.discoverables.plugin.PluginManager
+import dagger.Lazy
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
     private val discoverableInfo: PluginDiscoverableInfo
 ): PluginInfo<T> {
 
-    class Factory @Inject constructor(
+    class Factory @Inject constructor(val pluginManagerLazy: Lazy<PluginManager>
     ): PluginInfoFactory {
-        override fun <T : Plugin> create(discoverableInfo: PluginDiscoverableInfo): PluginInfo<T> =
-            PluginInfoImpl(discoverableInfo)
+        private val pluginManager: PluginManager by lazy { pluginManagerLazy.get() }
+        override fun <T : Plugin> create(discoverableInfo: PluginDiscoverableInfo): PluginInfo<T> {
+            val info = PluginInfoImpl<T>(discoverableInfo)
+            pluginManager.hooks.forEach { it.onPluginInfoCreated(info) }
+            return info
+        }
     }
 
     companion object {

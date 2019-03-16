@@ -30,7 +30,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.*
 import com.prefect47.pluginlibimpl.VersionInfo.InvalidVersionException
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
-import com.prefect47.pluginlib.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.Executors

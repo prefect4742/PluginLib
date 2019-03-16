@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
-import com.prefect47.pluginlib.plugin.Plugin
-import com.prefect47.pluginlib.plugin.PluginInfo
+import com.prefect47.pluginlib.discoverables.plugin.Plugin
+import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 
 open class PluginFragment : Fragment() {
     lateinit var pluginInfo: PluginInfo<out Plugin>

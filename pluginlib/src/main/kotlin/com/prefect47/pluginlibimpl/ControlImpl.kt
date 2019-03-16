@@ -5,13 +5,11 @@ import com.prefect47.pluginlib.Manager
 import com.prefect47.pluginlib.Providers
 import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
-import com.prefect47.pluginlib.factory.FactoryManager
-import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
+import com.prefect47.pluginlib.discoverables.plugin.*
 import com.prefect47.pluginlib.ui.preference.PluginSettingsEntrance
 import com.prefect47.pluginlibimpl.util.StartedTracker
 import dagger.Lazy
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 

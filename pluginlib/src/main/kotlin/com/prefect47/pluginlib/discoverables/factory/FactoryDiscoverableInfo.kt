@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 The Android Open Source Project
  * Copyright (C) 2018 Niklas Brunlid
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -12,17 +13,13 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib
+package com.prefect47.pluginlib.discoverables.factory
 
-import androidx.fragment.app.FragmentActivity
-import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlib.DiscoverableInfo
 
-object PluginLibrary {
-    const val ARG_CLASSNAME = "pluginClassName"
+interface FactoryDiscoverableInfo: DiscoverableInfo {
+    interface Factory: DiscoverableInfo.Factory<FactoryDiscoverableInfo>
+    interface Listener: DiscoverableInfo.Listener<FactoryDiscoverableInfo>
 
-    fun init(activity: FragmentActivity) {
-        PluginLibraryDI.init(activity)
-    }
-
-    fun getControl() = PluginLibraryDI.component.getControl()
+    val factory: FactoryDiscoverable
 }

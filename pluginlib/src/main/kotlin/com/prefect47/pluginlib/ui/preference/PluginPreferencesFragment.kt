@@ -8,10 +8,12 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
-import com.prefect47.pluginlib.impl.ui.PluginEditTextPreferenceDialogFragment
-import com.prefect47.pluginlib.impl.ui.PluginPreferenceAdapter
-import com.prefect47.pluginlib.plugin.*
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
+import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlibimpl.ui.PluginEditTextPreferenceDialogFragment
+import com.prefect47.pluginlibimpl.ui.PluginPreferenceAdapter
+import com.prefect47.pluginlib.discoverables.plugin.*
+import java.lang.IllegalArgumentException
 
 /**
  * Settings fragment that inflates a preference XML resource owned by the plugin.
@@ -26,21 +28,21 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     }
 
     private lateinit var prefs: PluginPreferenceDataStore
-    private lateinit var prefsListener: PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
-    private lateinit var plugin: Plugin
+    private lateinit var pluginInfo: PluginInfo<out Plugin>
     private var activityResultHandler: ActivityResultHandler? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
-        plugin = PluginLibraryDI.component.getControl().getPlugin(className!!)!!
+        pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
 
-        prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(plugin)
+        prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
         preferenceManager.preferenceDataStore = prefs
 
-        val preferencesResId = (plugin as PluginSettings).preferencesResId
-        addPreferencesFromResource(preferencesResId)
-
-        prefsListener = plugin as PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener
+        val preferencesResId = pluginInfo.getInt(PluginSettings.PREFERENCES, 0)
+        if (preferencesResId == 0) {
+            throw IllegalArgumentException("${pluginInfo.component.className} missing preferences resource meta-data")
+        }
+        addPreferencesFromResource(preferencesResId!!)
     }
 
     override fun onCreateAdapter(preferenceScreen: PreferenceScreen): RecyclerView.Adapter<*> {
@@ -49,19 +51,19 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
-        prefs.registerOnPluginPreferenceDataStoreChangeListener(prefsListener)
+        prefs.registerOnPluginPreferenceDataStoreChangeListener(pluginInfo)
     }
 
     override fun onPause() {
         super.onPause()
-        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(prefsListener)
+        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(pluginInfo)
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {
         val f: DialogFragment
         if (preference is PluginEditTextPreference) {
             f = PluginEditTextPreferenceDialogFragment.create(
-                plugin::class.qualifiedName!!,
+                pluginInfo.component.className,
                 preference.key,
                 preference.inputType,
                 preference.digits

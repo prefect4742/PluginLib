@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2017 The Android Open Source Project
  * Copyright (C) 2018 Niklas Brunlid
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -12,17 +13,23 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib
+package com.prefect47.pluginlib.discoverables.plugin
 
-import androidx.fragment.app.FragmentActivity
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlib.annotations.ProvidesInterface
+import kotlin.reflect.KClass
 
-object PluginLibrary {
-    const val ARG_CLASSNAME = "pluginClassName"
+@ProvidesInterface(version = PluginDependency.VERSION)
+object PluginDependency {
+    const val VERSION = 1
 
-    fun init(activity: FragmentActivity) {
-        PluginLibraryDI.init(activity)
+    private val provider: DependencyProvider by lazy { PluginLibraryDI.component.getDependencyProvider() }
+
+    operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T {
+        return provider[p, cls]
     }
 
-    fun getControl() = PluginLibraryDI.component.getControl()
+    abstract class DependencyProvider {
+        abstract operator fun <T: Any> get(p: Plugin, cls: KClass<T>): T
+    }
 }

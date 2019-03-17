@@ -27,6 +27,12 @@ interface PluginInfo<T: Plugin>: PluginPreferenceDataStore.OnPluginPreferenceDat
         const val TITLE = "title"
         const val DESCRIPTION = "description"
         const val ICON = "icon"
+
+        /**
+         * This will be set by the library when the PluginInfo is part of a list and can be used
+         * to have multiple selections of the same plugin type in one preference screen.
+         */
+        const val LIST_KEY = "listKey"
     }
 
     val pluginContext: Context

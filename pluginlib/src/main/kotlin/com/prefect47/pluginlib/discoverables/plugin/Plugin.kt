@@ -20,6 +20,7 @@ import android.content.Context
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.Manager
+import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlibimpl.di.PluginLibraryDI
 
 /**
@@ -167,10 +168,8 @@ interface Plugin: Discoverable {
     // and has invalidated any currently used PluginPreferenceDataStore discoverables).
     fun onStop() {}
 
-    /*
     val preferenceDataStore: PluginPreferenceDataStore
-        get() = null //prefsManager.getPreferenceDataStore(manager.discoverableInfoMap[this]!!)
-        */
+        get() = prefsManager.getPreferenceDataStore(manager.discoverableInfoMap[this]!!)
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
     // PreferenceDataStoreProvider and wishes all its discoverables to switch to another set of preferences.

@@ -48,6 +48,7 @@ class PluginListCategory @JvmOverloads constructor(
         val creator: (PluginInfo<out Plugin>)-> Preference = if (allowMulti) ::createMultiPref else ::createPref
 
         pluginManager.getList(className)?.forEach {
+            it.data.putString(PluginInfo.LIST_KEY, key)
             addPreference(creator(it))
         }
     }

@@ -5,6 +5,6 @@ import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 
 interface PluginSettingsEntrance {
     interface Callback {
-        fun openSettings(pluginInfo: PluginInfo<out Plugin>, prefsKey: String?)
+        fun openSettings(pluginInfo: PluginInfo<out Plugin>)
     }
 }

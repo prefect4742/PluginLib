@@ -40,7 +40,7 @@ class DefaultPreferenceDataStoreProvider(private val context: Context):
     }
     private val cache = mutableMapOf<String, PluginPreferenceDataStore>()
 
-    private class PluginDataStore(pluginInfo: PluginInfo<out Plugin>): DataStore(pluginInfo.pluginContext, "preferences") {
+    private class PluginDataStore(context: Context, name: String): DataStore(context, name) {
         init {
             prefs.registerOnSharedPreferenceChangeListener { _, key -> notifyPreferenceChanged(key) }
         }
@@ -50,10 +50,11 @@ class DefaultPreferenceDataStoreProvider(private val context: Context):
 
     override fun getPreferenceDataStore(key: Any): PluginPreferenceDataStore {
         if (key is PluginInfo<out Plugin>) {
-            cache[key.component.packageName]?.let { return it }
-            val newStore =
-                PluginDataStore(key)
-            cache[key.component.packageName] = newStore
+            val listKey = key.data.getString(PluginInfo.LIST_KEY)?.let { "_$it" } ?: ""
+            val name = "${key.component.packageName}${listKey}_settings"
+            cache[name]?.let { return it }
+            val newStore = PluginDataStore(context, name)
+            cache[name] = newStore
             return newStore
         } else {
             throw IllegalArgumentException("Unrecognized session key $key")

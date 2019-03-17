@@ -37,7 +37,7 @@ class PluginSingleListEntry(
             if (pluginInfo.containsKey(PluginSettings.PREFERENCES)) {
                 it.visibility = View.VISIBLE
                 it.settings_button?.setOnClickListener {
-                    PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo, key)
+                    PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo)
                 }
             } else {
                 it.visibility = View.INVISIBLE

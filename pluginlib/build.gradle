@@ -53,11 +53,11 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    api 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 
-    api "androidx.appcompat:appcompat:$androidx_appcompat_version"
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     api "androidx.preference:preference:$androidx_version"
-    api "androidx.constraintlayout:constraintlayout:$androidx_constraintlayout_version"
+    implementation "androidx.constraintlayout:constraintlayout:$androidx_constraintlayout_version"
     implementation "androidx.lifecycle:lifecycle-extensions:$androidx_arch_version"
     implementation "androidx.core:core-ktx:$androidx_ktx_version"
 

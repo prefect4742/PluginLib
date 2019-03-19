@@ -21,7 +21,6 @@ import com.prefect47.pluginlib.DiscoverableInfo
 interface PluginDiscoverableInfo: DiscoverableInfo {
     interface Factory: DiscoverableInfo.Factory<PluginDiscoverableInfo>
     interface Listener: DiscoverableInfo.Listener<PluginDiscoverableInfo>
-    val context: Context
 
     fun <T: Plugin> makePluginInfo(): PluginInfo<T>
 }

@@ -29,8 +29,8 @@ import kotlin.reflect.full.createInstance
 
 class FactoryDiscoverableInfoImpl (
     override val manager: DiscoverableManager<out Discoverable, FactoryDiscoverableInfo>,
-    override val cls: KClass<FactoryDiscoverable>, override val component: ComponentName,
-    override val version: VersionInfo?, override val metadata: Bundle
+    override val context: Context, override val cls: KClass<FactoryDiscoverable>,
+    override val component: ComponentName, override val version: VersionInfo?, override val metadata: Bundle
 ): FactoryDiscoverableInfo {
 
     override val factory: FactoryDiscoverable by lazy {
@@ -49,6 +49,7 @@ class FactoryDiscoverableInfoImpl (
             val metadata = serviceInfo.metaData ?: Bundle()
             return FactoryDiscoverableInfoImpl(
                 manager,
+                discoverableContext,
                 cls as KClass<FactoryDiscoverable>,
                 component,
                 version,

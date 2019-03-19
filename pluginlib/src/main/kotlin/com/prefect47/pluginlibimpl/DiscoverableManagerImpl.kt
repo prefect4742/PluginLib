@@ -291,13 +291,16 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
                 return try {
                     if (control.debugEnabled) Log.d(TAG, "discoverPlugin: $cls")
 
+                    // Create our own ClassLoader so we can use our own code as the parent.
+                    val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
+
                     @Suppress("UNCHECKED_CAST")
-                    val dClass = factoryManager.findClass(cls) as KClass<out Discoverable>
+                    val dClass = (factoryManager.findClass(cls)
+                        ?: classLoader.loadClass(cls).kotlin.also { factoryManager.addClass(cls, it) } )
+                        as KClass<out Discoverable>
 
                     val dVersion = checkVersion(dClass, version)
 
-                    // Create our own ClassLoader so we can use our own code as the parent.
-                    val classLoader = manager.getClassLoader(info.sourceDir, info.packageName)
                     val discoverableContext =
                         DiscoverableContextWrapper(
                             context,

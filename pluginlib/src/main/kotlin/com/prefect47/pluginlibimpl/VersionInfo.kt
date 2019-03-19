@@ -50,6 +50,7 @@ class VersionInfo(private val control: Control, private val factoryManager: Fact
             list.forEach {
                 versions[it.target] = Version(it.version, required)
             }
+            return
         }
 
         // Most discoverables will only implement one interface and have one Requires

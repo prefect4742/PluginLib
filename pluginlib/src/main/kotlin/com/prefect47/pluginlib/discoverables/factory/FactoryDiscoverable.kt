@@ -13,7 +13,7 @@ interface FactoryDiscoverable: Discoverable {
 
     data class Require(val target: KClass<*>, val version: Int)
 
-    val implementations: Map<String, KClass<*>>
+    val classMap: Map<String, KClass<*>>
     fun <T: Plugin> createInstance(cls: KClass<out Plugin>): T?
 
     val requirements: Map<KClass<*>, List<Require>>

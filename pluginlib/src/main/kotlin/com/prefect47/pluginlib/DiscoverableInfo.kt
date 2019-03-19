@@ -50,6 +50,7 @@ interface DiscoverableInfo {
 
     val manager: DiscoverableManager<out Discoverable, out DiscoverableInfo>
     val version: VersionInfo?
+    val context: Context
     val cls: KClass<out Discoverable>
     val component: ComponentName
     val metadata: Bundle

@@ -5,12 +5,15 @@ import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverable
 import com.prefect47.pluginlib.DiscoverableManager
 import com.prefect47.pluginlib.Manager
+import com.prefect47.pluginlib.annotations.Requirements
+import com.prefect47.pluginlib.annotations.Requires
 import com.prefect47.pluginlib.discoverables.factory.FactoryDiscoverableInfo
 import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.reflect.KClass
+import kotlin.reflect.full.findAnnotation
 
 class FactoryManagerImpl @Inject constructor(
     private val control: Control, private val manager: Manager,
@@ -44,6 +47,8 @@ class FactoryManagerImpl @Inject constructor(
     }
 
     private val factoryActions = ArrayList<FactoryAction>()
+    private val addedClasses = HashMap<String, KClass<*>>()
+    private val addedRequire = HashMap<KClass<*>, List<FactoryDiscoverable.Require>>()
 
     override val factories = java.util.ArrayList<FactoryDiscoverable>()
 
@@ -51,16 +56,28 @@ class FactoryManagerImpl @Inject constructor(
         factoryActions.add(FactoryAction(action, null))
     }
 
-    override fun findClass(cls: String): KClass<*> {
+    override fun addClass(className: String, cls: KClass<*>) {
+        addedClasses[className] = cls
+    }
+
+    override fun findClass(className: String): KClass<*>? {
         factories.forEach {  list ->
-            list.implementations[cls]?.let { return it }
+            list.classMap[className]?.let { return it }
         }
-        return Class.forName(cls).kotlin
+        control.staticProviders.forEach { list ->
+            list.classMap[className]?.let { return it }
+        }
+        return addedClasses[className]
     }
 
     override fun findRequirements(cls: KClass<*>): List<FactoryDiscoverable.Require>? {
         factories.forEach { factory -> factory.requirements[cls]?.let { return it } }
-        return null
+
+        control.debug("findRequirements($cls reflection fallback")
+        return addedRequire[cls]
+            ?: cls.findAnnotation<Requires>()?.let { a -> listOf(FactoryDiscoverable.Require(a.target, a.version)) }
+            ?: cls.findAnnotation<Requirements>()?.value?.map { a -> FactoryDiscoverable.Require(a.target, a.version) }
+                ?.also { addedRequire[cls] = it }
     }
 
     override suspend fun start() {

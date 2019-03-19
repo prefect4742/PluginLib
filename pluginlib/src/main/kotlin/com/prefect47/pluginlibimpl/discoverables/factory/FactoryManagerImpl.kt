@@ -77,7 +77,7 @@ class FactoryManagerImpl @Inject constructor(
         return addedRequire[cls]
             ?: cls.findAnnotation<Requires>()?.let { a -> listOf(FactoryDiscoverable.Require(a.target, a.version)) }
             ?: cls.findAnnotation<Requirements>()?.value?.map { a -> FactoryDiscoverable.Require(a.target, a.version) }
-                ?.also { addedRequire[cls] = it }
+            ?.also { addedRequire[cls] = it }
     }
 
     override suspend fun start() {

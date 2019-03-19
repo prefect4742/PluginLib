@@ -66,9 +66,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
 
-    api "com.prefect47:pluginlib_annotations:$annotations_version"
-
+    implementation "com.prefect47:pluginlib_annotations:$annotations_version"
     compileOnly "com.prefect47:pluginlib_annotationprocessor:$ap_version"
+
     kapt "com.prefect47:pluginlib_annotationprocessor:$ap_version"
     annotationProcessor "com.prefect47:pluginlib_annotationprocessor:$ap_version"
 

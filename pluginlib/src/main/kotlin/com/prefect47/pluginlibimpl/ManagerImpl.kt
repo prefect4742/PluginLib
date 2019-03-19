@@ -73,10 +73,14 @@ class ManagerImpl(
     // Lazily load this so it doesn't have any effect on devices without discoverables.
     private val parentClassLoader: ClassLoaderFilterInternal by lazy {
         val filter = ClassLoaderFilterInternal(this::class.java.classLoader!!)
+
+        /* Returning true from a filter that a discoverable is allowed to load that class from the library. This
+         * includes using reflection and so we have to be careful.
+         * Since we use the classloaders of the discoverables ourselves to look up annotations, those have to be
+         * allowed. */
         filter.filters.add { name ->
-            name.startsWith("com.prefect47.pluginlib")/* &&
-                    !name.startsWith("com.prefect47.pluginlib.discoverables.plugin") &&
-                    !name.startsWith("com.prefect47.pluginlib.ui")*/
+            name.startsWith("com.prefect47.pluginlib")
+                    && !name.startsWith("com.prefect47.pluginlib.annotations")
         }
         filter
     }
@@ -279,7 +283,7 @@ class ManagerImpl(
         parentClassLoader.filters.add(filter)
     }
 
-        // This allows discoverables to include any libraries or copied code they want by only including
+    // This allows discoverables to include any libraries or copied code they want by only including
     // classes from the plugin library.
     private class ClassLoaderFilterInternal(val base: ClassLoader) : ClassLoader(getSystemClassLoader()) {
         val filters = ArrayList<(String) -> Boolean>()

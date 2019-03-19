@@ -53,21 +53,13 @@ class VersionInfo(private val control: Control, private val factoryManager: Fact
             return
         }
 
-        // Most discoverables will only implement one interface and have one Requires
-        // Otherwise they might have more than one Requirements
-        // If these are not present, treat the class as a ProvidesInterface and if that exists, check for
-        // DependsOn/Dependencies.
-        cls.findAnnotation<Requires>()?.let { a -> versions[a.target] =
-            Version(a.version, required)
+        // Fallback for interface providers that have no factory.
+        control.debug("addClass($cls) reflection fallback, consider generating a factory" )
+        cls.findAnnotation<ProvidesInterface>()?.let {
+            a -> versions[cls] = Version(a.version, true)
+            cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
+                ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
         }
-            ?: cls.findAnnotation<Requirements>()?.value?.forEach { versions[it.target] =
-                Version(it.version, required)
-            }
-            ?: cls.findAnnotation<ProvidesInterface>()?.let { a ->
-                versions[cls] = Version(a.version, true)
-                cls.findAnnotation<DependsOn>()?.let { d -> addClass(d.target, true) }
-                    ?: cls.findAnnotation<Dependencies>()?.value?.forEach { addClass(it.target, true) }
-            }
     }
 
     @Throws(InvalidVersionException::class)

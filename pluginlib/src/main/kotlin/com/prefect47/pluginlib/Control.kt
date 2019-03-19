@@ -62,8 +62,10 @@ interface Control {
     //suspend fun stopPlugin(plugin: Plugin)
 
     /**
-     * Add a [filter] to the plugin classloader that lets discoverables use libraries or code where class names might
-     * conflict with those of the app.
+     * Add a [filter] to the discoverable classloaders that lets discoverables use libraries or code where class names
+     * might conflict with those of the app or this library.
+     * Returning true from a filter that a discoverable is allowed to load that class from the app. This includes using
+     * reflection, so be careful.
      */
     fun addClassFilter(filter: (String) -> Boolean)
 

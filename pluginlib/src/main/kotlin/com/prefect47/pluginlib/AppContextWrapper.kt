@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016 The Android Open Source Project
  * Copyright (C) 2018 Niklas Brunlid
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -14,15 +15,12 @@
 
 package com.prefect47.pluginlib
 
-import androidx.fragment.app.FragmentActivity
-import com.prefect47.pluginlib.di.PluginLibraryDI
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.SharedPreferences
 
-object PluginLibrary {
-    const val ARG_CLASSNAME = "pluginClassName"
-
-    fun init(activity: FragmentActivity) {
-        PluginLibraryDI.init(activity)
+class AppContextWrapper(base: Context) : ContextWrapper(base) {
+    override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
+        throw IllegalAccessException("Plugins can't access the applications SharedPreferences")
     }
-
-    fun getControl() = PluginLibraryDI.component.getControl()
 }

@@ -7,11 +7,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
-import com.prefect47.pluginlib.PluginLibrary
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
-import com.prefect47.pluginlibimpl.di.PluginLibraryDI
-import com.prefect47.pluginlibimpl.ui.PluginEditTextPreferenceDialogFragment
-import com.prefect47.pluginlibimpl.ui.PluginPreferenceAdapter
+import com.prefect47.pluginlib.di.PluginLibraryDI
+import com.prefect47.pluginlib.ui.preference.adapter.PluginPreferenceAdapter
 import com.prefect47.pluginlib.discoverables.plugin.*
 import java.lang.IllegalArgumentException
 
@@ -32,7 +30,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     private var activityResultHandler: ActivityResultHandler? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        val className = arguments!!.getString(PluginLibrary.ARG_CLASSNAME)
+        val className = arguments!!.getString(com.prefect47.pluginlib.PluginLibrary.ARG_CLASSNAME)
         pluginInfo = PluginLibraryDI.component.getControl().pluginManager[className!!]!!
 
         prefs = PluginLibraryDI.component.getDataStoreManager().getPreferenceDataStore(pluginInfo)
@@ -84,7 +82,7 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
     }
 
     internal fun startActivityForResult(handler: ActivityResultHandler, intent: Intent?, requestCode: Int,
-            options: Bundle?) {
+                                        options: Bundle?) {
         activityResultHandler = handler
         super.startActivityForResult(intent, requestCode, options)
     }

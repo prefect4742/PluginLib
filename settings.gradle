@@ -1,1 +1,1 @@
-include ':pluginlib'
+include ':pluginlib', ':pluginlib_api'

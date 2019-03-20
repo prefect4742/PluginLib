@@ -5,7 +5,7 @@ import android.view.View
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreferenceCompat
 import com.prefect47.pluginlib.R
-import com.prefect47.pluginlibimpl.di.PluginLibraryDI
+import com.prefect47.pluginlib.di.PluginLibraryDI
 import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore

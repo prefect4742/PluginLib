@@ -2,8 +2,12 @@
 
 buildscript {
     ext {
-        ap_version = '0.1.5'
-        annotations_version = '0.1.3'
+        versionMajor = 0
+        versionMinor = 3
+        versionPatch = 0
+
+        ap_version = '0.1.6'
+        annotations_version = '0.1.4'
         androidx_ktx_version = '1.1.0-alpha05'
         androidx_version = '1.1.0-alpha04'
         androidx_arch_version = '2.0.0'
@@ -19,7 +23,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -29,6 +33,8 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.17'
         classpath 'org.jetbrains.dokka:dokka-gradle-plugin:0.9.17'
+
+        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
     }
 }
 
@@ -40,6 +46,9 @@ allprojects {
             url  "http://dl.bintray.com/prefect4742/maven"
         }
     }
+
+    apply plugin: 'nebula.lint'
+    gradleLint.rules = ['unused-dependency']
 }
 
 task clean(type: Delete) {

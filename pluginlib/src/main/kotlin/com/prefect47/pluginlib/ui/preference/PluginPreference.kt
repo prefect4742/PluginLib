@@ -14,7 +14,8 @@ open class PluginPreference @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.pluginPreferenceStyle,
     defStyleRes: Int = R.style.PluginPreference
-): Preference(context, attrs, defStyleAttr, defStyleRes), PluginPreferencesFragment.ActivityResultHandler {
+): Preference(context, attrs, defStyleAttr, defStyleRes),
+    PluginPreferencesFragment.ActivityResultHandler {
 
     internal lateinit var parentFragment: PluginPreferencesFragment
 

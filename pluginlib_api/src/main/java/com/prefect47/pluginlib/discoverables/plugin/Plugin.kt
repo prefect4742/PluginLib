@@ -19,6 +19,7 @@ package com.prefect47.pluginlib.discoverables.plugin
 import android.content.Context
 import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.Discoverable
+import com.prefect47.pluginlib.annotations.ProvidesInterface
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 
 /**
@@ -107,8 +108,10 @@ import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 */
 */
 
+@ProvidesInterface(version = Plugin.VERSION)
 interface Plugin: Discoverable {
     companion object {
+        const val VERSION = 1
         internal lateinit var control: Control
         //internal lateinit var prefs
         //private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }

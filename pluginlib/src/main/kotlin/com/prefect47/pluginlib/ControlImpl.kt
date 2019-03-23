@@ -1,6 +1,5 @@
 package com.prefect47.pluginlib
 
-//import com.prefect47.pluginlib.PluginLibProvidersImpl
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStoreManager
 import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import com.prefect47.pluginlib.discoverables.plugin.PluginManager
@@ -19,9 +18,9 @@ class ControlImpl @Inject constructor(
     private val started = StartedTracker()
 
     private val listeners = ArrayList<Control.StateListener>()
-    override val staticProviders = ArrayList<Providers>() /*.apply {
+    override val staticProviders = ArrayList<Providers>().apply {
         add(PluginLibProvidersImpl)
-    }*/
+    }
 
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.

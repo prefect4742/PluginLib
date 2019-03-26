@@ -8,5 +8,5 @@ interface Providers {
     val classMap: Map<String, KClass<*>>
     val providers: Map<KClass<*>, Provider>
     val dependencies: Map<KClass<*>, List<KClass<*>>>
-    val flags: Map<KClass<*>, Set<String>>
+    val flags: Map<KClass<*>, Map<KClass<*>, Int>>
 }

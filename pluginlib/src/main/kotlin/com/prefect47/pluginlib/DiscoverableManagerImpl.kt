@@ -166,13 +166,13 @@ class DiscoverableManagerImpl<T: Discoverable, I: DiscoverableInfo>(
         return String.format("%s@%s (action=%s)", this::class.simpleName, hashCode(), action)
     }
 
-    fun findFlags(cls: KClass<*>): Set<String> {
+    fun findFlags(cls: KClass<*>): Map<KClass<*>, Int> {
         control.staticProviders.forEach { list ->
             list.flags[cls]?.let {
                 return it
             }
         }
-        return emptySet()
+        return emptyMap()
     }
 
     inner class PluginHandler: CoroutineScope {

@@ -20,6 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep public class com.prefect47.pluginlib.** { public *; }
+
 # Kotlin
 -keep class kotlin.Metadata { *; }
 -dontnote kotlin.internal.PlatformImplementationsKt

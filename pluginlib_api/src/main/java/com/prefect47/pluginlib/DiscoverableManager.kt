@@ -29,7 +29,7 @@ interface DiscoverableManager<T: Discoverable, I: DiscoverableInfo> {
 
     val cls: KClass<out T>
     val discoverables: List<I>
-    val flags: Set<String>
+    val flags: Map<KClass<*>, Int>
 
     suspend fun loadAll()
     fun checkAndDisable(className: String): Boolean

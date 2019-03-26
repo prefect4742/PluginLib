@@ -51,6 +51,12 @@ interface Manager {
 
     fun dependsOn(discoverableInfo: DiscoverableInfo, cls: KClass<*>): Boolean
 
+    /**
+     * Get flags from annotations on the [cls] interface.
+     */
+    fun <T: Discoverable> getFlags(cls: KClass<T>, flagClass: KClass<*>): Int
+    fun getFlags(clsName: String, flagClass: KClass<*>): Int
+
     fun getClassLoader(sourceDir: String, pkg: String): ClassLoader
     fun handleWtfs()
 

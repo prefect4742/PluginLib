@@ -98,18 +98,6 @@ class PluginManagerImpl @Inject constructor(
         return get(factoryManager.findClass(clsName) as KClass<out Plugin>)
     }
 
-    override fun <T : Plugin> getFlags(pluginClass: KClass<T>): Set<String> {
-        started.assertStarted()
-        return list[pluginClass]?.discoverableManager?.flags ?: emptySet()
-    }
-
-    override fun getFlags(pluginClassName: String): Set<String> {
-        started.assertStarted()
-        return list.values.find {
-            it.discoverableManager.cls.qualifiedName == pluginClassName
-        }?.discoverableManager?.flags ?: emptySet()
-    }
-
     override suspend fun start() {
         if (control.debugEnabled) Log.d(TAG, "Starting")
         withContext(Dispatchers.Default) {

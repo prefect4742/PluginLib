@@ -32,6 +32,7 @@ import android.util.ArraySet
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.prefect47.pluginlib.DiscoverableInfo.Listener
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import dagger.Lazy
 import dalvik.system.PathClassLoader
@@ -45,17 +46,19 @@ import kotlin.reflect.KClass
  * @see Plugin
  */
 class ManagerImpl(
-    private val context: Context, private val control: Control, private val discoverablePrefs: DiscoverablePrefs,
-    private val factoryLazy: Lazy<DiscoverableManager.Factory>, defaultHandler: UncaughtExceptionHandler
+    private val context: Context, private val control: Control, private val factoryManagerLazy: Lazy<FactoryManager>,
+    private val discoverablePrefs: DiscoverablePrefs, private val factoryLazy: Lazy<DiscoverableManager.Factory>,
+    defaultHandler: UncaughtExceptionHandler
 ) : BroadcastReceiver(), Manager {
 
     class Factory @Inject constructor(
-        private val context: Context, private val control: Control, private val discoverablePrefs: DiscoverablePrefs,
-        private val factoryLazy: Lazy<DiscoverableManager.Factory>
+        private val context: Context, private val control: Control, private val factoryManagerLazy: Lazy<FactoryManager>,
+        private val discoverablePrefs: DiscoverablePrefs, private val factoryLazy: Lazy<DiscoverableManager.Factory>
     ): Manager.Factory {
         override fun create(defaultHandler: Thread.UncaughtExceptionHandler) = ManagerImpl(
             AppContextWrapper(context),
             control,
+            factoryManagerLazy,
             discoverablePrefs,
             factoryLazy,
             defaultHandler
@@ -90,6 +93,7 @@ class ManagerImpl(
     // We need to get() this double-lazily since we can't call it in the constructor since that would introduce a
     // circular call loop and exhaust the stack.
     private val factory: DiscoverableManager.Factory by lazy { factoryLazy.get() }
+    private val factoryManager: FactoryManager by lazy { factoryManagerLazy.get() }
 
     init {
         val uncaughtExceptionHandler = PluginExceptionHandler(defaultHandler)
@@ -294,6 +298,13 @@ class ManagerImpl(
         return false
         */
     }
+
+    override fun <T: Discoverable> getFlags(cls: KClass<T>, flagClass: KClass<*>) =
+        discoverableManagerMap.values.find { it.cls == cls }?.flags?.get(flagClass) ?: 0
+
+    @Suppress("UNCHECKED_CAST")
+    override fun getFlags(clsName: String, flagClass: KClass<*>) =
+        getFlags(factoryManager.findClass(clsName) as KClass<out Discoverable>, flagClass)
 
     override fun handleWtfs() {
         if (!isWtfsSet) {

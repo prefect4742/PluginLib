@@ -42,10 +42,4 @@ interface PluginManager {
      */
     operator fun <T: Plugin> get(cls: KClass<T>): PluginInfo<T>?
     operator fun get(clsName: String): PluginInfo<out Plugin>?
-
-    /**
-     * Get flags from annotations on the [pluginClass] interface.
-     */
-    fun <T: Plugin> getFlags(pluginClass: KClass<T>): Set<String>
-    fun getFlags(pluginClassName: String): Set<String>
 }

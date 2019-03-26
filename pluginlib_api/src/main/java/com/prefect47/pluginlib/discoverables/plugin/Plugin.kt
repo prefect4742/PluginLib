@@ -121,7 +121,7 @@ interface Plugin: Discoverable {
          * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
          * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
          */
-        const val FLAG_ALLOW_SIMULTANEOUS_USE = "allowSimultaneousUse"
+        const val FLAG_ALLOW_SIMULTANEOUS_USE = 1
     }
 
     // TODO: Clean up this class.

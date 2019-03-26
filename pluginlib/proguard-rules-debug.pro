@@ -25,3 +25,5 @@
 -dontnote kotlin.internal.PlatformImplementationsKt
 -dontnote kotlin.reflect.jvm.internal.**
 -dontnote kotlin.coroutines.jvm.internal.DebugMetadataKt
+
+-dontobfuscate

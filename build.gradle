@@ -4,9 +4,9 @@ buildscript {
     ext {
         versionMajor = 0
         versionMinor = 3
-        versionPatch = 1
+        versionPatch = 2
 
-        ap_version = '0.1.7'
+        ap_version = '0.1.8'
         annotations_version = '0.1.5'
         androidx_ktx_version = '1.1.0-alpha05'
         androidx_version = '1.1.0-alpha04'

@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.EditText
 import androidx.preference.EditTextPreferenceDialogFragmentCompat
 import com.prefect47.pluginlib.PluginLibrary
-import com.prefect47.pluginlib.di.PluginLibraryDI
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 

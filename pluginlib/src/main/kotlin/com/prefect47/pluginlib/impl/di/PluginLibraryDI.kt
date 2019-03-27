@@ -12,17 +12,16 @@
  * permissions and limitations under the License.
  */
 
-package com.prefect47.pluginlib
+package com.prefect47.pluginlib.impl.di
 
 import androidx.fragment.app.FragmentActivity
-import com.prefect47.pluginlib.impl.di.PluginLibraryDI
+import com.prefect47.pluginlib.impl.di.component.DaggerPluginLibraryComponent
+import com.prefect47.pluginlib.impl.di.component.PluginLibraryComponent
 
-object PluginLibrary {
-    const val ARG_CLASSNAME = "pluginClassName"
+internal object PluginLibraryDI {
+    lateinit var component: PluginLibraryComponent
 
-    fun init(activity: FragmentActivity) {
-        PluginLibraryDI.init(activity)
+    internal fun init(activity: FragmentActivity) {
+        component = DaggerPluginLibraryComponent.builder().activity(activity).build()
     }
-
-    fun getControl() = PluginLibraryDI.component.getControl()
 }

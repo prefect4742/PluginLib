@@ -59,7 +59,6 @@ class PluginDiscoverableInfoImpl (
                 cls as KClass<out Plugin>,
                 component,
                 metadata,
-                //version,
                 pluginInfoFactory
             )
         }

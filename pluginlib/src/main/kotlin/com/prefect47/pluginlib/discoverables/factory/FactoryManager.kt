@@ -1,5 +1,6 @@
 package com.prefect47.pluginlib.discoverables.factory
 
+import com.prefect47.pluginlib.Discoverable
 import kotlin.reflect.KClass
 
 /**
@@ -16,5 +17,6 @@ interface FactoryManager {
     fun findClass(className: String): KClass<*>?
     fun findRequirements(cls: KClass<*>): List<FactoryDiscoverable.Require>?
 
+    fun <T: Discoverable> createInstance(cls: KClass<T>): T?
     //TODO: Methods for looking up everything should be placed here, for use by PluginInfo, DiscoverableManager and VersionInfo
 }

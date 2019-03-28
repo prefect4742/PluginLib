@@ -20,6 +20,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import com.prefect47.pluginlib.DiscoverableInfo
 
 interface PluginInfo<T: Plugin>: com.prefect47.pluginlib.datastore.PluginPreferenceDataStore.OnPluginPreferenceDataStoreChangeListener {
     companion object {
@@ -36,10 +37,11 @@ interface PluginInfo<T: Plugin>: com.prefect47.pluginlib.datastore.PluginPrefere
 
     val pluginContext: Context
     val data: Bundle
+    val discoverableInfo: DiscoverableInfo
     val component: ComponentName
 
-    fun start(): T
-    fun stop()
+    suspend fun start(): T
+    suspend fun stop()
 
     /** Check if the meta-data for the plugin type declares contains the given key **/
     fun containsKey(key: String): Boolean

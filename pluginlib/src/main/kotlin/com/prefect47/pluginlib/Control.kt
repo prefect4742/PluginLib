@@ -54,9 +54,6 @@ interface Control {
     fun resume()
     fun stop()
 
-    //suspend fun startPlugin(plugin: Plugin)
-    //suspend fun stopPlugin(plugin: Plugin)
-
     /**
      * Add a [filter] to the discoverable classloaders that lets discoverables use libraries or code where class names
      * might conflict with those of the app or this library.

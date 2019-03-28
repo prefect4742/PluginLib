@@ -19,23 +19,29 @@ import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
+import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
+import com.prefect47.pluginlib.discoverables.factory.FactoryManager
 import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.discoverables.plugin.PluginDiscoverableInfo
 import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.discoverables.plugin.PluginManager
 import dagger.Lazy
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class PluginInfoImpl<T: Plugin> (
-    private val discoverableInfo: PluginDiscoverableInfo
+    override val discoverableInfo: PluginDiscoverableInfo,
+    private val pluginManager: PluginManager,
+    private val factoryManager: FactoryManager
 ): PluginInfo<T> {
 
-    class Factory @Inject constructor(val pluginManagerLazy: Lazy<PluginManager>
+    class Factory @Inject constructor(
+        private val pluginManagerLazy: Lazy<PluginManager>, private val factoryManager: FactoryManager
     ): PluginInfoFactory {
         private val pluginManager: PluginManager by lazy { pluginManagerLazy.get() }
         override fun <T : Plugin> create(discoverableInfo: PluginDiscoverableInfo): PluginInfo<T> {
-            val info = PluginInfoImpl<T>(discoverableInfo)
+            val info = PluginInfoImpl<T>(discoverableInfo, pluginManager, factoryManager)
             pluginManager.hooks.forEach { it.onPluginInfoCreated(info) }
             return info
         }
@@ -48,6 +54,8 @@ class PluginInfoImpl<T: Plugin> (
     override val pluginContext = discoverableInfo.context
     override val component = discoverableInfo.component
     override val data = Bundle()
+
+    private var instance: T? = null
 
     override fun containsKey(key: String) = discoverableInfo.metadata.containsKey(key)
 
@@ -73,11 +81,30 @@ class PluginInfoImpl<T: Plugin> (
         Log.w(TAG, "pluginInfo.onDataStorePreferenceChanged NOT IMPLEMENTED")
     }
 
-    override fun start(): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    @Suppress("UNCHECKED_CAST")
+    override suspend fun start(): T {
+        if (instance != null) throw IllegalStateException(
+            "Attempted to start an already started plugin instance ${component.className}")
+
+        val discoverable = factoryManager.createInstance(discoverableInfo.cls)
+            ?: throw IllegalStateException("Failed to start plugin instance ${component.className}")
+
+        instance = discoverable as T
+        pluginManager.pluginInfoMap[instance!!] = this
+        withContext(Dispatchers.Main) {
+            instance!!.onCreate()
+        }
+
+        return instance!!
     }
 
-    override fun stop() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun stop() {
+        if (instance == null) throw IllegalStateException(
+            "Attempted to stop a not started plugin instance ${component.className}")
+        withContext(Dispatchers.Main) {
+            instance!!.onDestroy()
+        }
+        pluginManager.pluginInfoMap.remove(instance!!)
+        instance = null
     }
 }

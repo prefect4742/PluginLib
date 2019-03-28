@@ -2,6 +2,7 @@ package com.prefect47.pluginlib.impl.discoverables.factory
 
 import android.util.Log
 import com.prefect47.pluginlib.Control
+import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.DiscoverableManager
 import com.prefect47.pluginlib.Manager
 import com.prefect47.pluginlib.annotations.Requirements
@@ -78,6 +79,11 @@ class FactoryManagerImpl @Inject constructor(
             ?: cls.findAnnotation<Requires>()?.let { a -> listOf(FactoryDiscoverable.Require(a.target, a.version)) }
             ?: cls.findAnnotation<Requirements>()?.value?.map { a -> FactoryDiscoverable.Require(a.target, a.version) }
             ?.also { addedRequire[cls] = it }
+    }
+
+    override fun <T : Discoverable> createInstance(cls: KClass<T>): T? {
+        factories.forEach { factory -> factory.createInstance<T>(cls)?.let { return it } }
+        return null
     }
 
     override suspend fun start() {

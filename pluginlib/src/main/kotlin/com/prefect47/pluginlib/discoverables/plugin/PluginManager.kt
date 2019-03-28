@@ -16,7 +16,7 @@ interface PluginManager {
         fun onPluginInfoCreated(pluginInfo: PluginInfo<out Plugin>)
     }
 
-    val discoverableInfoMap: MutableMap<Plugin, PluginDiscoverableInfo>
+    val pluginInfoMap: MutableMap<Plugin, PluginInfo<out Plugin>>
 
     val list: Map<KClass<out Plugin>, PluginList<out Plugin>>
 

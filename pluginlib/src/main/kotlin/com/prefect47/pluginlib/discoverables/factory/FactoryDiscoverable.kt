@@ -1,7 +1,6 @@
 package com.prefect47.pluginlib.discoverables.factory
 
 import com.prefect47.pluginlib.Discoverable
-import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.annotations.ProvidesInterface
 import kotlin.reflect.KClass
 
@@ -14,7 +13,7 @@ interface FactoryDiscoverable: Discoverable {
     data class Require(val target: KClass<*>, val version: Int)
 
     val classMap: Map<String, KClass<*>>
-    fun <T: Plugin> createInstance(cls: KClass<out Plugin>): T?
+    fun <T: Discoverable> createInstance(cls: KClass<out Discoverable>): T?
 
     val requirements: Map<KClass<*>, List<Require>>
 }

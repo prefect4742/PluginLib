@@ -28,7 +28,7 @@ class PluginManagerImpl @Inject constructor(
         const val TAG = "PluginManager"
     }
 
-    override val discoverableInfoMap = HashMap<Plugin, PluginDiscoverableInfo>()
+    override val pluginInfoMap = HashMap<Plugin, PluginInfo<out Plugin>>()
 
     override val hooks = ArrayList<PluginInfoHook>()
 

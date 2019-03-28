@@ -17,9 +17,9 @@
 package com.prefect47.pluginlib.discoverables.plugin
 
 import android.content.Context
-import com.prefect47.pluginlib.Control
 import com.prefect47.pluginlib.Discoverable
 import com.prefect47.pluginlib.annotations.ProvidesInterface
+import com.prefect47.pluginlib.impl.di.PluginLibraryDI
 
 /**
  * Plugins are separate APKs that are expected to implement interfaces
@@ -111,10 +111,6 @@ import com.prefect47.pluginlib.annotations.ProvidesInterface
 interface Plugin: Discoverable {
     companion object {
         const val VERSION = 1
-        internal lateinit var control: Control
-        //internal lateinit var prefs
-        //private val manager: Manager by lazy { PluginLibraryDI.component.getManager() }
-        //private val prefsManager: PluginPreferenceDataStoreManager by lazy { PluginLibraryDI.component.getDataStoreManager() }
 
         /**
          * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
@@ -123,56 +119,21 @@ interface Plugin: Discoverable {
         const val FLAG_ALLOW_SIMULTANEOUS_USE = 1
     }
 
-    // TODO: Clean up this class.
-    // TODO: Much is now in Discoverable.
-    // TODO: A Plugin shall be a runnable entity, so one PluginInfo shall map to one Plugin.
-    // TODO: And one PluginDiscoverableInfo shall map to multiple PluginInfo.
-
-
-    /*
-    /**
-     * Behavioral flags that apply to the Plugin type.
-     * Declare these as a companion object member EnumSet called "FLAGS" in your Plugin class interface.
-     */
-    enum class Flag {
-        /**
-         * Allow multiple implementations of this plugin to be used at the same time. This is just for convenience
-         * and will be used in for example the PluginListCategory to choose between single choice and multi choice.
-         */
-        ALLOW_SIMULTANEOUS_USE
-    }
-    */
-
-    /*
-    val className: String
-        get() = this::class.qualifiedName!!
-    val pkgName: String
-        get() = manager.discoverableInfoMap[this]!!.component.packageName
-    */
     val pluginContext: Context
-        get() = (control.pluginManager.discoverableInfoMap[this]!!).context
+        get() = (PluginLibraryDI.component.getControl().pluginManager.pluginInfoMap[this]!!).pluginContext
     val applicationContext: Context
-        get() = control.manager.getApplicationContext()
+        get() = PluginLibraryDI.component.getControl().manager.getApplicationContext()
 
-    // Called when plugin is loaded, either at app start or when an plugin is installed while app is running.
-    // pluginContext and applicationContext is available until onDestroy is called.
+    // Called when an instance of plugin is started.
+    // pluginContext and applicationContext is available until onDestroy has been called.
     fun onCreate() {}
 
-    // Called when app shuts down, or if APK containing the plugin is uninstalled while app is running.
+    // Called when instance of plugin is stopped.
     fun onDestroy() {}
 
-    // Called when app wishes to use the plugin.
-    // preferenceDataStore is available until onStop is called.
-    fun onStart() {}
-
-    // Called when app wishes to stop using the plugin.
-    // preferenceDataStore may no longer be valid (for example if the app implements a PluginPreferenceDataStoreProvider
-    // and has invalidated any currently used PluginPreferenceDataStore discoverables).
-    fun onStop() {}
-
     val preferenceDataStore: com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
-        get() = control.preferenceDataStoreManager.getPreferenceDataStore(
-            control.pluginManager.discoverableInfoMap[this]!!)
+        get() = PluginLibraryDI.component.getControl().preferenceDataStoreManager.getPreferenceDataStore(
+            PluginLibraryDI.component.getControl().pluginManager.pluginInfoMap[this]!!)
 
     // Called when app calls PreferenceDataStoreManager.invalidate(). This can happen if the app implements a
     // PreferenceDataStoreProvider and wishes all its discoverables to switch to another set of preferences.

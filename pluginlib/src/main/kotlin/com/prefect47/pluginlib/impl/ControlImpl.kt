@@ -77,20 +77,4 @@ class ControlImpl @Inject constructor(
     override fun stop() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    /*
-    override suspend fun startPlugin(plugin: Plugin) {
-        started.assertStarted()
-        withContext(Dispatchers.Main) {
-            plugin.onStart()
-        }
-    }
-
-    override suspend fun stopPlugin(plugin: Plugin) {
-        started.assertStarted()
-        withContext(Dispatchers.Main) {
-            plugin.onStop()
-        }
-    }
-    */
 }

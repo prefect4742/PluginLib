@@ -20,28 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.prefect47.pluginlib.annotations.** { *; }
--keep interface com.prefect47.pluginlib.annotations.** { *; }
--keep class com.prefect47.pluginlib.datastore.** { *; }
--keep interface com.prefect47.pluginlib.datastore.** { *; }
--keep class com.prefect47.pluginlib.discoverables.** { *; }
--keep interface com.prefect47.pluginlib.discoverables.** { *; }
--keep class com.prefect47.pluginlib.ui.** { *; }
--keep class com.prefect47.pluginlib.*  { *; }
--keep interface com.prefect47.pluginlib.*  { *; }
--keep class androidx.preference.PreferenceDataStore { public *; }
--keep class androidx.preference.PreferenceFragmentCompat { public *; }
-
--keep class javax.annotation.processing.** { *; }
-
-#-dontwarn androidx.**
-#-keep class androidx.** { *; }
-#-keep interface androidx.** { *; }
-
-# Kotlin
--keep class kotlin.Metadata { *; }
--dontnote kotlin.internal.PlatformImplementationsKt
--dontnote kotlin.reflect.jvm.internal.**
--dontnote kotlin.coroutines.jvm.internal.DebugMetadataKt
-
 -dontobfuscate

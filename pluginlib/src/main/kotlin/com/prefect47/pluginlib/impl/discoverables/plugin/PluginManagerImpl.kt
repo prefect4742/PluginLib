@@ -99,7 +99,7 @@ class PluginManagerImpl @Inject constructor(
     @Suppress("UNCHECKED_CAST")
     override fun get(clsName: String): PluginInfo<out Plugin>? {
         started.assertStarted()
-        return get(factoryManager.findClass(clsName) as KClass<out Plugin>)
+        return (factoryManager.findClass(clsName) as? KClass<out Plugin>)?.let { get(it) }
     }
 
     override suspend fun start() {

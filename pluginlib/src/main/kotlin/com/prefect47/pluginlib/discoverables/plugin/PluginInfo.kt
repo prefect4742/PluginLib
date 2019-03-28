@@ -40,6 +40,8 @@ interface PluginInfo<T: Plugin>: com.prefect47.pluginlib.datastore.PluginPrefere
     val discoverableInfo: DiscoverableInfo
     val component: ComponentName
 
+    val instance: T
+
     suspend fun start(): T
     suspend fun stop()
 

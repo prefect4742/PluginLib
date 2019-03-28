@@ -54,8 +54,10 @@ class PluginInfoImpl<T: Plugin> (
     override val pluginContext = discoverableInfo.context
     override val component = discoverableInfo.component
     override val data = Bundle()
+    override val instance: T
+        get() = innerInstance ?: throw IllegalStateException("Plugin not started: ${component.className}")
 
-    private var instance: T? = null
+    private var innerInstance: T? = null
 
     override fun containsKey(key: String) = discoverableInfo.metadata.containsKey(key)
 
@@ -83,28 +85,28 @@ class PluginInfoImpl<T: Plugin> (
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun start(): T {
-        if (instance != null) throw IllegalStateException(
+        if (innerInstance != null) throw IllegalStateException(
             "Attempted to start an already started plugin instance ${component.className}")
 
         val discoverable = factoryManager.createInstance(discoverableInfo.cls)
             ?: throw IllegalStateException("Failed to start plugin instance ${component.className}")
 
-        instance = discoverable as T
-        pluginManager.pluginInfoMap[instance!!] = this
+        innerInstance = discoverable as T
+        pluginManager.pluginInfoMap[innerInstance!!] = this
         withContext(Dispatchers.Main) {
-            instance!!.onCreate()
+            innerInstance!!.onCreate()
         }
 
-        return instance!!
+        return innerInstance!!
     }
 
     override suspend fun stop() {
-        if (instance == null) throw IllegalStateException(
+        if (innerInstance == null) throw IllegalStateException(
             "Attempted to stop a not started plugin instance ${component.className}")
         withContext(Dispatchers.Main) {
-            instance!!.onDestroy()
+            innerInstance!!.onDestroy()
         }
-        pluginManager.pluginInfoMap.remove(instance!!)
-        instance = null
+        pluginManager.pluginInfoMap.remove(innerInstance!!)
+        innerInstance = null
     }
 }

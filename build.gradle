@@ -4,7 +4,7 @@ buildscript {
     ext {
         versionMajor = 0
         versionMinor = 3
-        versionPatch = 2
+        versionPatch = 3
 
         ap_version = '0.1.9'
         annotations_version = '0.1.5'

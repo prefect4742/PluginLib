@@ -20,8 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.prefect47.pluginlib.annotations.** { public *; }
--keep public class com.prefect47.pluginlib.datastore.** { public *; }
--keep public class com.prefect47.pluginlib.discoverables.** { public *; }
--keep public class com.prefect47.pluginlib.ui.** { public *; }
--keep public class com.prefect47.pluginlib.*  { public *; }
+-keep,includedescriptorclasses public class com.prefect47.pluginlib.annotations.** { public *; }
+-keep,includedescriptorclasses public class com.prefect47.pluginlib.datastore.** { public *; }
+-keep,includedescriptorclasses public class com.prefect47.pluginlib.discoverables.** { public *; }
+-keep,includedescriptorclasses public class com.prefect47.pluginlib.ui.** { public *; }
+-keep,includedescriptorclasses public class com.prefect47.pluginlib.*  { public *; }

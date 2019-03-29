@@ -35,9 +35,7 @@ class FactoryDiscoverableInfoImpl (
 ): FactoryDiscoverableInfo {
 
     override val factory: FactoryDiscoverable by lazy {
-        val factoryClass = Class.forName(component.className).kotlin
-        val factory = factoryClass.objectInstance ?: factoryClass.createInstance()
-        factory as FactoryDiscoverable
+        cls.objectInstance ?: cls.createInstance()
     }
 
     class Factory: FactoryDiscoverableInfo.Factory {

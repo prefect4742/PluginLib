@@ -77,13 +77,11 @@ class ManagerImpl(
         val filter =
             ClassLoaderFilterInternal(this::class.java.classLoader!!)
 
-        /* Returning true from a filter that a discoverable is allowed to load that class from the library. This
-         * includes using reflection and so we have to be careful.
-         * Since we use the classloaders of the discoverables ourselves to look up annotations, those have to be
-         * allowed. */
+        /* Returning true from a filter means that a discoverable is not allowed to load that class from the library.
+         * This includes using reflection and so we have to be careful.
+         * Generally we want to hide the internal implementation of the library. */
         filter.filters.add { name ->
-            name.startsWith("com.prefect47.pluginlib")
-                    && !name.startsWith("com.prefect47.pluginlib.annotations")
+            name.startsWith("com.prefect47.pluginlib.impl")
         }
         filter
     }

@@ -18,6 +18,18 @@ class DiscoverableLayoutInflater(
     original: LayoutInflater, private val appContext: Context, private val dContext: Context
 ): LayoutInflater(dContext), LayoutInflater.Factory2 {
 
+    init {
+        factory2 = this
+    }
+
+    override fun setFactory(factory: Factory?) {
+        super.setFactory(factory)
+    }
+
+    override fun setFactory2(factory: Factory2?) {
+        super.setFactory2(factory)
+    }
+
     override fun cloneInContext(newContext: Context): LayoutInflater {
         return DiscoverableLayoutInflater(this, appContext, newContext)
     }

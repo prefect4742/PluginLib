@@ -26,11 +26,13 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatViewInflater
 import androidx.core.view.LayoutInflaterCompat
+import java.lang.reflect.Array
 import kotlin.reflect.full.declaredFunctions
 
 class DiscoverableContextWrapper(private val appContext: Context, base: Context, private val myClassLoader: ClassLoader,
                                  internal val pkg: String) : ContextWrapper(base) {
 
+    /*
     inner class MyRes: Resources(myAssetManager, appContext.resources.displayMetrics, appContext.resources.configuration) {
         override fun getDrawable(id: Int): Drawable {
             return super.getDrawable(id)
@@ -47,29 +49,42 @@ class DiscoverableContextWrapper(private val appContext: Context, base: Context,
         override fun getDrawableForDensity(id: Int, density: Int, theme: Theme?): Drawable? {
             return super.getDrawableForDensity(id, density, theme)
         }
+
+        override fun getText(id: Int): CharSequence {
+            return super.getText(id)
+        }
+
+        override fun getText(id: Int, def: CharSequence?): CharSequence {
+            return super.getText(id, def)
+        }
     }
+    */
 
     private val inflater: LayoutInflater by lazy {
         //AppCompatViewInflater().
-        //LayoutInflater.from(appContext).cloneInContext(this)
+        LayoutInflater.from(appContext).cloneInContext(this)
         /*
         val layoutInflater = DiscoverableLayoutInflater(this)
         LayoutInflaterCompat.setFactory2(layoutInflater, DiscoverableLayoutInflaterFactory(this))
         layoutInflater
         */
-        DiscoverableLayoutInflater(LayoutInflater.from(appContext), appContext, this)
+        //DiscoverableLayoutInflater(LayoutInflater.from(appContext), appContext, this)
     }
 
+    /*
     private val myAssetManager: AssetManager by lazy {
         val assetManager = AssetManager::class.java.newInstance()
+        val setApkAssets = assetManager::class.java.getMethod("setApkAssets", Array::class.java, Boolean::class.java)
         val addAssetPath = assetManager::class.java.getMethod("addAssetPath", String::class.java)
         val apkPath = packageResourcePath
         addAssetPath.invoke(assetManager, apkPath)
         assetManager
     }
+    */
 
     private val myResources: Resources by lazy {
-        MyRes()
+        packageManager.getResourcesForApplication(pkg)
+        //MyRes()
         /*
         val baseResources = appContext.resources
         Resources(myAssetManager, baseResources.displayMetrics, baseResources.configuration)
@@ -105,7 +120,12 @@ class DiscoverableContextWrapper(private val appContext: Context, base: Context,
     }
 
     override fun getTheme(): Resources.Theme {
-        return appContext.theme
+        return myResources.newTheme()
+        /*
+        packageManager.getApplicationInfo(pkg, PackageManager.GET_ACTIVITIES).
+        return appContext.theme.
+                resources.
+                */
     }
 
     override fun getSystemService(name: String): Any {
@@ -119,9 +139,12 @@ class DiscoverableContextWrapper(private val appContext: Context, base: Context,
         return myResources
     }
 
+    /*
     override fun getAssets(): AssetManager {
-        return myAssetManager
+        return myResources.assets
+        //return myAssetManager
     }
+    */
 
     override fun getSharedPreferences(name: String?, mode: Int): SharedPreferences? {
         //val handler = Dependency[Control::class].currentSharedPreferencesHandler

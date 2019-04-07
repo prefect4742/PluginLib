@@ -51,12 +51,12 @@ class PluginPreferencesFragment : PreferenceFragmentCompat() {
 
     override fun onResume() {
         super.onResume()
-        prefs.registerOnPluginPreferenceDataStoreChangeListener(pluginInfo)
+        prefs.addListener(pluginInfo)
     }
 
     override fun onPause() {
         super.onPause()
-        prefs.unregisterOnPluginPreferenceDataStoreChangeListener(pluginInfo)
+        prefs.removeListener(pluginInfo)
     }
 
     override fun onDisplayPreferenceDialog(preference: Preference?) {

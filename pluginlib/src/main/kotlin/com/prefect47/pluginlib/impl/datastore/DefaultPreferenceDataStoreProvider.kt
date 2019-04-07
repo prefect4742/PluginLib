@@ -57,7 +57,7 @@ class DefaultPreferenceDataStoreProvider(private val context: Context):
             cache[name] = newStore
             return newStore
         } else {
-            throw IllegalArgumentException("Unrecognized session key $key")
+            throw IllegalArgumentException("Unrecognized key $key")
         }
     }
 }

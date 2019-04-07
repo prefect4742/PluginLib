@@ -9,11 +9,11 @@ abstract class PluginPreferenceDataStore: PreferenceDataStore() {
         fun onDataStorePreferenceChanged(dataStore: PluginPreferenceDataStore, key: String)
     }
 
-    infix fun registerOnPluginPreferenceDataStoreChangeListener(listener: OnPluginPreferenceDataStoreChangeListener) {
+    infix fun addListener(listener: OnPluginPreferenceDataStoreChangeListener) {
         listeners.add(listener)
     }
 
-    infix fun unregisterOnPluginPreferenceDataStoreChangeListener(listener: OnPluginPreferenceDataStoreChangeListener) {
+    infix fun removeListener(listener: OnPluginPreferenceDataStoreChangeListener) {
         listeners.remove(listener)
     }
 

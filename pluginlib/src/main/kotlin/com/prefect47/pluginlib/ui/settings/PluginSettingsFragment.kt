@@ -12,6 +12,7 @@ open class PluginSettingsFragment : PluginFragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
+
         val layoutResId = pluginInfo.getInt(PluginSettings.FRAGMENTLAYOUT, R.layout.plugin_settings_fragment)
         return inflater.inflate(layoutResId!!, container, false)
     }

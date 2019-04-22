@@ -2,6 +2,8 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreferenceCompat
 import com.prefect47.pluginlib.R
@@ -10,8 +12,6 @@ import com.prefect47.pluginlib.discoverables.plugin.Plugin
 import com.prefect47.pluginlib.discoverables.plugin.PluginInfo
 import com.prefect47.pluginlib.datastore.PluginPreferenceDataStore
 import com.prefect47.pluginlib.discoverables.plugin.PluginSettings
-import kotlinx.android.synthetic.main.plugin_pref.view.*
-import kotlinx.android.synthetic.main.plugin_setting.view.*
 
 /**
  * Preference with plugin metadata. Turns on the settings button if plugin has a settings layout.
@@ -33,10 +33,10 @@ class PluginSingleListEntry(
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
-        holder.itemView.settings_frame?.let {
+        holder.itemView.findViewById<LinearLayout>(R.id.settings_frame)?.let {
             if (pluginInfo.containsKey(PluginSettings.PREFERENCES)) {
                 it.visibility = View.VISIBLE
-                it.settings_button?.setOnClickListener {
+                it.findViewById<Button>(R.id.settings_button)?.setOnClickListener {
                     PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo)
                 }
             } else {

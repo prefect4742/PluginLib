@@ -2,7 +2,6 @@ package com.prefect47.pluginlib.ui.preference
 
 import android.content.Context
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import androidx.preference.CheckBoxPreference
 import androidx.preference.PreferenceViewHolder
@@ -35,7 +34,7 @@ class PluginMultiListEntry(
         holder.itemView.findViewById<LinearLayout>(R.id.settings_frame)?.let {
             if (pluginInfo.containsKey(PluginSettings.PREFERENCES)) {
                 it.visibility = View.VISIBLE
-                it.findViewById<Button>(R.id.settings_button)?.setOnClickListener {
+                it.findViewById<View>(R.id.settings_button)?.setOnClickListener {
                     PluginLibraryDI.component.getControl().settingsHandler?.openSettings(pluginInfo)
                 }
             } else {

@@ -20,6 +20,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     // Avoid Kotlin docs error
     tasks.withType(Javadoc) {
         enabled = false
@@ -48,8 +52,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.google.android.material:material:1.0.0'
 
@@ -74,10 +78,10 @@ dependencies {
     annotationProcessor "com.prefect47:pluginlib_annotationprocessor:$ap_version"
 
     // Dagger2
-    implementation 'com.google.dagger:dagger-android:2.20'
-    implementation 'com.google.dagger:dagger-android-support:2.20' // if you use the support libraries
-    kapt 'com.google.dagger:dagger-android-processor:2.20'
-    kapt 'com.google.dagger:dagger-compiler:2.20'
+    implementation 'com.google.dagger:dagger-android:2.25.2'
+    implementation 'com.google.dagger:dagger-android-support:2.25.2' // if you use the support libraries
+    kapt 'com.google.dagger:dagger-android-processor:2.25.2'
+    kapt 'com.google.dagger:dagger-compiler:2.25.2'
 }
 
 if (rootProject.file('release-bintray.gradle').exists()) {
